@@ -1,0 +1,32 @@
+{
+  "name": "morgan",
+  "description": "connect's logger for node.js",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jonathan Ong",
+    "email": "me@jongleberry.com",
+    "url": "http://jongleberry.com",
+    "twitter": "https://twitter.com/jongleberry"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/expressjs/morgan.git"
+  },
+  "bugs": {
+    "mail": "me@jongleberry.com",
+    "url": "https://github.com/expressjs/morgan/issues"
+  },
+  "dependencies": {
+    "bytes": "~0.2.0"
+  },
+  "devDependencies": {
+    "connect": "*",
+    "mocha": "*",
+    "should": "*",
+    "supertest": "*"
+  },
+  "scripts": {
+    "test": "make test"
+  }
+}
