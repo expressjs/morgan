@@ -49,6 +49,16 @@ var defaultBufferDuration = 1000;
  *   - `immediate`  Write log line on request instead of response (for response times)
  *   - `skip`    Function to determine if logging is skipped, called as
  *               `skip(req, res)`, defaults to always false.
+ *   - `redirect_console`  Bits. Each of the low-order four bits represents a
+ *                         console debugging function to redirect to the log
+ *                         stream:
+ *                           bit 0x01 : redirect console.log
+ *                           bit 0x02 : redirect console.debug
+ *                           bit 0x04 : redirect console.warn
+ *                           bit 0x08 : redirect console.error
+ *                         In each case in which a console debugging function
+ *                         is redirected to the log stream, the console
+ *                         function name is prefixed to the written arguments.
  *
  * Tokens:
  *
@@ -266,6 +276,31 @@ exports = module.exports = function logger(options) {
         // Write the data to the stream (unbuffered)
         realStream.write(str);
       }
+    };
+  }
+
+  // If requested, redirect console.* debugging functions to the log stream
+  if (options.redirect_console){
+    console = console || {};
+  }
+  if (options.redirect_console & 0x01) {
+    console.log = function(){
+      stream.write("(log) " + [].join.call(arguments, " ") + "\n");
+    };
+  }
+  if (options.redirect_console & 0x02) {
+    console.debug = function(){
+      stream.write("(debug) " + [].join.call(arguments, " ") + "\n");
+    };
+  }
+  if (options.redirect_console & 0x04) {
+    console.warn = function(){
+      stream.write("(warn) " + [].join.call(arguments, " ") + "\n");
+    };
+  }
+  if (options.redirect_console & 0x08) {
+    console.error = function(){
+      stream.write("(error) " + [].join.call(arguments, " ") + "\n");
     };
   }
 
