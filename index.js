@@ -9,7 +9,10 @@
  * Module dependencies.
  */
 
-var bytes = require('bytes');
+var path = require('path');
+var fs = require('fs');
+require('stream');
+
 
 /*!
  * Default log buffer duration.
@@ -25,11 +28,23 @@ var defaultBufferDuration = 1000;
  * Options:
  *
  *   - `format`  Format string, see below for tokens
- *   - `stream`  Output stream, defaults to _stdout_
+ *   - `stream`  Output stream, defaults to _stdout_ unless logdir is given
+ *   - `logdir`  Directory in which to place rotating logs
+ *   - `retaindays` Number of days to retain log files, default 14
  *   - `buffer`  Buffer duration, defaults to 1000ms when _true_
  *   - `immediate`  Write log line on request instead of response (for response times)
  *   - `skip`    Function to determine if logging is skipped, called as
  *               `skip(req, res)`, defaults to always false.
+ *   - `redirect_console`  Bits. Each of the low-order four bits represents a
+ *                         console debugging function to redirect to the log
+ *                         stream:
+ *                           bit 0x01 : redirect console.log
+ *                           bit 0x02 : redirect console.debug
+ *                           bit 0x04 : redirect console.warn
+ *                           bit 0x08 : redirect console.error
+ *                         In each case in which a console debugging function
+ *                         is redirected to the log stream, the console
+ *                         function name is prefixed to the written arguments.
  *
  * Tokens:
  *
@@ -105,14 +120,98 @@ exports = module.exports = function logger(options) {
   // compile format
   if ('function' != typeof fmt) fmt = compile(fmt);
 
-  // options
+  //
+  // Allow for rotating log files in a given directory.
+  //
+  var logTime;
+  
+  // One day, in milliseconds
+  var DAY = 1000 * 60 * 60 * 24;
+  
+  // Function to generate the filename for a log which begins "now", and open
+  // a stream to that file. If this function just happens to be called twice
+  // in a single millisecond, we append to the existing file rather than
+  // overwriting it. Presumably that will never occur.
+  function createLogStream()
+  {
+    // Generate the file name in the given log directory. The file name is of
+    // the form, 2014-03-27T09:29:37.023
+    logTime = new Date();
+    var filename = 
+      options.logdir + path.sep +
+      logTime.getUTCFullYear() + "-" +
+      ("0" + (logTime.getUTCMonth() + 1)).substr(-2) + "-" +
+      ("0" + logTime.getUTCDate()).substr(-2) + "T" +
+      ("0" + logTime.getUTCHours()).substr(-2) + ":" +
+      ("0" + logTime.getUTCMinutes()).substr(-2) + ":" +
+      ("0" + logTime.getUTCSeconds()).substr(-2) + "." +
+      ("00" + logTime.getUTCMilliseconds()).substr(-3);
+    
+    // Create a stream to write (or append) to the file
+    return fs.createWriteStream(filename, { flags : 'w+' });
+  }
+
+  // Function to rotate log files. Any files older than the number of days
+  // specified by options.retaindays are removed.
+  function rotateLogs()
+  {
+    var now = Date.now();
+    
+    // Get a list of files in the log directory.
+    fs.readdir(
+      options.logdir,
+      function(err, files)
+      {
+        // If there was an error, we'll try rotating again later
+        if (err){
+          return;
+        }
+        
+        // Remove any files which are too old
+        files.forEach(
+          function(name)
+          {
+            var fileTimestamp;
+            
+            // The name should be in the format described in
+            // createLogStream(). Parse that date format.
+            fileTimestamp = new Date(name);
+            
+            // Is the file older than the number of days we've been told we
+            // are to retain files for?
+            var expires = 
+              new Date(fileTimestamp.getTime() + (DAY * options.retaindays));
+            if (expires.getTime() < now){
+              
+              // Yup. Remove this file. Ignore errors.
+              fs.unlink(options.logdir + path.sep + name);
+            }
+          });
+      });
+  }
+
+  // See if a log directory is specified.
+  if (options.logdir){
+    // It is. First, set default options.
+    if (typeof options.retaindays == "undefined"){
+      options.retaindays = 14;
+    }
+  
+    // Rotate logs to get rid of any old log files
+    rotateLogs();
+    
+    // Open the initial logging stream in the specified directory
+    options.stream = createLogStream();
+  }
+
+  // additional options
   var stream = options.stream || process.stdout
-    , buffer = options.buffer;
+    , buffer = options.buffer
+    , realStream = stream;
 
   // buffering support
   if (buffer) {
-    var realStream = stream
-      , buf = []
+    var buf = []
       , interval = 'number' == typeof buffer
         ? buffer
         : defaultBufferDuration;
@@ -120,6 +219,19 @@ exports = module.exports = function logger(options) {
     // flush interval
     setInterval(function(){
       if (buf.length) {
+        // Once per day, check for log files to be removed
+        if (options.logdir &&
+            options.retaindays > 0 &&
+            Date.now() > logTime.getTime() + DAY){
+
+          // It is. Rotate the logs to get rid of any old ones
+          rotateLogs();
+          
+          // Create a new log file stream.
+          realStream = createLogStream();
+        }
+
+        // Write the buffered data to the stream
         realStream.write(buf.join(''));
         buf.length = 0;
       }
@@ -130,6 +242,51 @@ exports = module.exports = function logger(options) {
       write: function(str){
         buf.push(str);
       }
+    };
+  } else {
+    // Not buffered. We still need to check for rotation
+    stream = {
+      write : function(str){
+        // Once per day, check for log files to be removed
+        if (options.logdir &&
+            options.retaindays > 0 &&
+            Date.now() > logTime.getTime() + DAY){
+
+          // It is. Rotate the logs to get rid of any old ones
+          rotateLogs();
+          
+          // Create a new log file stream.
+          realStream = createLogStream();
+        }
+        
+        // Write the data to the stream (unbuffered)
+        realStream.write(str);
+      }
+    };
+  }
+
+  // If requested, redirect console.* debugging functions to the log stream
+  if (options.redirect_console){
+    console = console || {};
+  }
+  if (options.redirect_console & 0x01) {
+    console.log = function(){
+      stream.write("(log) " + [].join.call(arguments, " ") + "\n");
+    };
+  }
+  if (options.redirect_console & 0x02) {
+    console.debug = function(){
+      stream.write("(debug) " + [].join.call(arguments, " ") + "\n");
+    };
+  }
+  if (options.redirect_console & 0x04) {
+    console.warn = function(){
+      stream.write("(warn) " + [].join.call(arguments, " ") + "\n");
+    };
+  }
+  if (options.redirect_console & 0x08) {
+    console.error = function(){
+      stream.write("(error) " + [].join.call(arguments, " ") + "\n");
     };
   }
 
@@ -229,6 +386,7 @@ exports.format('tiny', ':method :url :status :res[content-length] - :response-ti
  */
 
 exports.format('dev', function(tokens, req, res){
+  var bytes = require('bytes');
   var status = res.statusCode
     , len = parseInt(res.getHeader('Content-Length'), 10)
     , color = 32;
