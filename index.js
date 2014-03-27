@@ -13,20 +13,6 @@ var path = require('path');
 var fs = require('fs');
 require('stream');
 
-// TEMPORARY...
-Date.prototype.toJSON = function()
-{
-  return (
-    this.getUTCFullYear() + "-" +
-    ("0" + (this.getUTCMonth() + 1)).substr(-2) + "-" +
-    ("0" + this.getUTCDate()).substr(-2) + "T" +
-    ("0" + this.getUTCHours()).substr(-2) + ":" +
-    ("0" + this.getUTCMinutes()).substr(-2) + ":" +
-    ("0" + this.getUTCSeconds()).substr(-2) + "." +
-    ("00" + this.getUTCMilliseconds()).substr(-3));
-};
-// ...TEMPORARY
-
 
 /*!
  * Default log buffer duration.
