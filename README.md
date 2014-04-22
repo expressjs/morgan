@@ -2,6 +2,15 @@
 
 Connect's logging middleware. Named after [Dexter](http://en.wikipedia.org/wiki/Dexter_Morgan), a show you should not watch until completion. You may view the old docs at http://www.senchalabs.org/connect/logger.html. Otherwise, view the source code's JSDocs.
 
+## Usage
+
+In Express 4.x:
+
+
+    var morgan = require( 'morgan' );
+    app.use( morgan() );
+
+
 ## License
 
 The MIT License (MIT)
