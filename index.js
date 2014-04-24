@@ -1,5 +1,5 @@
 /*!
- * Connect - logger
+ * Morgan | Connect - logger
  * Copyright(c) 2010 Sencha Inc.
  * Copyright(c) 2011 TJ Holowaychuk
  * MIT Licensed
@@ -18,69 +18,12 @@ var bytes = require('bytes');
 var defaultBufferDuration = 1000;
 
 /**
- * Logger:
- *
  * Log requests with the given `options` or a `format` string.
  *
- * Options:
- *
- *   - `format`  Format string, see below for tokens
- *   - `stream`  Output stream, defaults to _stdout_
- *   - `buffer`  Buffer duration, defaults to 1000ms when _true_
- *   - `immediate`  Write log line on request instead of response (for response times)
- *   - `skip`    Function to determine if logging is skipped, called as
- *               `skip(req, res)`, defaults to always false.
- *
- * Tokens:
- *
- *   - `:req[header]` ex: `:req[Accept]`
- *   - `:res[header]` ex: `:res[Content-Length]`
- *   - `:http-version`
- *   - `:response-time`
- *   - `:remote-addr`
- *   - `:date`
- *   - `:method`
- *   - `:url`
- *   - `:referrer`
- *   - `:user-agent`
- *   - `:status`
- *
- * Formats:
- *
- *   Pre-defined formats that ship with connect:
- *
- *    - `default` ':remote-addr - - [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'
- *    - `short` ':remote-addr - :method :url HTTP/:http-version :status :res[content-length] - :response-time ms'
- *    - `tiny`  ':method :url :status :res[content-length] - :response-time ms'
- *    - `dev` concise output colored by response status for development use
- *
- * Examples:
- *
- *      connect.logger() // default
- *      connect.logger('short')
- *      connect.logger('tiny')
- *      connect.logger({ immediate: true, format: 'dev' })
- *      connect.logger(':method :url - :referrer')
- *      connect.logger(':req[content-type] -> :res[content-type]')
- *      connect.logger(function(tokens, req, res){ return 'some format string' })
- *      connect.logger({ format: 'dev', skip: function(req, res){ return res.statusCode === 304; }})
- *
- * Defining Tokens:
- *
- *   To define a token, simply invoke `connect.logger.token()` with the
- *   name and a callback function. The value returned is then available
- *   as ":type" in this case.
- *
- *      connect.logger.token('type', function(req, res){ return req.headers['content-type']; })
- *
- * Defining Formats:
- *
- *   All default formats are defined this way, however it's public API as well:
- *
- *       connect.logger.format('name', 'string or function')
+ * See README.md for documentation of options and formatting.
  *
  * @param {String|Function|Object} format or options
- * @return {Function}
+ * @return {Function} middleware
  * @api public
  */
 
@@ -201,8 +144,8 @@ exports.token = function(name, fn) {
  * @api public
  */
 
-exports.format = function(name, str){
-  exports[name] = str;
+exports.format = function(name, fmt){
+  exports[name] = fmt;
   return this;
 };
 
