@@ -8,9 +8,9 @@ Logging middleware for node.js http apps.
 
 ```js
 var express = require('express')
-  , morgan  = require('morgan')
-  , app     = express()
+var morgan  = require('morgan')
 
+var app = express()
 app.use(morgan())
 ```
 
