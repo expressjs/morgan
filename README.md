@@ -1,4 +1,4 @@
-# Morgan [![Build Status](https://travis-ci.org/expressjs/morgan.svg)](https://travis-ci.org/expressjs/morgan) [![NPM version](https://badge.fury.io/js/morgan.svg)](http://badge.fury.io/js/morgan)
+# morgan [![Build Status](https://travis-ci.org/expressjs/morgan.svg)](https://travis-ci.org/expressjs/morgan) [![NPM version](https://badge.fury.io/js/morgan.svg)](http://badge.fury.io/js/morgan)
 
 Logging middleware for node.js http apps.
 
