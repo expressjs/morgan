@@ -26,6 +26,9 @@
     "should": "*",
     "supertest": "*"
   },
+  "engines": {
+    "node": ">= 0.8.0"
+  },
   "scripts": {
     "test": "mocha --require should --reporter spec --bail"
   }
