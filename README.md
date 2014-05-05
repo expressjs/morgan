@@ -71,6 +71,15 @@ morgan.token('type', function(req, res){ return req.headers['content-type']; })
 ```
 
 
+## Usage
+
+In Express 4.x:
+
+
+    var morgan = require( 'morgan' );
+    app.use( morgan() );
+
+
 ## License
 
 The MIT License (MIT)
