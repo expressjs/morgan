@@ -1,5 +1,5 @@
-HEAD
-====
+1.0.1 / 2014-05-04
+==================
 
   * Make buffer unique per morgan instance
   * deps: bytes@0.3.0
