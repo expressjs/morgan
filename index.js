@@ -28,12 +28,10 @@ var defaultBufferDuration = 1000;
  */
 
 exports = module.exports = function logger(options) {
-  if ('object' == typeof options) {
-    options = options || {};
-  } else if (options) {
+  if (options && typeof options !== 'object') {
     options = { format: options };
   } else {
-    options = {};
+    options = options || {};
   }
 
   // output on request instead of response
