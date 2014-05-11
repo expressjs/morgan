@@ -8,6 +8,23 @@ var lastLogLine;
 function saveLastLogLine(line) { lastLogLine = line; }
 
 describe('logger()', function () {
+  describe('arguments', function () {
+    it('should accept format as function', function (done) {
+      var line;
+      var server = createServer(function (tokens, req, res) {
+        line = [req.method, req.url, res.statusCode].join(' ')
+      })
+
+      request(server)
+      .get('/')
+      .end(function (err, res) {
+        if (err) return done(err)
+        line.should.equal('GET / 200')
+        done()
+      })
+    })
+  })
+
   describe('with skip option', function () {
     it('should be able to skip based on request', function (done) {
       function skip(req) { return ~req.url.indexOf('skip=true') }
@@ -58,7 +75,7 @@ describe('logger()', function () {
 function createServer(opts) {
   var options = opts || {}
 
-  if (!options.stream) {
+  if (typeof options === 'object' && !options.stream) {
     options.stream = {'write': saveLastLogLine}
     lastLogLine = null
   }
