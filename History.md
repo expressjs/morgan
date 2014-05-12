@@ -1,3 +1,9 @@
+unreleased
+==========
+
+  * deps: bytes@1.0.0
+    - add negative support
+
 1.0.1 / 2014-05-04
 ==================
 
