@@ -87,13 +87,12 @@ describe('logger()', function () {
       })
 
       it('should use req.ip if there', function (done) {
-        var server = createServer({
-          format: ':remote-addr'
+        var server = createServer({format: ':remote-addr'}, function (req) {
+          req.ip = '10.0.0.1'
         })
 
         request(server)
         .get('/')
-        .set('x-req-ip', '10.0.0.1')
         .end(function (err, res) {
           if (err) return done(err)
           lastLogLine.should.equal('10.0.0.1\n')
@@ -102,9 +101,7 @@ describe('logger()', function () {
       })
 
       it('should work when connection: close', function (done) {
-        var server = createServer({
-          format: ':remote-addr'
-        })
+        var server = createServer({format: ':remote-addr'})
 
         request(server)
         .get('/')
@@ -117,8 +114,8 @@ describe('logger()', function () {
       })
 
       it('should work when connection: keep-alive', function (done) {
-        var server = createServer({
-          format: ':remote-addr'
+        var server = createServer({format: ':remote-addr'}, function (req) {
+          delete req._remoteAddress;
         })
 
         request(server)
@@ -127,6 +124,37 @@ describe('logger()', function () {
         .end(function (err, res) {
           if (err) return done(err)
           lastLogLine.should.equal(res.text + '\n')
+          done()
+        })
+      })
+    })
+
+    describe(':response-time', function () {
+      it('should be in milliseconds', function (done) {
+        var start = Date.now()
+        var server = createServer({format: ':response-time'})
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          var end = Date.now()
+          var ms = parseFloat(lastLogLine)
+          ms.should.be.within(0, end - start + 1)
+          done()
+        })
+      })
+
+      it('should be empty without hidden property', function (done) {
+        var server = createServer({format: ':response-time'}, function (req) {
+          delete req._startAt;
+        })
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          lastLogLine.should.equal('-\n')
           done()
         })
       })
@@ -213,7 +241,7 @@ describe('logger()', function () {
   })
 })
 
-function createServer(opts) {
+function createServer(opts, fn) {
   var options = opts || {}
 
   if (typeof options === 'object' && !options.stream) {
@@ -224,13 +252,10 @@ function createServer(opts) {
   var logger = morgan(options)
 
   return http.createServer(function onRequest(req, res) {
-    if (req.headers['x-req-ip']) {
-      req.ip = req.headers['x-req-ip'];
-    }
-
     logger(req, res, function onNext(err) {
-      if (!/close/i.test(req.headers.connection)) {
-        delete req._remoteAddress;
+      if (fn) {
+        // allow req, res alterations
+        fn(req, res)
       }
 
       res.statusCode = err ? 500 : 200
