@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * "dev" format will use same tokens as other formats
   * deps: bytes@1.0.0
     - add negative support
 

@@ -170,25 +170,16 @@ exports.format('tiny', ':method :url :status :res[content-length] - :response-ti
  */
 
 exports.format('dev', function(tokens, req, res){
-  var status = res.statusCode
-    , len = parseInt(res.getHeader('Content-Length'), 10)
-    , color = 32;
+  var color = 32; // green
+  var status = res.statusCode;
 
-  if (status >= 500) color = 31
-  else if (status >= 400) color = 33
-  else if (status >= 300) color = 36;
+  if (status >= 500) color = 31; // red
+  else if (status >= 400) color = 33; // yellow
+  else if (status >= 300) color = 36; // cyan
 
-  len = isNaN(len)
-    ? ''
-    : len = ' - ' + bytes(len);
+  var fn = compile('\x1b[90m:method :url \x1b[' + color + 'm:status \x1b[90m:response-time ms - :res[content-length]\x1b[0m');
 
-  return '\x1b[90m' + req.method
-    + ' ' + (req.originalUrl || req.url) + ' '
-    + '\x1b[' + color + 'm' + res.statusCode
-    + ' \x1b[90m'
-    + (new Date - req._startTime)
-    + 'ms' + len
-    + '\x1b[0m';
+  return fn(tokens, req, res);
 });
 
 /**
