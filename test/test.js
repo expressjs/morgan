@@ -158,6 +158,21 @@ describe('logger()', function () {
           done()
         })
       })
+
+      it('should be empty before response', function (done) {
+        var server = createServer({
+          format: ':response-time',
+          immediate: true
+        })
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          lastLogLine.should.equal('-\n')
+          done()
+        })
+      })
     })
 
     describe(':status', function () {

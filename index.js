@@ -203,8 +203,8 @@ exports.token('method', function(req){
  * response time in milliseconds
  */
 
-exports.token('response-time', function(req){
-  if (!req._startAt) return '';
+exports.token('response-time', function(req, res){
+  if (!res._header || !req._startAt) return '';
   var diff = process.hrtime(req._startAt);
   var ms = diff[0] * 1e3 + diff[1] * 1e-6;
   return ms.toFixed(3);
