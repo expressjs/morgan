@@ -174,7 +174,7 @@ exports.format('dev', function(tokens, req, res){
     , len = parseInt(res.getHeader('Content-Length'), 10)
     , color = 32
     , responseTime = process.hrtime(req._startTime);
-  responseTime = ((responseTime[0] * 1e9 + responseTime[1]) / 1000000).toFixed(2);
+  responseTime = (responseTime[0] * 1e3) + (responseTime[1] / 1e6)).toFixed(2);
 
   if (status >= 500) color = 31
   else if (status >= 400) color = 33
@@ -215,7 +215,7 @@ exports.token('method', function(req){
 
 exports.token('response-time', function(req){
   var responseTime = process.hrtime(req._startTime);
-  return String(((responseTime[0] * 1e9 + responseTime[1]) / 1000000).toFixed(2));
+  return String((responseTime[0] * 1e3) + (responseTime[1] / 1e6)).toFixed(2));
 });
 
 /**
