@@ -76,7 +76,7 @@ exports = module.exports = function logger(options) {
 
   return function logger(req, res, next) {
     var sock = req.socket;
-    req._startTime = new Date;
+    req._startTime = process.hrtime();
     req._remoteAddress = sock.socket ? sock.socket.remoteAddress : sock.remoteAddress;
 
     function logRequest(){
@@ -172,7 +172,9 @@ exports.format('tiny', ':method :url :status :res[content-length] - :response-ti
 exports.format('dev', function(tokens, req, res){
   var status = res.statusCode
     , len = parseInt(res.getHeader('Content-Length'), 10)
-    , color = 32;
+    , color = 32
+    , responseTime = process.hrtime(req._startTime);
+  responseTime = (responseTime[0] * 1e9 + responseTime[1]).toFixed(2);
 
   if (status >= 500) color = 31
   else if (status >= 400) color = 33
@@ -186,7 +188,7 @@ exports.format('dev', function(tokens, req, res){
     + ' ' + (req.originalUrl || req.url) + ' '
     + '\x1b[' + color + 'm' + res.statusCode
     + ' \x1b[90m'
-    + (new Date - req._startTime)
+    + responseTime
     + 'ms' + len
     + '\x1b[0m';
 });
@@ -212,7 +214,8 @@ exports.token('method', function(req){
  */
 
 exports.token('response-time', function(req){
-  return String(Date.now() - req._startTime);
+  var responseTime = process.hrtime(req._startTime);
+  return String((responseTime[0] * 1e9 + responseTime[1]).toFixed(2));
 });
 
 /**
