@@ -207,6 +207,115 @@ describe('logger()', function () {
     })
   })
 
+  describe('formats', function () {
+    describe('default', function () {
+      it('should match expectations', function (done) {
+        var server = createServer({format: 'default'})
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          lastLogLine.should.startWith(res.text + ' - - ')
+          lastLogLine.should.containEql('"GET / HTTP/1.1"')
+          done()
+        })
+      })
+    })
+
+    describe('dev', function () {
+      it('should color 200 green', function (done) {
+        var server = createServer({format: 'dev'})
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
+          lastLogLine.should.startWith('_color_90_GET / _color_32_200 _color_90_')
+          lastLogLine.should.endWith('_color_0_\n')
+          done()
+        })
+      })
+
+      it('should color 500 red', function (done) {
+        var server = createServer({format: 'dev'}, function (req, res) {
+          res.statusCode = 500
+        })
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
+          lastLogLine.should.startWith('_color_90_GET / _color_31_500 _color_90_')
+          lastLogLine.should.endWith('_color_0_\n')
+          done()
+        })
+      })
+
+      it('should color 400 yelow', function (done) {
+        var server = createServer({format: 'dev'}, function (req, res) {
+          res.statusCode = 400
+        })
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
+          lastLogLine.should.startWith('_color_90_GET / _color_33_400 _color_90_')
+          lastLogLine.should.endWith('_color_0_\n')
+          done()
+        })
+      })
+
+      it('should color 300 cyan', function (done) {
+        var server = createServer({format: 'dev'}, function (req, res) {
+          res.statusCode = 300
+        })
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
+          lastLogLine.should.startWith('_color_90_GET / _color_36_300 _color_90_')
+          lastLogLine.should.endWith('_color_0_\n')
+          done()
+        })
+      })
+    })
+
+    describe('short', function () {
+      it('should match expectations', function (done) {
+        var server = createServer({format: 'short'})
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          lastLogLine.should.startWith(res.text + ' - GET / HTTP/1.1')
+          done()
+        })
+      })
+    })
+
+    describe('tiny', function () {
+      it('should match expectations', function (done) {
+        var server = createServer({format: 'tiny'})
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          lastLogLine.should.startWith('GET / 200')
+          done()
+        })
+      })
+    })
+  })
+
   describe('with immediate option', function () {
     it('should log before response', function (done) {
       var server = createServer({
@@ -273,7 +382,7 @@ function createServer(opts, fn) {
         fn(req, res)
       }
 
-      res.statusCode = err ? 500 : 200
+      if (err) res.statusCode = 500
       res.setHeader('X-Sent', 'true')
       res.end(err ? err.message : String(req.connection.remoteAddress))
     })
