@@ -223,7 +223,7 @@ exports.token('date', function(){
  */
 
 exports.token('status', function(req, res){
-  return res.headersSent ? res.statusCode : null;
+  return res._header ? res.statusCode : null;
 });
 
 /**

@@ -131,6 +131,37 @@ describe('logger()', function () {
         })
       })
     })
+
+    describe(':status', function () {
+      it('should get response status', function (done) {
+        var server = createServer({
+          format: ':status'
+        })
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          lastLogLine.should.equal(res.statusCode + '\n')
+          done()
+        })
+      })
+
+      it('should not exist before response sent', function (done) {
+        var server = createServer({
+          format: ':status',
+          immediate: true
+        })
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          lastLogLine.should.equal('-\n')
+          done()
+        })
+      })
+    })
   })
 
   describe('with immediate option', function () {
