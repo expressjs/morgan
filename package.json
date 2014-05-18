@@ -39,6 +39,6 @@
   "scripts": {
     "test": "mocha --require should --reporter dot",
     "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --require should --reporter dot",
-    "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --require should --reporter spec && cat ./coverage/lcov.info | coveralls"
+    "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --require should --reporter spec && (cat ./coverage/lcov.info | coveralls || true)"
   }
 }
