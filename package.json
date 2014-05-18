@@ -21,7 +21,7 @@
     "bytes": "1.0.0"
   },
   "devDependencies": {
-    "mocha": "~1.18.2",
+    "mocha": "~1.19.0",
     "should": "~3.3.1",
     "supertest": "~0.12.0"
   },
