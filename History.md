@@ -2,6 +2,8 @@ unreleased
 ==========
 
   * "dev" format will use same tokens as other formats
+  * `:response-time` token is now monotonic
+  * `:response-time` token has precision to 1 μs
   * deps: bytes@1.0.0
     - add negative support
 

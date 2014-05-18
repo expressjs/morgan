@@ -76,6 +76,7 @@ exports = module.exports = function logger(options) {
 
   return function logger(req, res, next) {
     var sock = req.socket;
+    req._startAt = process.hrtime();
     req._startTime = new Date;
     req._remoteAddress = sock.socket ? sock.socket.remoteAddress : sock.remoteAddress;
 
@@ -203,7 +204,10 @@ exports.token('method', function(req){
  */
 
 exports.token('response-time', function(req){
-  return String(Date.now() - req._startTime);
+  if (!req._startAt) return '';
+  var diff = process.hrtime(req._startAt);
+  var ms = diff[0] * 1e3 + diff[1] * 1e-6;
+  return ms.toFixed(3);
 });
 
 /**
