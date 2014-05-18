@@ -27,6 +27,7 @@
     "bytes": "1.0.0"
   },
   "devDependencies": {
+    "coveralls": "2.10.0",
     "istanbul": "0.2.10",
     "mocha": "~1.19.0",
     "should": "~3.3.1",
@@ -36,7 +37,8 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "test": "mocha --require should --reporter spec --bail",
-    "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --require should --reporter dot"
+    "test": "mocha --require should --reporter dot",
+    "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --require should --reporter dot",
+    "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --require should --reporter spec && cat ./coverage/lcov.info | coveralls"
   }
 }
