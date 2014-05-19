@@ -100,6 +100,40 @@ describe('logger()', function () {
         })
       })
 
+      it('should work on https server', function (done) {
+        var fs = require('fs')
+        var https = require('https')
+        var cert = fs.readFileSync(__dirname + '/fixtures/server.crt', 'ascii')
+        var logger = createLogger({format: ':remote-addr'})
+        var server = https.createServer({
+          key: fs.readFileSync(__dirname + '/fixtures/server.key', 'ascii'),
+          cert: cert
+        })
+
+        server.on('request', function (req, res) {
+          logger(req, res, function (err) {
+            delete req._remoteAddress
+            res.end(req.connection.remoteAddress)
+          })
+        })
+
+        var agent = new https.Agent({ca: cert})
+        var createConnection = agent.createConnection
+
+        agent.createConnection = function (options) {
+          options.servername = 'morgan.local'
+          return createConnection.call(this, options)
+        };
+
+        var req = request(server).get('/')
+        req.agent(agent)
+        req.end(function (err, res) {
+          if (err) return done(err)
+          lastLogLine.should.equal(res.text + '\n')
+          done()
+        })
+      })
+
       it('should work when connection: close', function (done) {
         var server = createServer({format: ':remote-addr'})
 
@@ -365,7 +399,7 @@ describe('logger()', function () {
   })
 })
 
-function createServer(opts, fn) {
+function createLogger(opts) {
   var options = opts || {}
 
   if (typeof options === 'object' && !options.stream) {
@@ -373,8 +407,11 @@ function createServer(opts, fn) {
     lastLogLine = null
   }
 
-  var logger = morgan(options)
+  return morgan(options)
+}
 
+function createServer(opts, fn) {
+  var logger = createLogger(opts)
   return http.createServer(function onRequest(req, res) {
     logger(req, res, function onNext(err) {
       if (fn) {
