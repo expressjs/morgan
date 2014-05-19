@@ -350,6 +350,66 @@ describe('logger()', function () {
     })
   })
 
+  describe('with buffer option', function () {
+    it('should flush log periodically', function (done) {
+      var count = 0;
+      var server = createServer({
+        buffer: true,
+        format: ':method :url',
+        stream: {write: writeLog}
+      })
+
+      function writeLog(log) {
+        log.should.equal('GET /first\nGET /second\n')
+        server.close()
+        done()
+      }
+
+      server = server.listen()
+      request(server)
+      .get('/first')
+      .end(function (err, res) {
+        if (err) throw err
+        count++
+        request(server)
+        .get('/second')
+        .end(function (err, res) {
+          if (err) throw err
+          count++
+        })
+      })
+    })
+
+    it('should accept custom interval', function (done) {
+      var count = 0;
+      var server = createServer({
+        buffer: 200,
+        format: ':method :url',
+        stream: {write: writeLog}
+      })
+
+      function writeLog(log) {
+        log.should.equal('GET /first\nGET /second\n')
+        server.close()
+        done()
+      }
+
+      server = server.listen()
+      request(server)
+      .get('/first')
+      .end(function (err, res) {
+        if (err) throw err
+        count++
+        request(server)
+        .get('/second')
+        .end(function (err, res) {
+          if (err) throw err
+          count++
+        })
+      })
+    })
+  })
+
   describe('with immediate option', function () {
     it('should log before response', function (done) {
       var server = createServer({
