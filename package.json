@@ -1,6 +1,6 @@
 {
   "name": "morgan",
-  "description": "connect's logger for node.js",
+  "description": "http request logger middleware for node.js",
   "version": "1.0.1",
   "author": {
     "name": "Jonathan Ong",
