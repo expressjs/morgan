@@ -53,22 +53,29 @@ exports = module.exports = function logger(options) {
   // buffering support
   if (buffer) {
     var realStream = stream
-      , buf = []
-      , interval = 'number' == typeof buffer
-        ? buffer
-        : defaultBufferDuration;
+    var buf = []
+    var timer = null
+    var interval = 'number' == typeof buffer
+      ? buffer
+      : defaultBufferDuration
 
-    // flush interval
-    setInterval(function(){
+    // flush function
+    var flush = function(){
+      timer = null
+
       if (buf.length) {
         realStream.write(buf.join(''));
         buf.length = 0;
       }
-    }, interval);
+    }
 
     // swap the stream
     stream = {
       write: function(str){
+        if (timer === null) {
+          timer = setTimeout(flush, interval)
+        }
+
         buf.push(str);
       }
     };

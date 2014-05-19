@@ -6,6 +6,7 @@ unreleased
   * `:response-time` token is now monotonic
   * `:response-time` token has precision to 1 μs
   * fix `:status` + immediate output in node.js 0.8
+  * improve `buffer` option to prevent indefinite event loop holding
   * deps: bytes@1.0.0
     - add negative support
 
