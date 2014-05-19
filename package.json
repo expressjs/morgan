@@ -1,7 +1,7 @@
 {
   "name": "morgan",
   "description": "http request logger middleware for node.js",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "author": {
     "name": "Jonathan Ong",
     "email": "me@jongleberry.com",

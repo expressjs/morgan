@@ -1,5 +1,5 @@
-unreleased
-==========
+1.1.0 / 2014-05-18
+==================
 
   * "dev" format will use same tokens as other formats
   * `:response-time` token is now empty when immediate used
