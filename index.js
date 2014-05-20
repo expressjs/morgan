@@ -82,10 +82,9 @@ exports = module.exports = function logger(options) {
   }
 
   return function logger(req, res, next) {
-    var sock = req.socket;
     req._startAt = process.hrtime();
     req._startTime = new Date;
-    req._remoteAddress = sock.socket ? sock.socket.remoteAddress : sock.remoteAddress;
+    req._remoteAddress = req.connection && req.connection.remoteAddress;
 
     function logRequest(){
       res.removeListener('finish', logRequest);
@@ -248,9 +247,8 @@ exports.token('referrer', function(req){
 exports.token('remote-addr', function(req){
   if (req.ip) return req.ip;
   if (req._remoteAddress) return req._remoteAddress;
-  var sock = req.socket;
-  if (sock.socket) return sock.socket.remoteAddress;
-  return sock.remoteAddress;
+  if (req.connection) return req.connection.remoteAddress;
+  return undefined;
 });
 
 /**

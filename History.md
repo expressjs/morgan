@@ -1,3 +1,8 @@
+unreleased
+==========
+
+  * simplify method to get remote address
+
 1.1.0 / 2014-05-18
 ==================
 

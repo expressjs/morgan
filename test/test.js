@@ -161,6 +161,22 @@ describe('logger()', function () {
           done()
         })
       })
+
+      it('should not fail if req.connection missing', function (done) {
+        var server = createServer({format: ':remote-addr'}, function (req) {
+          delete req.connection;
+          delete req._remoteAddress;
+        })
+
+        request(server)
+        .get('/')
+        .set('Connection', 'keep-alive')
+        .end(function (err, res) {
+          if (err) return done(err)
+          lastLogLine.should.equal(res.text + '\n')
+          done()
+        })
+      })
     })
 
     describe(':response-time', function () {
@@ -479,9 +495,13 @@ function createServer(opts, fn) {
         fn(req, res)
       }
 
-      if (err) res.statusCode = 500
+      if (err) {
+        res.statusCode = 500
+        res.end(err.message)
+      }
+
       res.setHeader('X-Sent', 'true')
-      res.end(err ? err.message : String(req.connection.remoteAddress))
+      res.end((req.connection && req.connection.remoteAddress) || '-')
     })
   })
 }
