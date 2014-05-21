@@ -1,5 +1,5 @@
-unreleased
-==========
+1.1.1 / 2014-05-20
+==================
 
   * simplify method to get remote address
 
