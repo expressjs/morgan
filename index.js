@@ -51,7 +51,7 @@ exports = module.exports = function logger(options) {
     write:  function(str) {
       process.stdout.write(str + '\n');
     }
-  }
+  };
   var stream = options.stream || defaultStream
     , buffer = options.buffer;
 
