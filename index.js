@@ -46,8 +46,13 @@ exports = module.exports = function logger(options) {
   // compile format
   if ('function' != typeof fmt) fmt = compile(fmt);
 
-  // options
-  var stream = options.stream || process.stdout
+  // stream
+  var defaultStream = {
+    write:  function(str) {
+      process.stdout.write(str + '\n');
+    }
+  }
+  var stream = options.stream || defaultStream
     , buffer = options.buffer;
 
   // buffering support
@@ -92,7 +97,7 @@ exports = module.exports = function logger(options) {
       if (skip(req, res)) return;
       var line = fmt(exports, req, res);
       if (null == line) return;
-      stream.write(line + '\n');
+      stream.write(line);
     };
 
     // immediate
