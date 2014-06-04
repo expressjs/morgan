@@ -49,7 +49,7 @@ describe('logger()', function () {
         .set('x-from-string', 'me')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal('me\n')
+          lastLogLine.should.equal('me')
           done()
         })
       })
@@ -65,7 +65,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal('true\n')
+          lastLogLine.should.equal('true')
           done()
         })
       })
@@ -81,7 +81,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal(res.text + '\n')
+          lastLogLine.should.equal(res.text)
           done()
         })
       })
@@ -95,7 +95,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal('10.0.0.1\n')
+          lastLogLine.should.equal('10.0.0.1')
           done()
         })
       })
@@ -129,7 +129,7 @@ describe('logger()', function () {
         req.agent(agent)
         req.end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal(res.text + '\n')
+          lastLogLine.should.equal(res.text)
           done()
         })
       })
@@ -142,7 +142,7 @@ describe('logger()', function () {
         .set('Connection', 'close')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal(res.text + '\n')
+          lastLogLine.should.equal(res.text)
           done()
         })
       })
@@ -157,7 +157,7 @@ describe('logger()', function () {
         .set('Connection', 'keep-alive')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal(res.text + '\n')
+          lastLogLine.should.equal(res.text)
           done()
         })
       })
@@ -173,7 +173,7 @@ describe('logger()', function () {
         .set('Connection', 'keep-alive')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal(res.text + '\n')
+          lastLogLine.should.equal(res.text)
           done()
         })
       })
@@ -204,7 +204,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal('-\n')
+          lastLogLine.should.equal('-')
           done()
         })
       })
@@ -219,7 +219,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal('-\n')
+          lastLogLine.should.equal('-')
           done()
         })
       })
@@ -235,7 +235,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal(res.statusCode + '\n')
+          lastLogLine.should.eql(res.statusCode)
           done()
         })
       })
@@ -250,7 +250,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal('-\n')
+          lastLogLine.should.equal('-')
           done()
         })
       })
@@ -283,7 +283,7 @@ describe('logger()', function () {
           if (err) return done(err)
           lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
           lastLogLine.should.startWith('_color_90_GET / _color_32_200 _color_90_')
-          lastLogLine.should.endWith('_color_0_\n')
+          lastLogLine.should.endWith('_color_0_')
           done()
         })
       })
@@ -299,7 +299,7 @@ describe('logger()', function () {
           if (err) return done(err)
           lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
           lastLogLine.should.startWith('_color_90_GET / _color_31_500 _color_90_')
-          lastLogLine.should.endWith('_color_0_\n')
+          lastLogLine.should.endWith('_color_0_')
           done()
         })
       })
@@ -315,7 +315,7 @@ describe('logger()', function () {
           if (err) return done(err)
           lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
           lastLogLine.should.startWith('_color_90_GET / _color_33_400 _color_90_')
-          lastLogLine.should.endWith('_color_0_\n')
+          lastLogLine.should.endWith('_color_0_')
           done()
         })
       })
@@ -331,7 +331,7 @@ describe('logger()', function () {
           if (err) return done(err)
           lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
           lastLogLine.should.startWith('_color_90_GET / _color_36_300 _color_90_')
-          lastLogLine.should.endWith('_color_0_\n')
+          lastLogLine.should.endWith('_color_0_')
           done()
         })
       })
@@ -376,7 +376,7 @@ describe('logger()', function () {
       })
 
       function writeLog(log) {
-        log.should.equal('GET /first\nGET /second\n')
+        log.should.equal('GET /firstGET /second')
         server.close()
         done()
       }
@@ -405,7 +405,7 @@ describe('logger()', function () {
       })
 
       function writeLog(log) {
-        log.should.equal('GET /first\nGET /second\n')
+        log.should.equal('GET /firstGET /second')
         server.close()
         done()
       }
@@ -437,7 +437,7 @@ describe('logger()', function () {
       .get('/')
       .end(function (err, res) {
         if (err) return done(err)
-        lastLogLine.should.equal('GET / -\n')
+        lastLogLine.should.equal('GET / -')
         done()
       })
     })
