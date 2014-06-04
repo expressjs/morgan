@@ -235,7 +235,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal(res.statusCode)
+          lastLogLine.should.eql(res.statusCode)
           done()
         })
       })
