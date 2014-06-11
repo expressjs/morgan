@@ -190,6 +190,23 @@ exports.format('dev', function(tokens, req, res){
 });
 
 /**
+ * dev+ (dev with more information)
+ */
+
+exports.format('dev+', function(tokens, req, res){
+  var color = 32; // green
+  var status = res.statusCode;
+
+  if (status >= 500) color = 31; // red
+  else if (status >= 400) color = 33; // yellow
+  else if (status >= 300) color = 36; // cyan
+
+  var fn = compile('\x1b[90m:remote-addr \x1b[32m:method \x1b[35m:url \x1b[/' + color + 'm:status \x1b[97m:response-time ms\x1b[0m');
+
+  return fn(tokens, req, res);
+});
+
+/**
  * request url
  */
 
