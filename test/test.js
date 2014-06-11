@@ -152,13 +152,14 @@ describe('logger()', function () {
           delete req._remoteAddress;
         })
 
-        request(server)
+        request(server.listen())
         .get('/')
         .set('Connection', 'keep-alive')
         .end(function (err, res) {
           if (err) return done(err)
           lastLogLine.should.equal(res.text + '\n')
-          done()
+          res.req.connection.destroy()
+          server.close(done)
         })
       })
 
@@ -168,13 +169,14 @@ describe('logger()', function () {
           delete req._remoteAddress;
         })
 
-        request(server)
+        request(server.listen())
         .get('/')
         .set('Connection', 'keep-alive')
         .end(function (err, res) {
           if (err) return done(err)
           lastLogLine.should.equal(res.text + '\n')
-          done()
+          res.req.connection.destroy()
+          server.close(done)
         })
       })
     })
