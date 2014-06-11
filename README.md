@@ -1,4 +1,8 @@
-# morgan [![NPM version](https://badge.fury.io/js/morgan.svg)](http://badge.fury.io/js/morgan) [![Build Status](https://travis-ci.org/expressjs/morgan.svg)](https://travis-ci.org/expressjs/morgan) [![Coverage Status](https://img.shields.io/coveralls/expressjs/morgan.svg)](https://coveralls.io/r/expressjs/morgan)
+# morgan
+
+[![NPM version](https://badge.fury.io/js/morgan.svg)](http://badge.fury.io/js/morgan)
+[![Build Status](https://travis-ci.org/expressjs/morgan.svg?branch=master)](https://travis-ci.org/expressjs/morgan)
+[![Coverage Status](https://img.shields.io/coveralls/expressjs/morgan.svg?branch=master)](https://coveralls.io/r/expressjs/morgan)
 
 Logging middleware for node.js http apps.
 
