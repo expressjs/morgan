@@ -2,27 +2,12 @@
   "name": "morgan",
   "description": "http request logger middleware for node.js",
   "version": "1.1.1",
-  "author": {
-    "name": "Jonathan Ong",
-    "email": "me@jongleberry.com",
-    "url": "http://jongleberry.com",
-    "twitter": "https://twitter.com/jongleberry"
-  },
+  "author": "Jonathan Ong <me@jongleberry.com> (http://jongleberry.com)",
   "contributors": [
-    {
-      "name": "Douglas Christopher Wilson",
-      "email": "doug@somethingdoug.com"
-    }
+    "Douglas Christopher Wilson <doug@somethingdoug.com>"
   ],
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/expressjs/morgan.git"
-  },
-  "bugs": {
-    "mail": "me@jongleberry.com",
-    "url": "https://github.com/expressjs/morgan/issues"
-  },
+  "repository": "expressjs/morgan",
   "dependencies": {
     "bytes": "1.0.0"
   },
