@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/expressjs/morgan.svg?branch=master)](https://travis-ci.org/expressjs/morgan)
 [![Coverage Status](https://img.shields.io/coveralls/expressjs/morgan.svg?branch=master)](https://coveralls.io/r/expressjs/morgan)
 
-Logging middleware for node.js http apps.
+HTTP request logger middleware for node.js
 
 > Named after [Dexter](http://en.wikipedia.org/wiki/Dexter_Morgan), a show you should not watch until completion.
 
