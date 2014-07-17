@@ -184,7 +184,7 @@ exports.format('dev', function(tokens, req, res){
   else if (status >= 400) color = 33; // yellow
   else if (status >= 300) color = 36; // cyan
 
-  var fn = compile('\x1b[90m:method :url \x1b[' + color + 'm:status \x1b[90m:response-time ms - :res[content-length]\x1b[0m');
+  var fn = compile('\x1b[0m:method :url \x1b[' + color + 'm:status \x1b[0m:response-time ms - :res[content-length]\x1b[0m');
 
   return fn(tokens, req, res);
 });
