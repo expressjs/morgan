@@ -284,7 +284,7 @@ describe('logger()', function () {
         .end(function (err, res) {
           if (err) return done(err)
           lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          lastLogLine.should.startWith('_color_90_GET / _color_32_200 _color_90_')
+          lastLogLine.should.startWith('_color_0_GET / _color_32_200 _color_0_')
           lastLogLine.should.endWith('_color_0_\n')
           done()
         })
@@ -300,7 +300,7 @@ describe('logger()', function () {
         .end(function (err, res) {
           if (err) return done(err)
           lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          lastLogLine.should.startWith('_color_90_GET / _color_31_500 _color_90_')
+          lastLogLine.should.startWith('_color_0_GET / _color_31_500 _color_0_')
           lastLogLine.should.endWith('_color_0_\n')
           done()
         })
@@ -316,7 +316,7 @@ describe('logger()', function () {
         .end(function (err, res) {
           if (err) return done(err)
           lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          lastLogLine.should.startWith('_color_90_GET / _color_33_400 _color_90_')
+          lastLogLine.should.startWith('_color_0_GET / _color_33_400 _color_0_')
           lastLogLine.should.endWith('_color_0_\n')
           done()
         })
@@ -332,7 +332,7 @@ describe('logger()', function () {
         .end(function (err, res) {
           if (err) return done(err)
           lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          lastLogLine.should.startWith('_color_90_GET / _color_36_300 _color_90_')
+          lastLogLine.should.startWith('_color_0_GET / _color_36_300 _color_0_')
           lastLogLine.should.endWith('_color_0_\n')
           done()
         })
