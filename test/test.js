@@ -306,10 +306,13 @@ describe('logger()', function () {
 
         request(server)
         .get('/')
+        .set('Authorization', 'Basic dGo6')
+        .set('Referer', 'http://localhost/')
+        .set('User-Agent', 'my-ua')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.startWith(res.text + ' - - ')
-          lastLogLine.should.containEql('"GET / HTTP/1.1"')
+          var line = lastLogLine.replace(/\w+, \d+ \w+ \d+ \d+:\d+:\d+ \w+/, '_timestamp_')
+          line.should.equal(res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 - "http://localhost/" "my-ua"\n')
           done()
         })
       })
@@ -385,9 +388,11 @@ describe('logger()', function () {
 
         request(server)
         .get('/')
+        .set('Authorization', 'Basic dGo6')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.startWith(res.text + ' - GET / HTTP/1.1')
+          var line = lastLogLine.replace(/\d+\.\d{3} ms/, '_timer_')
+          line.should.equal(res.text + ' tj GET / HTTP/1.1 200 - - _timer_\n')
           done()
         })
       })
@@ -401,7 +406,8 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.startWith('GET / 200')
+          var line = lastLogLine.replace(/\d+\.\d{3} ms/, '_timer_')
+          line.should.equal('GET / 200 - - _timer_\n')
           done()
         })
       })
