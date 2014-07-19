@@ -181,6 +181,46 @@ describe('logger()', function () {
       })
     })
 
+    describe(':remote-user', function () {
+      it('should be empty if none present', function (done) {
+        var server = createServer({format: ':remote-user'})
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          lastLogLine.should.equal('-\n')
+          done()
+        })
+      })
+
+      it('should support Basic authorization', function (done) {
+        var server = createServer({format: ':remote-user'})
+
+        request(server)
+        .get('/')
+        .set('Authorization', 'Basic dGo6')
+        .end(function (err, res) {
+          if (err) return done(err)
+          lastLogLine.should.equal('tj\n')
+          done()
+        })
+      })
+
+      it('should be empty for empty Basic authorization user', function (done) {
+        var server = createServer({format: ':remote-user'})
+
+        request(server)
+        .get('/')
+        .set('Authorization', 'Basic Og==')
+        .end(function (err, res) {
+          if (err) return done(err)
+          lastLogLine.should.equal('-\n')
+          done()
+        })
+      })
+    })
+
     describe(':response-time', function () {
       it('should be in milliseconds', function (done) {
         var start = Date.now()

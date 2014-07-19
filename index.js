@@ -10,6 +10,7 @@
  * Module dependencies.
  */
 
+var auth = require('basic-auth')
 var bytes = require('bytes');
 
 /**
@@ -157,13 +158,13 @@ exports.format = function(name, fmt){
  * Default format.
  */
 
-exports.format('default', ':remote-addr - - [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"');
+exports.format('default', ':remote-addr - :remote-user [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"');
 
 /**
  * Short format.
  */
 
-exports.format('short', ':remote-addr - :method :url HTTP/:http-version :status :res[content-length] - :response-time ms');
+exports.format('short', ':remote-addr :remote-user :method :url HTTP/:http-version :status :res[content-length] - :response-time ms');
 
 /**
  * Tiny format.
@@ -249,6 +250,16 @@ exports.token('remote-addr', function(req){
   if (req.connection) return req.connection.remoteAddress;
   return undefined;
 });
+
+/**
+ * remote user
+ */
+
+exports.token('remote-user', function (req) {
+  var creds = auth(req)
+  var user = (creds && creds.name) || '-'
+  return user;
+})
 
 /**
  * HTTP version

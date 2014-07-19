@@ -62,6 +62,7 @@ morgan.format('name', 'string or function')
 - `:http-version`
 - `:response-time`
 - `:remote-addr`
+- `:remote-user`
 - `:date`
 - `:method`
 - `:url`

@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Add `:remote-user` token
   * Remove non-standard grey color from `dev` format
 
 1.1.1 / 2014-05-20
