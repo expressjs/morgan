@@ -21,8 +21,8 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "test": "mocha --require should --reporter dot",
-    "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --require should --reporter dot",
-    "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --require should --reporter spec"
+    "test": "mocha --check-leaks --require should --reporter spec --bail",
+    "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --check-leaks --require should --reporter dot",
+    "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --check-leaks --require should --reporter spec"
   }
 }
