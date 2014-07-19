@@ -1,7 +1,8 @@
 /*!
- * Morgan | Connect - logger
+ * morgan
  * Copyright(c) 2010 Sencha Inc.
  * Copyright(c) 2011 TJ Holowaychuk
+ * Copyright(c) 2014 Jonathan Ong
  * MIT Licensed
  */
 
@@ -11,23 +12,21 @@
 
 var bytes = require('bytes');
 
-/*!
+/**
  * Default log buffer duration.
  */
 
 var defaultBufferDuration = 1000;
 
 /**
- * Log requests with the given `options` or a `format` string.
- *
- * See README.md for documentation of options and formatting.
+ * Create a logger middleware.
  *
  * @param {String|Function|Object} format or options
  * @return {Function} middleware
  * @api public
  */
 
-exports = module.exports = function logger(options) {
+exports = module.exports = function morgan(options) {
   if (options && typeof options !== 'object') {
     options = { format: options };
   } else {
