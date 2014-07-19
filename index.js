@@ -155,6 +155,12 @@ exports.format = function(name, fmt){
 };
 
 /**
+ * Apache combined log format.
+ */
+
+exports.format('combined', ':remote-addr - :remote-user [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"')
+
+/**
  * Default format.
  */
 

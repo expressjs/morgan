@@ -300,6 +300,24 @@ describe('logger()', function () {
   })
 
   describe('formats', function () {
+    describe('combined', function () {
+      it('should match expectations', function (done) {
+        var server = createServer({format: 'combined'})
+
+        request(server)
+        .get('/')
+        .set('Authorization', 'Basic dGo6')
+        .set('Referer', 'http://localhost/')
+        .set('User-Agent', 'my-ua')
+        .end(function (err, res) {
+          if (err) return done(err)
+          var line = lastLogLine.replace(/\w+, \d+ \w+ \d+ \d+:\d+:\d+ \w+/, '_timestamp_')
+          line.should.equal(res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 - "http://localhost/" "my-ua"\n')
+          done()
+        })
+      })
+    })
+
     describe('default', function () {
       it('should match expectations', function (done) {
         var server = createServer({format: 'default'})

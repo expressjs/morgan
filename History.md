@@ -2,6 +2,7 @@ unreleased
 ==========
 
   * Add `:remote-user` token
+  * Add `combined` log format
   * Remove non-standard grey color from `dev` format
 
 1.1.1 / 2014-05-20
