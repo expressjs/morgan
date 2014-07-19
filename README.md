@@ -36,6 +36,7 @@ morgan({ format: 'dev', skip: function(req, res){ return res.statusCode === 304;
 #### Predefined Formats
 
 - `combined` - Standard Apache combined log output.
+- `common` - Standard Apache common log output.
 - `short` - Shorter than default, also including response time.
 - `tiny` - The minimal.
 - `dev` - Concise output colored by response status for development use.

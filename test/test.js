@@ -318,6 +318,22 @@ describe('logger()', function () {
       })
     })
 
+    describe('common', function () {
+      it('should match expectations', function (done) {
+        var server = createServer({format: 'common'})
+
+        request(server)
+        .get('/')
+        .set('Authorization', 'Basic dGo6')
+        .end(function (err, res) {
+          if (err) return done(err)
+          var line = lastLogLine.replace(/\w+, \d+ \w+ \d+ \d+:\d+:\d+ \w+/, '_timestamp_')
+          line.should.equal(res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 -\n')
+          done()
+        })
+      })
+    })
+
     describe('default', function () {
       it('should match expectations', function (done) {
         var server = createServer({format: 'default'})
