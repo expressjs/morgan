@@ -6,6 +6,7 @@ unreleased
   * Add `common` log format
   * Add `morgan(format, options)` function signature
   * Deprecate `default` format -- use `combined` format instead
+  * Deprecate not providing a format
   * Remove non-standard grey color from `dev` format
 
 1.1.1 / 2014-05-20

@@ -39,6 +39,10 @@ exports = module.exports = function morgan(format, options) {
     deprecate('morgan(options): use morgan(' + (typeof format === 'string' ? JSON.stringify(format) : 'format') + ', options) instead')
   }
 
+  if (format === undefined) {
+    deprecate('undefined format: specify a format')
+  }
+
   options = options || {}
 
   // output on request instead of response
