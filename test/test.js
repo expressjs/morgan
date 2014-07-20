@@ -87,8 +87,9 @@ describe('logger()', function () {
       })
 
       it('should use req.ip if there', function (done) {
-        var server = createServer({format: ':remote-addr'}, function (req) {
+        var server = createServer({format: ':remote-addr'}, function (req, res, next) {
           req.ip = '10.0.0.1'
+          next()
         })
 
         request(server)
@@ -148,8 +149,9 @@ describe('logger()', function () {
       })
 
       it('should work when connection: keep-alive', function (done) {
-        var server = createServer({format: ':remote-addr'}, function (req) {
-          delete req._remoteAddress;
+        var server = createServer({format: ':remote-addr'}, function (req, res, next) {
+          delete req._remoteAddress
+          next()
         })
 
         request(server.listen())
@@ -164,9 +166,10 @@ describe('logger()', function () {
       })
 
       it('should not fail if req.connection missing', function (done) {
-        var server = createServer({format: ':remote-addr'}, function (req) {
-          delete req.connection;
-          delete req._remoteAddress;
+        var server = createServer({format: ':remote-addr'}, function (req, res, next) {
+          delete req.connection
+          delete req._remoteAddress
+          next()
         })
 
         request(server.listen())
@@ -238,8 +241,9 @@ describe('logger()', function () {
       })
 
       it('should be empty without hidden property', function (done) {
-        var server = createServer({format: ':response-time'}, function (req) {
-          delete req._startAt;
+        var server = createServer({format: ':response-time'}, function (req, res, next) {
+          delete req._startAt
+          next()
         })
 
         request(server)
@@ -295,6 +299,22 @@ describe('logger()', function () {
           lastLogLine.should.equal('-\n')
           done()
         })
+      })
+
+      it('should not exist for aborted request', function (done) {
+        var stream = {write: writeLog}
+        var server = createServer({format: ':status', stream: stream}, function () {
+          test.abort()
+        })
+
+        function writeLog(log) {
+          log.should.equal('-\n')
+          server.close()
+          done()
+        }
+
+        var test = request(server).post('/')
+        test.write('0')
       })
     })
   })
@@ -368,8 +388,9 @@ describe('logger()', function () {
       })
 
       it('should color 500 red', function (done) {
-        var server = createServer({format: 'dev'}, function (req, res) {
+        var server = createServer({format: 'dev'}, function (req, res, next) {
           res.statusCode = 500
+          next()
         })
 
         request(server)
@@ -384,8 +405,9 @@ describe('logger()', function () {
       })
 
       it('should color 400 yelow', function (done) {
-        var server = createServer({format: 'dev'}, function (req, res) {
+        var server = createServer({format: 'dev'}, function (req, res, next) {
           res.statusCode = 400
+          next()
         })
 
         request(server)
@@ -400,8 +422,9 @@ describe('logger()', function () {
       })
 
       it('should color 300 cyan', function (done) {
-        var server = createServer({format: 'dev'}, function (req, res) {
+        var server = createServer({format: 'dev'}, function (req, res, next) {
           res.statusCode = 300
+          next()
         })
 
         request(server)
@@ -570,20 +593,19 @@ function createLogger(opts) {
 
 function createServer(opts, fn) {
   var logger = createLogger(opts)
+  var middle = fn || function (req, res, next) { next() }
   return http.createServer(function onRequest(req, res) {
     logger(req, res, function onNext(err) {
-      if (fn) {
-        // allow req, res alterations
-        fn(req, res)
-      }
+      // allow req, res alterations
+      middle(req, res, function onDone() {
+        if (err) {
+          res.statusCode = 500
+          res.end(err.message)
+        }
 
-      if (err) {
-        res.statusCode = 500
-        res.end(err.message)
-      }
-
-      res.setHeader('X-Sent', 'true')
-      res.end((req.connection && req.connection.remoteAddress) || '-')
+        res.setHeader('X-Sent', 'true')
+        res.end((req.connection && req.connection.remoteAddress) || '-')
+      })
     })
   })
 }

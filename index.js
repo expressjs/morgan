@@ -12,6 +12,7 @@
 
 var auth = require('basic-auth')
 var bytes = require('bytes');
+var onFinished = require('finished')
 
 /**
  * Default log buffer duration.
@@ -87,8 +88,6 @@ exports = module.exports = function morgan(options) {
     req._remoteAddress = req.connection && req.connection.remoteAddress;
 
     function logRequest(){
-      res.removeListener('finish', logRequest);
-      res.removeListener('close', logRequest);
       if (skip(req, res)) return;
       var line = fmt(exports, req, res);
       if (null == line) return;
@@ -98,12 +97,9 @@ exports = module.exports = function morgan(options) {
     // immediate
     if (immediate) {
       logRequest();
-    // proxy end to output logging
     } else {
-      res.on('finish', logRequest);
-      res.on('close', logRequest);
+      onFinished(res, logRequest)
     }
-
 
     next();
   };

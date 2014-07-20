@@ -10,7 +10,8 @@
   "repository": "expressjs/morgan",
   "dependencies": {
     "basic-auth": "1.0.0",
-    "bytes": "1.0.0"
+    "bytes": "1.0.0",
+    "finished": "~1.2.2"
   },
   "devDependencies": {
     "istanbul": "0.3.0",
@@ -22,8 +23,8 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "test": "mocha --check-leaks --require should --reporter spec --bail",
-    "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --check-leaks --require should --reporter dot",
-    "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --check-leaks --require should --reporter spec"
+    "test": "mocha --check-leaks --reporter spec --bail",
+    "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --check-leaks --reporter dot",
+    "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --check-leaks --reporter spec"
   }
 }
