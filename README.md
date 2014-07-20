@@ -15,21 +15,26 @@ var express = require('express')
 var morgan  = require('morgan')
 
 var app = express()
-app.use(morgan())
+app.use(morgan('combined'))
 ```
 
-### morgan(options)
+### morgan(format, options)
 
-Morgan may be passed options to configure the logging output. The options may be passed as a predefined format, formatting string, function, or object.
+Create a new morgan logger middleware function using the given `format` and `options`.
+The `format` argument may be a string of a predefined name (see below for the names),
+a string of a format string, or a function that will produce a log entry.
 
 ```js
-morgan() // default
-morgan('short')
-morgan('tiny')
-morgan({ format: 'dev', immediate: true })
-morgan(':method :url - :referrer')
-morgan(':req[content-type] -> :res[content-type]')
-morgan(function(tokens, req, res){ return 'some format string' })
+// a pre-defined name
+morgan('combined')
+
+// a format string
+morgan(':remote-addr :method :url')
+
+// a custom function
+morgan(function (req, res) {
+  return req.method + ' ' + req.url
+})
 ```
 
 #### Options
@@ -54,7 +59,7 @@ will be called as `skip(req, res)`.
 
 ```js
 // only log error responses
-morgan({
+morgan('combined', {
   skip: function (req, res) { return res.statusCode < 400 }
 })
 ```

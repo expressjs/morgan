@@ -12,6 +12,7 @@
 
 var auth = require('basic-auth')
 var bytes = require('bytes');
+var deprecate = require('depd')('morgan')
 var onFinished = require('finished')
 
 /**
@@ -23,17 +24,22 @@ var defaultBufferDuration = 1000;
 /**
  * Create a logger middleware.
  *
- * @param {String|Function|Object} format or options
+ * @param {String|Function} format
+ * @param {Object} [options]
  * @return {Function} middleware
  * @api public
  */
 
-exports = module.exports = function morgan(options) {
-  if (options && typeof options !== 'object') {
-    options = { format: options };
-  } else {
-    options = options || {};
+exports = module.exports = function morgan(format, options) {
+  if (typeof format === 'object') {
+    options = format
+    format = options.format || 'default'
+
+    // smart deprecation message
+    deprecate('morgan(options): use morgan(' + (typeof format === 'string' ? JSON.stringify(format) : 'format') + ', options) instead')
   }
+
+  options = options || {}
 
   // output on request instead of response
   var immediate = options.immediate;
@@ -42,7 +48,7 @@ exports = module.exports = function morgan(options) {
   var skip = options.skip || function () { return false; };
 
   // format name
-  var fmt = exports[options.format] || options.format || exports.default;
+  var fmt = exports[format] || format || exports.default;
 
   // compile format
   if ('function' != typeof fmt) fmt = compile(fmt);

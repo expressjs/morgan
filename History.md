@@ -4,6 +4,7 @@ unreleased
   * Add `:remote-user` token
   * Add `combined` log format
   * Add `common` log format
+  * Add `morgan(format, options)` function signature
   * Remove non-standard grey color from `dev` format
 
 1.1.1 / 2014-05-20

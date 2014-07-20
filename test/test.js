@@ -1,4 +1,6 @@
 
+process.env.NO_DEPRECATION = 'morgan'
+
 var http = require('http');
 var morgan = require('..');
 var should = require('should');
@@ -9,25 +11,8 @@ function saveLastLogLine(line) { lastLogLine = line; }
 
 describe('logger()', function () {
   describe('arguments', function () {
-    it('should accept format as function', function (done) {
-      var line;
-      var server = createServer(function (tokens, req, res) {
-        line = [req.method, req.url, res.statusCode].join(' ') + '\n'
-      })
-
-      request(server)
-      .get('/')
-      .end(function (err, res) {
-        if (err) return done(err)
-        line.should.equal('GET / 200\n')
-        done()
-      })
-    })
-
     it('should use default format', function (done) {
-      var server = createServer({})
-
-      request(server)
+      request(createServer())
       .get('/')
       .end(function (err, res) {
         if (err) return done(err, res)
@@ -35,14 +20,59 @@ describe('logger()', function () {
         done()
       })
     })
+
+    describe('format', function () {
+      it('should accept format as format name', function (done) {
+        request(createServer('tiny'))
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          should(lastLogLine).match(/^GET \/ 200 - - \d+\.\d{3} ms\n$/)
+          done()
+        })
+      })
+
+      it('should accept format as format string', function (done) {
+        request(createServer(':method :url'))
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          should(lastLogLine).equal('GET /\n')
+          done()
+        })
+      })
+
+      it('should accept format as function', function (done) {
+        var line;
+        var server = createServer(function (tokens, req, res) {
+          line = [req.method, req.url, res.statusCode].join(' ') + '\n'
+        })
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          line.should.equal('GET / 200\n')
+          done()
+        })
+      })
+
+      it('should accept format in options for back-compat', function (done) {
+        request(createServer({format: ':method :url'}))
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          should(lastLogLine).equal('GET /\n')
+          done()
+        })
+      })
+    })
   })
 
   describe('tokens', function () {
     describe(':req', function () {
       it('should get request properties', function (done) {
-        var server = createServer({
-          format: ':req[x-from-string]'
-        })
+        var server = createServer(':req[x-from-string]')
 
         request(server)
         .get('/')
@@ -57,9 +87,7 @@ describe('logger()', function () {
 
     describe(':res', function () {
       it('should get response properties', function (done) {
-        var server = createServer({
-          format: ':res[x-sent]'
-        })
+        var server = createServer(':res[x-sent]')
 
         request(server)
         .get('/')
@@ -73,9 +101,7 @@ describe('logger()', function () {
 
     describe(':remote-addr', function () {
       it('should get remote address', function (done) {
-        var server = createServer({
-          format: ':remote-addr'
-        })
+        var server = createServer(':remote-addr')
 
         request(server)
         .get('/')
@@ -87,7 +113,7 @@ describe('logger()', function () {
       })
 
       it('should use req.ip if there', function (done) {
-        var server = createServer({format: ':remote-addr'}, function (req, res, next) {
+        var server = createServer(':remote-addr', null, function (req, res, next) {
           req.ip = '10.0.0.1'
           next()
         })
@@ -105,7 +131,7 @@ describe('logger()', function () {
         var fs = require('fs')
         var https = require('https')
         var cert = fs.readFileSync(__dirname + '/fixtures/server.crt', 'ascii')
-        var logger = createLogger({format: ':remote-addr'})
+        var logger = createLogger(':remote-addr')
         var server = https.createServer({
           key: fs.readFileSync(__dirname + '/fixtures/server.key', 'ascii'),
           cert: cert
@@ -136,7 +162,7 @@ describe('logger()', function () {
       })
 
       it('should work when connection: close', function (done) {
-        var server = createServer({format: ':remote-addr'})
+        var server = createServer(':remote-addr')
 
         request(server)
         .get('/')
@@ -149,7 +175,7 @@ describe('logger()', function () {
       })
 
       it('should work when connection: keep-alive', function (done) {
-        var server = createServer({format: ':remote-addr'}, function (req, res, next) {
+        var server = createServer(':remote-addr', null, function (req, res, next) {
           delete req._remoteAddress
           next()
         })
@@ -166,7 +192,7 @@ describe('logger()', function () {
       })
 
       it('should not fail if req.connection missing', function (done) {
-        var server = createServer({format: ':remote-addr'}, function (req, res, next) {
+        var server = createServer(':remote-addr', null, function (req, res, next) {
           delete req.connection
           delete req._remoteAddress
           next()
@@ -186,7 +212,7 @@ describe('logger()', function () {
 
     describe(':remote-user', function () {
       it('should be empty if none present', function (done) {
-        var server = createServer({format: ':remote-user'})
+        var server = createServer(':remote-user')
 
         request(server)
         .get('/')
@@ -198,7 +224,7 @@ describe('logger()', function () {
       })
 
       it('should support Basic authorization', function (done) {
-        var server = createServer({format: ':remote-user'})
+        var server = createServer(':remote-user')
 
         request(server)
         .get('/')
@@ -211,7 +237,7 @@ describe('logger()', function () {
       })
 
       it('should be empty for empty Basic authorization user', function (done) {
-        var server = createServer({format: ':remote-user'})
+        var server = createServer(':remote-user')
 
         request(server)
         .get('/')
@@ -227,7 +253,7 @@ describe('logger()', function () {
     describe(':response-time', function () {
       it('should be in milliseconds', function (done) {
         var start = Date.now()
-        var server = createServer({format: ':response-time'})
+        var server = createServer(':response-time')
 
         request(server)
         .get('/')
@@ -241,7 +267,7 @@ describe('logger()', function () {
       })
 
       it('should be empty without hidden property', function (done) {
-        var server = createServer({format: ':response-time'}, function (req, res, next) {
+        var server = createServer(':response-time', null, function (req, res, next) {
           delete req._startAt
           next()
         })
@@ -256,8 +282,7 @@ describe('logger()', function () {
       })
 
       it('should be empty before response', function (done) {
-        var server = createServer({
-          format: ':response-time',
+        var server = createServer(':response-time', {
           immediate: true
         })
 
@@ -273,9 +298,7 @@ describe('logger()', function () {
 
     describe(':status', function () {
       it('should get response status', function (done) {
-        var server = createServer({
-          format: ':status'
-        })
+        var server = createServer(':status')
 
         request(server)
         .get('/')
@@ -287,8 +310,7 @@ describe('logger()', function () {
       })
 
       it('should not exist before response sent', function (done) {
-        var server = createServer({
-          format: ':status',
+        var server = createServer(':status', {
           immediate: true
         })
 
@@ -303,7 +325,7 @@ describe('logger()', function () {
 
       it('should not exist for aborted request', function (done) {
         var stream = {write: writeLog}
-        var server = createServer({format: ':status', stream: stream}, function () {
+        var server = createServer(':status', {stream: stream}, function () {
           test.abort()
         })
 
@@ -322,7 +344,7 @@ describe('logger()', function () {
   describe('formats', function () {
     describe('combined', function () {
       it('should match expectations', function (done) {
-        var server = createServer({format: 'combined'})
+        var server = createServer('combined')
 
         request(server)
         .get('/')
@@ -340,7 +362,7 @@ describe('logger()', function () {
 
     describe('common', function () {
       it('should match expectations', function (done) {
-        var server = createServer({format: 'common'})
+        var server = createServer('common')
 
         request(server)
         .get('/')
@@ -356,7 +378,7 @@ describe('logger()', function () {
 
     describe('default', function () {
       it('should match expectations', function (done) {
-        var server = createServer({format: 'default'})
+        var server = createServer('default')
 
         request(server)
         .get('/')
@@ -374,7 +396,7 @@ describe('logger()', function () {
 
     describe('dev', function () {
       it('should color 200 green', function (done) {
-        var server = createServer({format: 'dev'})
+        var server = createServer('dev')
 
         request(server)
         .get('/')
@@ -388,7 +410,7 @@ describe('logger()', function () {
       })
 
       it('should color 500 red', function (done) {
-        var server = createServer({format: 'dev'}, function (req, res, next) {
+        var server = createServer('dev', null, function (req, res, next) {
           res.statusCode = 500
           next()
         })
@@ -405,7 +427,7 @@ describe('logger()', function () {
       })
 
       it('should color 400 yelow', function (done) {
-        var server = createServer({format: 'dev'}, function (req, res, next) {
+        var server = createServer('dev', null, function (req, res, next) {
           res.statusCode = 400
           next()
         })
@@ -422,7 +444,7 @@ describe('logger()', function () {
       })
 
       it('should color 300 cyan', function (done) {
-        var server = createServer({format: 'dev'}, function (req, res, next) {
+        var server = createServer('dev', null, function (req, res, next) {
           res.statusCode = 300
           next()
         })
@@ -441,7 +463,7 @@ describe('logger()', function () {
 
     describe('short', function () {
       it('should match expectations', function (done) {
-        var server = createServer({format: 'short'})
+        var server = createServer('short')
 
         request(server)
         .get('/')
@@ -457,7 +479,7 @@ describe('logger()', function () {
 
     describe('tiny', function () {
       it('should match expectations', function (done) {
-        var server = createServer({format: 'tiny'})
+        var server = createServer('tiny')
 
         request(server)
         .get('/')
@@ -474,9 +496,8 @@ describe('logger()', function () {
   describe('with buffer option', function () {
     it('should flush log periodically', function (done) {
       var count = 0;
-      var server = createServer({
+      var server = createServer(':method :url', {
         buffer: true,
-        format: ':method :url',
         stream: {write: writeLog}
       })
 
@@ -503,9 +524,8 @@ describe('logger()', function () {
 
     it('should accept custom interval', function (done) {
       var count = 0;
-      var server = createServer({
+      var server = createServer(':method :url', {
         buffer: 200,
-        format: ':method :url',
         stream: {write: writeLog}
       })
 
@@ -533,8 +553,7 @@ describe('logger()', function () {
 
   describe('with immediate option', function () {
     it('should log before response', function (done) {
-      var server = createServer({
-        format: ':method :url :res[x-sent]',
+      var server = createServer(':method :url :res[x-sent]', {
         immediate: true
       })
 
@@ -580,20 +599,23 @@ describe('logger()', function () {
   })
 })
 
-function createLogger(opts) {
-  var options = opts || {}
+function createLogger(format, opts) {
+  var args = Array.prototype.slice.call(arguments)
+  var i = Number(typeof args[0] !== 'object')
+  var options = args[i] || {}
 
   if (typeof options === 'object' && !options.stream) {
     options.stream = {'write': saveLastLogLine}
     lastLogLine = null
+    args[i] = options
   }
 
-  return morgan(options)
+  return morgan.apply(null, args)
 }
 
-function createServer(opts, fn) {
-  var logger = createLogger(opts)
-  var middle = fn || function (req, res, next) { next() }
+function createServer(format, opts, fn) {
+  var logger = createLogger(format, opts)
+  var middle = fn || noopMiddleware
   return http.createServer(function onRequest(req, res) {
     logger(req, res, function onNext(err) {
       // allow req, res alterations
@@ -608,4 +630,8 @@ function createServer(opts, fn) {
       })
     })
   })
+}
+
+function noopMiddleware(req, res, next) {
+  next()
 }

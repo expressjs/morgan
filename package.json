@@ -11,6 +11,7 @@
   "dependencies": {
     "basic-auth": "1.0.0",
     "bytes": "1.0.0",
+    "depd": "0.4.2",
     "finished": "~1.2.2"
   },
   "devDependencies": {
