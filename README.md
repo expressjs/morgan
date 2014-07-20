@@ -30,8 +30,38 @@ morgan({ format: 'dev', immediate: true })
 morgan(':method :url - :referrer')
 morgan(':req[content-type] -> :res[content-type]')
 morgan(function(tokens, req, res){ return 'some format string' })
-morgan({ format: 'dev', skip: function(req, res){ return res.statusCode === 304; }})
 ```
+
+#### Options
+
+Morgan accepts these properties in the options object.
+
+#### buffer
+
+Buffer duration before writing logs to the `stream`, defaults to `false`. When
+set to `true`, defaults to `1000 ms`.
+
+#### immediate
+
+Write log line on request instead of response. This means that a  requests will
+be logged even if the server crashes, but data from the response cannot be logged
+(like the response code).
+
+##### skip
+
+Function to determine if logging is skipped, defaults to `false`. This function
+will be called as `skip(req, res)`.
+
+```js
+// only log error responses
+morgan({
+  skip: function (req, res) { return res.statusCode < 400 }
+})
+```
+
+##### stream
+
+Output stream for writing log lines, defaults to `process.stdout`.
 
 #### Predefined Formats
 
@@ -77,21 +107,6 @@ The minimal output.
 
 ```
 :method :url :status :res[content-length] - :response-time ms
-```
-
-#### Options
-
-Morgan accepts these properties in the options object.
-
-- `format` - Format string or Setting, see below for format tokens.
-- `stream` - Output stream, defaults to `stdout`.
-- `buffer` - Buffer duration, defaults to `1000 ms` when `true`.
-- `immediate` - Write log line on request instead of response (for response times).
-- `skip` - Function to determine if logging is skipped, called as `skip(req, res)`, defaults to `false`.
-
-All default formats are defined this way, however the api is also public:
-```js
-morgan.format('name', 'string or function')
 ```
 
 #### Tokens
