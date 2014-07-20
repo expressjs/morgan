@@ -173,6 +173,7 @@ exports.format('common', ':remote-addr - :remote-user [:date] ":method :url HTTP
  */
 
 exports.format('default', ':remote-addr - :remote-user [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"');
+deprecate.property(exports, 'default', 'default format: use combined format')
 
 /**
  * Short format.
