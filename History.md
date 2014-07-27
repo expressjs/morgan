@@ -1,3 +1,9 @@
+unreleased
+==========
+
+  * deps: depd@0.4.4
+    - Work-around v8 generating empty stack traces
+
 1.2.1 / 2014-07-26
 ==================
 
