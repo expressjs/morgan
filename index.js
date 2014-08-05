@@ -264,6 +264,7 @@ exports.token('referrer', function(req){
  */
 
 exports.token('remote-addr', function(req){
+  if (req.header('x-forwarded-for')) return req.header('x-forwarded-for');
   if (req.ip) return req.ip;
   if (req._remoteAddress) return req._remoteAddress;
   if (req.connection) return req.connection.remoteAddress;
