@@ -13,7 +13,7 @@
 var auth = require('basic-auth')
 var bytes = require('bytes');
 var deprecate = require('depd')('morgan')
-var onFinished = require('finished')
+var onFinished = require('on-finished')
 
 /**
  * Default log buffer duration.

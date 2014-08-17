@@ -12,7 +12,7 @@
     "basic-auth": "1.0.0",
     "bytes": "1.0.0",
     "depd": "0.4.4",
-    "finished": "~1.2.2"
+    "on-finished": "2.1.0"
   },
   "devDependencies": {
     "istanbul": "0.3.0",
