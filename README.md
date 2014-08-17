@@ -49,9 +49,9 @@ set to `true`, defaults to `1000 ms`.
 
 #### immediate
 
-Write log line on request instead of response. This means that a  requests will
-be logged even if the server crashes, but data from the response cannot be logged
-(like the response code).
+Write log line on request instead of response. This means that a requests will
+be logged even if the server crashes, _but data from the response (like the
+response code, content length, etc.) cannot be logged_.
 
 ##### skip
 
