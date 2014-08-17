@@ -3,6 +3,7 @@
 [![NPM version](https://badge.fury.io/js/morgan.svg)](http://badge.fury.io/js/morgan)
 [![Build Status](https://travis-ci.org/expressjs/morgan.svg?branch=master)](https://travis-ci.org/expressjs/morgan)
 [![Coverage Status](https://img.shields.io/coveralls/expressjs/morgan.svg?branch=master)](https://coveralls.io/r/expressjs/morgan)
+[![Gittip](http://img.shields.io/gittip/dougwilson.svg)](https://www.gittip.com/dougwilson/)
 
 HTTP request logger middleware for node.js
 
