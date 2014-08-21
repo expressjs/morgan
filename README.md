@@ -33,7 +33,7 @@ morgan('combined')
 morgan(':remote-addr :method :url')
 
 // a custom function
-morgan(function (req, res) {
+morgan(function (tokens, req, res) {
   return req.method + ' ' + req.url
 })
 ```
