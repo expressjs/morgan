@@ -1,3 +1,8 @@
+unreleased
+==========
+
+  * Assert if `format` is not a function or string
+
 1.2.3 / 2014-08-16
 ==================
 

@@ -51,11 +51,8 @@ exports = module.exports = function morgan(format, options) {
   // check if log entry should be skipped
   var skip = options.skip || function () { return false; };
 
-  // format name
-  var fmt = exports[format] || format || exports.default;
-
-  // compile format
-  if ('function' != typeof fmt) fmt = compile(fmt);
+  // format function
+  var fmt = compile(exports[format] || format || exports.default)
 
   // options
   var stream = options.stream || process.stdout
@@ -116,18 +113,28 @@ exports = module.exports = function morgan(format, options) {
 };
 
 /**
- * Compile `fmt` into a function.
+ * Compile `format` into a function.
  *
- * @param {String} fmt
+ * @param {Function|String} format
  * @return {Function}
  * @api private
  */
 
-function compile(fmt) {
-  fmt = fmt.replace(/"/g, '\\"');
+function compile(format) {
+  if (typeof format === 'function') {
+    // already compiled
+    return format
+  }
+
+  if (typeof format !== 'string') {
+    throw new TypeError('argument format must be a function or string')
+  }
+
+  var fmt = format.replace(/"/g, '\\"')
   var js = '  return "' + fmt.replace(/:([-\w]{2,})(?:\[([^\]]+)\])?/g, function(_, name, arg){
     return '"\n    + (tokens["' + name + '"](req, res, "' + arg + '") || "-") + "';
   }) + '";'
+
   return new Function('tokens, req, res', js);
 };
 

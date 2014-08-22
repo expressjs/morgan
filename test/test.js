@@ -66,6 +66,10 @@ describe('logger()', function () {
           done()
         })
       })
+
+      it('should reject format as bool', function () {
+        createServer.bind(null, true).should.throw(/argument format/)
+      })
     })
   })
 
