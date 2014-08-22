@@ -124,6 +124,7 @@ exports = module.exports = function morgan(format, options) {
  */
 
 function compile(fmt) {
+  if(typeof fmt !== 'string') fmt = ''+fmt;
   fmt = fmt.replace(/"/g, '\\"');
   var js = '  return "' + fmt.replace(/:([-\w]{2,})(?:\[([^\]]+)\])?/g, function(_, name, arg){
     return '"\n    + (tokens["' + name + '"](req, res, "' + arg + '") || "-") + "';
