@@ -3,6 +3,7 @@
  * Copyright(c) 2010 Sencha Inc.
  * Copyright(c) 2011 TJ Holowaychuk
  * Copyright(c) 2014 Jonathan Ong
+ * Copyright(c) 2014 Douglas Christopher Wilson
  * MIT Licensed
  */
 
