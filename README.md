@@ -13,11 +13,7 @@ HTTP request logger middleware for node.js
 ## API
 
 ```js
-var express = require('express')
-var morgan  = require('morgan')
-
-var app = express()
-app.use(morgan('combined'))
+var morgan = require('morgan')
 ```
 
 ### morgan(format, options)
@@ -25,19 +21,6 @@ app.use(morgan('combined'))
 Create a new morgan logger middleware function using the given `format` and `options`.
 The `format` argument may be a string of a predefined name (see below for the names),
 a string of a format string, or a function that will produce a log entry.
-
-```js
-// a pre-defined name
-morgan('combined')
-
-// a format string
-morgan(':remote-addr :method :url')
-
-// a custom function
-morgan(function (tokens, req, res) {
-  return req.method + ' ' + req.url
-})
-```
 
 #### Options
 
@@ -60,7 +43,7 @@ Function to determine if logging is skipped, defaults to `false`. This function
 will be called as `skip(req, res)`.
 
 ```js
-// only log error responses
+// EXAMPLE: only log error responses
 morgan('combined', {
   skip: function (req, res) { return res.statusCode < 400 }
 })
@@ -134,6 +117,71 @@ The minimal output.
 To define a token, simply invoke `morgan.token()` with the name and a callback function. The value returned is then available as ":type" in this case:
 ```js
 morgan.token('type', function(req, res){ return req.headers['content-type']; })
+```
+
+## Examples
+
+### express/connect
+
+Simple app that will log all request in the Apache combined format to STDOUT
+
+```js
+var express = require('express')
+var morgan = require('morgan')
+
+var app = express()
+
+app.use(morgan('combined'))
+
+app.get('/', function (req, res) {
+  res.send('hello, world!')
+})
+```
+
+### vanilla http server
+
+Simple app that will log all request in the Apache combined format to STDOUT
+
+```js
+var finalhandler = require('finalhandler')
+var http = require('http')
+var morgan = require('morgan')
+
+// create "middleware"
+var logger = morgan('combined')
+
+http.createServer(function (req, res) {
+  var done = finalhandler(req, res)
+  logger(req, res, function (err) {
+    if (err) return done(err)
+
+    // respond to request
+    res.setHeader('content-type', 'text/plain')
+    res.end('hello, world!')
+  })
+})
+```
+
+### write logs to a file
+
+Simple app that will log all request in the Apache combined format to the file "access.log"
+
+```js
+var express = require('express')
+var fs = require('fs')
+var morgan = require('morgan')
+
+var app = express()
+
+// create a write stream (in append mode)
+var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
+
+// setup the logger
+app.use(morgan('combined', {stream: accessLogStream}))
+
+app.get('/', function (req, res) {
+  res.send('hello, world!')
+})
 ```
 
 ## License
