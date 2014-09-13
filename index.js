@@ -12,7 +12,6 @@
  */
 
 var auth = require('basic-auth')
-var bytes = require('bytes');
 var deprecate = require('depd')('morgan')
 var onFinished = require('on-finished')
 
@@ -92,7 +91,6 @@ exports = module.exports = function morgan(format, options) {
 
   return function logger(req, res, next) {
     req._startAt = process.hrtime();
-    req._startTime = new Date;
     req._remoteAddress = req.connection && req.connection.remoteAddress;
 
     function logRequest(){
