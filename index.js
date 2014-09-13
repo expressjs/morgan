@@ -91,6 +91,7 @@ exports = module.exports = function morgan(format, options) {
 
   return function logger(req, res, next) {
     req._startAt = process.hrtime();
+    req._startTime = new Date;
     req._remoteAddress = req.connection && req.connection.remoteAddress;
 
     function logRequest(){
