@@ -1,3 +1,8 @@
+unreleased
+==========
+
+  * Remove us-used `bytes` dependency
+
 1.3.0 / 2014-09-01
 ==================
 
