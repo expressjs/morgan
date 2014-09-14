@@ -2,6 +2,7 @@ unreleased
 ==========
 
   * Remove us-used `bytes` dependency
+  * deps: depd@0.4.5
 
 1.3.0 / 2014-09-01
 ==================
