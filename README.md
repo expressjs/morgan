@@ -45,7 +45,7 @@ will be called as `skip(req, res)`.
 ```js
 // EXAMPLE: only log error responses
 morgan({
-  format: 'combined'
+  format: 'combined',
   skip: function (req, res) { return res.statusCode < 400 }
 })
 ```
