@@ -92,7 +92,7 @@ exports = module.exports = function morgan(format, options) {
   return function logger(req, res, next) {
     req._startAt = process.hrtime();
     req._startTime = new Date;
-    req._remoteAddress = req.connection && req.connection.remoteAddress;
+    req._remoteAddress = getip(req);
 
     function logRequest(){
       if (skip(req, res)) return;
@@ -270,12 +270,7 @@ exports.token('referrer', function(req){
  * remote address
  */
 
-exports.token('remote-addr', function(req){
-  if (req.ip) return req.ip;
-  if (req._remoteAddress) return req._remoteAddress;
-  if (req.connection) return req.connection.remoteAddress;
-  return undefined;
-});
+exports.token('remote-addr', getip);
 
 /**
  * remote user
@@ -319,3 +314,13 @@ exports.token('res', function(req, res, field){
   return (res._headers || {})[field.toLowerCase()];
 });
 
+/**
+ * Get request IP address.
+ */
+
+function getip(req) {
+  return req.ip
+    || req._remoteAddress
+    || (req.connection && req.connection.remoteAddress)
+    || undefined;
+}

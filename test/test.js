@@ -117,9 +117,8 @@ describe('logger()', function () {
       })
 
       it('should use req.ip if there', function (done) {
-        var server = createServer(':remote-addr', null, function (req, res, next) {
+        var server = createServer(':remote-addr', null, null, function (req) {
           req.ip = '10.0.0.1'
-          next()
         })
 
         request(server)
@@ -195,11 +194,26 @@ describe('logger()', function () {
         })
       })
 
+      it('should work when req.ip is a getter', function (done) {
+        var server = createServer(':remote-addr', null, null, function (req) {
+          Object.defineProperty(req, 'ip', {
+            get: function () { return req.connection.remoteAddress ? '10.0.0.1' : undefined }
+          })
+        })
+
+        request(server)
+        .get('/')
+        .set('Connection', 'close')
+        .end(function (err, res) {
+          if (err) return done(err)
+          lastLogLine.should.equal('10.0.0.1\n')
+          done()
+        })
+      })
+
       it('should not fail if req.connection missing', function (done) {
-        var server = createServer(':remote-addr', null, function (req, res, next) {
+        var server = createServer(':remote-addr', null, null, function (req) {
           delete req.connection
-          delete req._remoteAddress
-          next()
         })
 
         request(server.listen())
@@ -617,10 +631,14 @@ function createLogger(format, opts) {
   return morgan.apply(null, args)
 }
 
-function createServer(format, opts, fn) {
+function createServer(format, opts, fn, fn1) {
   var logger = createLogger(format, opts)
   var middle = fn || noopMiddleware
   return http.createServer(function onRequest(req, res) {
+    // prior alterations
+    if (fn1) {
+      fn1(req, res)
+    }
     logger(req, res, function onNext(err) {
       // allow req, res alterations
       middle(req, res, function onDone() {

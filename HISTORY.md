@@ -1,3 +1,8 @@
+unreleased
+==========
+
+  * Fix `req.ip` integration when `immediate: false`
+
 1.3.1 / 2014-09-14
 ==================
 
