@@ -11,12 +11,16 @@
  * Module dependencies.
  */
 
+/** @private */
 var auth = require('basic-auth')
+/** @private */
 var deprecate = require('depd')('morgan')
+/** @private */
 var onFinished = require('on-finished')
 
 /**
  * Default log buffer duration.
+ * @private
  */
 
 var defaultBufferDuration = 1000;
@@ -118,6 +122,7 @@ exports = module.exports = function morgan(format, options) {
  * @param {Function|String} format
  * @return {Function}
  * @api private
+ * @private
  */
 
 function compile(format) {
@@ -316,6 +321,7 @@ exports.token('res', function(req, res, field){
 
 /**
  * Get request IP address.
+ * @private
  */
 
 function getip(req) {
