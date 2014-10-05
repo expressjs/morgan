@@ -9,6 +9,7 @@
 
 /**
  * Module dependencies.
+ * @private
  */
 
 var auth = require('basic-auth')
@@ -17,6 +18,7 @@ var onFinished = require('on-finished')
 
 /**
  * Default log buffer duration.
+ * @private
  */
 
 var defaultBufferDuration = 1000;
@@ -24,10 +26,10 @@ var defaultBufferDuration = 1000;
 /**
  * Create a logger middleware.
  *
+ * @public
  * @param {String|Function} format
  * @param {Object} [options]
  * @return {Function} middleware
- * @api public
  */
 
 exports = module.exports = function morgan(format, options) {
@@ -115,9 +117,9 @@ exports = module.exports = function morgan(format, options) {
 /**
  * Compile `format` into a function.
  *
+ * @private
  * @param {Function|String} format
  * @return {Function}
- * @api private
  */
 
 function compile(format) {
@@ -142,10 +144,10 @@ function compile(format) {
  * Define a token function with the given `name`,
  * and callback `fn(req, res)`.
  *
+ * @public
  * @param {String} name
  * @param {Function} fn
  * @return {Object} exports for chaining
- * @api public
  */
 
 exports.token = function(name, fn) {
@@ -156,10 +158,10 @@ exports.token = function(name, fn) {
 /**
  * Define a `fmt` with the given `name`.
  *
+ * @public
  * @param {String} name
  * @param {String|Function} fmt
  * @return {Object} exports for chaining
- * @api public
  */
 
 exports.format = function(name, fmt){
@@ -316,6 +318,10 @@ exports.token('res', function(req, res, field){
 
 /**
  * Get request IP address.
+ *
+ * @private
+ * @param {IncomingMessage} req
+ * @return {string}
  */
 
 function getip(req) {
