@@ -1,5 +1,5 @@
-unreleased
-==========
+1.4.0 / 2014-10-16
+==================
 
   * Add `debug` messages
   * deps: depd@~1.0.0
