@@ -13,6 +13,7 @@
  */
 
 var auth = require('basic-auth')
+var debug = require('debug')('morgan')
 var deprecate = require('depd')('morgan')
 var onFinished = require('on-finished')
 
@@ -97,10 +98,20 @@ exports = module.exports = function morgan(format, options) {
     req._remoteAddress = getip(req);
 
     function logRequest(){
-      if (skip(req, res)) return;
-      var line = fmt(exports, req, res);
-      if (null == line) return;
-      stream.write(line + '\n');
+      if (skip(req, res)) {
+        debug('skip request')
+        return
+      }
+
+      var line = fmt(exports, req, res)
+
+      if (null == line) {
+        debug('skip line')
+        return
+      }
+
+      debug('log request')
+      stream.write(line + '\n')
     };
 
     // immediate
