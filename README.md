@@ -194,7 +194,7 @@ app.get('/', function (req, res) {
 [travis-url]: https://travis-ci.org/expressjs/morgan
 [coveralls-image]: https://img.shields.io/coveralls/expressjs/morgan.svg?style=flat
 [coveralls-url]: https://coveralls.io/r/expressjs/morgan?branch=master
-[downloads-image]: http://img.shields.io/npm/dm/morgan.svg?style=flat
+[downloads-image]: https://img.shields.io/npm/dm/morgan.svg?style=flat
 [downloads-url]: https://npmjs.org/package/morgan
 [gratipay-image]: https://img.shields.io/gratipay/dougwilson.svg?style=flat
 [gratipay-url]: https://www.gratipay.com/dougwilson/
