@@ -119,6 +119,12 @@ To define a token, simply invoke `morgan.token()` with the name and a callback f
 morgan.token('type', function(req, res){ return req.headers['content-type']; })
 ```
 
+You can redefine token, e.g.
+```js
+morgan.token('date', function(){ return new Date().toISOString(); })
+```
+for [ISO style](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString) `2011-10-05T14:48:00.000Z`
+
 ## Examples
 
 ### express/connect
