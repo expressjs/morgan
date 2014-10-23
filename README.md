@@ -119,6 +119,8 @@ To define a token, simply invoke `morgan.token()` with the name and a callback f
 morgan.token('type', function(req, res){ return req.headers['content-type']; })
 ```
 
+Calling `morgan.token()` using the same name as an existing token will overwrite that token definition.
+
 ## Examples
 
 ### express/connect
@@ -178,6 +180,29 @@ var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a
 
 // setup the logger
 app.use(morgan('combined', {stream: accessLogStream}))
+
+app.get('/', function (req, res) {
+  res.send('hello, world!')
+})
+```
+
+### use custom token formats
+
+Sample app that will use custom token formats like changing the ":date"
+
+```js
+var express = require('express')
+var morgan = require('morgan')
+
+// alter :date token format
+// ex. 2011-10-05T14:48:00.000Z
+morgan.token('date', function () {
+  return new Date().toISOString()
+})
+
+var app = express()
+
+app.use(morgan('combined'))
 
 app.get('/', function (req, res) {
   res.send('hello, world!')
