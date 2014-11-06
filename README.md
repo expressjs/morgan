@@ -114,7 +114,7 @@ The minimal output.
 - `:user-agent`
 - `:status`
 
-To define a token, simply invoke `morgan.token()` with the name and a callback function. The value returned is then available as ":type" in this case:
+To define a token, simply invoke `morgan.token()` with the name and a callback function. This callback function is expected to return a string value. The value returned is then available as ":type" in this case:
 ```js
 morgan.token('type', function(req, res){ return req.headers['content-type']; })
 ```
