@@ -1,6 +1,10 @@
 unreleased
 ==========
 
+  * Add multiple date formats
+    - `clf` for the common log format
+    - `iso` for the common ISO 8601 date time format
+    - `web` for the common RFC 1123 date time format
   * Fix token arguments to accept values with `"`
 
 1.4.1 / 2014-10-22

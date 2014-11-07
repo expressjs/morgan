@@ -107,12 +107,14 @@ The minimal output.
 - `:response-time`
 - `:remote-addr`
 - `:remote-user`
-- `:date`
+- `:date[format]`
 - `:method`
 - `:url`
 - `:referrer`
 - `:user-agent`
 - `:status`
+
+##### Creating new tokens
 
 To define a token, simply invoke `morgan.token()` with the name and a callback function. This callback function is expected to return a string value. The value returned is then available as ":type" in this case:
 ```js
@@ -120,6 +122,16 @@ morgan.token('type', function(req, res){ return req.headers['content-type']; })
 ```
 
 Calling `morgan.token()` using the same name as an existing token will overwrite that token definition.
+
+##### :date[format]
+
+The current date and time in UTC. The available formats are:
+
+  - `clf` for the common log format (`"10/Oct/2000:13:55:36 +0000"`)
+  - `iso` for the common ISO 8601 date time format (`2000-10-10T13:55:36.000Z`)
+  - `web` for the common RFC 1123 date time format (`Tue, 10 Oct 2000 13:55:36 GMT`)
+
+If no format is given, then the default is `web`.
 
 ## Examples
 

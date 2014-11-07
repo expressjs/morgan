@@ -18,6 +18,16 @@ var deprecate = require('depd')('morgan')
 var onFinished = require('on-finished')
 
 /**
+ * Array of CLF month names.
+ * @private
+ */
+
+var clfmonth = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+]
+
+/**
  * Default log buffer duration.
  * @private
  */
@@ -256,11 +266,22 @@ exports.token('response-time', function(req, res){
 });
 
 /**
- * UTC date
+ * current date
  */
 
-exports.token('date', function(){
-  return new Date().toUTCString();
+exports.token('date', function(req, res, format){
+  format = format || 'web'
+
+  var date = new Date()
+
+  switch (format) {
+    case 'clf':
+      return clfdate(date)
+    case 'iso':
+      return date.toISOString()
+    case 'web':
+      return date.toUTCString()
+  }
 });
 
 /**
@@ -328,6 +349,28 @@ exports.token('res', function(req, res, field){
 });
 
 /**
+ * Format a Date in the common log format.
+ *
+ * @private
+ * @param {Date} dateTime
+ * @return {string}
+ */
+
+function clfdate(dateTime) {
+  var date = dateTime.getUTCDate()
+  var hour = dateTime.getUTCHours()
+  var mins = dateTime.getUTCMinutes()
+  var secs = dateTime.getUTCSeconds()
+  var year = dateTime.getUTCFullYear()
+
+  var month = clfmonth[dateTime.getUTCMonth()]
+
+  return pad2(date) + '/' + month + '/' + year
+    + ':' + pad2(hour) + ':' + pad2(mins) + ':' + pad2(secs)
+    + ' +0000'
+}
+
+/**
  * Get request IP address.
  *
  * @private
@@ -340,4 +383,19 @@ function getip(req) {
     || req._remoteAddress
     || (req.connection && req.connection.remoteAddress)
     || undefined;
+}
+
+/**
+ * Pad number to two digits.
+ *
+ * @private
+ * @param {number} num
+ * @return {string}
+ */
+
+function pad2(num) {
+  var str = String(num)
+
+  return (str.length === 1 ? '0' : '')
+    + str
 }

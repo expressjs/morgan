@@ -75,6 +75,68 @@ describe('logger()', function () {
   })
 
   describe('tokens', function () {
+    describe(':date', function () {
+      it('should get current date in "web" format by default', function (done) {
+        var server = createServer(':date')
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          assert(/^\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT$/m.test(lastLogLine))
+          done()
+        })
+      })
+
+      it('should get current date in "clf" format', function (done) {
+        var server = createServer(':date[clf]')
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          assert(/^\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2} \+0000$/m.test(lastLogLine))
+          done()
+        })
+      })
+
+      it('should get current date in "iso" format', function (done) {
+        var server = createServer(':date[iso]')
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          assert(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/m.test(lastLogLine))
+          done()
+        })
+      })
+
+      it('should get current date in "web" format', function (done) {
+        var server = createServer(':date[web]')
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          assert(/^\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT$/m.test(lastLogLine))
+          done()
+        })
+      })
+
+      it('should be blank for unknown format', function (done) {
+        var server = createServer(':date[bogus]')
+
+        request(server)
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          assert.equal(lastLogLine, '-\n')
+          done()
+        })
+      })
+    })
+
     describe(':req', function () {
       it('should get request properties', function (done) {
         var server = createServer(':req[x-from-string]')
