@@ -17,7 +17,6 @@
   "devDependencies": {
     "istanbul": "0.3.2",
     "mocha": "~2.0.0",
-    "should": "~4.1.0",
     "supertest": "~0.14.0"
   },
   "files": [

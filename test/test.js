@@ -1,9 +1,9 @@
 
 process.env.NO_DEPRECATION = 'morgan'
 
+var assert = require('assert');
 var http = require('http');
 var morgan = require('..');
-var should = require('should');
 var request = require('supertest');
 
 var lastLogLine;
@@ -16,7 +16,8 @@ describe('logger()', function () {
       .get('/')
       .end(function (err, res) {
         if (err) return done(err, res)
-        lastLogLine.should.startWith(res.text);
+        assert(res.text.length > 0)
+        assert.equal(lastLogLine.substr(0, res.text.length), res.text)
         done()
       })
     })
@@ -27,7 +28,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          should(lastLogLine).match(/^GET \/ 200 - - \d+\.\d{3} ms\n$/)
+          assert(/^GET \/ 200 - - \d+\.\d{3} ms\n$/.test(lastLogLine))
           done()
         })
       })
@@ -37,7 +38,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          should(lastLogLine).equal('GET /\n')
+          assert.equal(lastLogLine, 'GET /\n')
           done()
         })
       })
@@ -52,7 +53,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          line.should.equal('GET / 200\n')
+          assert.equal(line, 'GET / 200\n')
           done()
         })
       })
@@ -62,13 +63,13 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          should(lastLogLine).equal('GET /\n')
+          assert.equal(lastLogLine, 'GET /\n')
           done()
         })
       })
 
       it('should reject format as bool', function () {
-        createServer.bind(null, true).should.throw(/argument format/)
+        assert.throws(createServer.bind(null, true), /argument format/)
       })
     })
   })
@@ -83,7 +84,7 @@ describe('logger()', function () {
         .set('x-from-string', 'me')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal('me\n')
+          assert.equal(lastLogLine, 'me\n')
           done()
         })
       })
@@ -97,7 +98,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal('true\n')
+          assert.equal(lastLogLine, 'true\n')
           done()
         })
       })
@@ -111,7 +112,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal(res.text + '\n')
+          assert.equal(lastLogLine, res.text + '\n')
           done()
         })
       })
@@ -125,7 +126,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal('10.0.0.1\n')
+          assert.equal(lastLogLine, '10.0.0.1\n')
           done()
         })
       })
@@ -159,7 +160,7 @@ describe('logger()', function () {
         req.agent(agent)
         req.end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal(res.text + '\n')
+          assert.equal(lastLogLine, res.text + '\n')
           done()
         })
       })
@@ -172,7 +173,7 @@ describe('logger()', function () {
         .set('Connection', 'close')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal(res.text + '\n')
+          assert.equal(lastLogLine, res.text + '\n')
           done()
         })
       })
@@ -188,7 +189,7 @@ describe('logger()', function () {
         .set('Connection', 'keep-alive')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal(res.text + '\n')
+          assert.equal(lastLogLine, res.text + '\n')
           res.req.connection.destroy()
           server.close(done)
         })
@@ -206,7 +207,7 @@ describe('logger()', function () {
         .set('Connection', 'close')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal('10.0.0.1\n')
+          assert.equal(lastLogLine, '10.0.0.1\n')
           done()
         })
       })
@@ -221,7 +222,7 @@ describe('logger()', function () {
         .set('Connection', 'keep-alive')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal(res.text + '\n')
+          assert.equal(lastLogLine, res.text + '\n')
           res.req.connection.destroy()
           server.close(done)
         })
@@ -236,7 +237,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal('-\n')
+          assert.equal(lastLogLine, '-\n')
           done()
         })
       })
@@ -249,7 +250,7 @@ describe('logger()', function () {
         .set('Authorization', 'Basic dGo6')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal('tj\n')
+          assert.equal(lastLogLine, 'tj\n')
           done()
         })
       })
@@ -262,7 +263,7 @@ describe('logger()', function () {
         .set('Authorization', 'Basic Og==')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal('-\n')
+          assert.equal(lastLogLine, '-\n')
           done()
         })
       })
@@ -279,7 +280,8 @@ describe('logger()', function () {
           if (err) return done(err)
           var end = Date.now()
           var ms = parseFloat(lastLogLine)
-          ms.should.be.within(0, end - start + 1)
+          assert(ms > 0)
+          assert(ms < end - start + 1)
           done()
         })
       })
@@ -294,7 +296,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal('-\n')
+          assert.equal(lastLogLine, '-\n')
           done()
         })
       })
@@ -308,7 +310,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal('-\n')
+          assert.equal(lastLogLine, '-\n')
           done()
         })
       })
@@ -322,7 +324,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal(res.statusCode + '\n')
+          assert.equal(lastLogLine, res.statusCode + '\n')
           done()
         })
       })
@@ -336,7 +338,7 @@ describe('logger()', function () {
         .get('/')
         .end(function (err, res) {
           if (err) return done(err)
-          lastLogLine.should.equal('-\n')
+          assert.equal(lastLogLine, '-\n')
           done()
         })
       })
@@ -348,7 +350,7 @@ describe('logger()', function () {
         })
 
         function writeLog(log) {
-          log.should.equal('-\n')
+          assert.equal(log, '-\n')
           server.close()
           done()
         }
@@ -372,7 +374,7 @@ describe('logger()', function () {
         .end(function (err, res) {
           if (err) return done(err)
           var line = lastLogLine.replace(/\w+, \d+ \w+ \d+ \d+:\d+:\d+ \w+/, '_timestamp_')
-          line.should.equal(res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 - "http://localhost/" "my-ua"\n')
+          assert.equal(line, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 - "http://localhost/" "my-ua"\n')
           done()
         })
       })
@@ -388,7 +390,7 @@ describe('logger()', function () {
         .end(function (err, res) {
           if (err) return done(err)
           var line = lastLogLine.replace(/\w+, \d+ \w+ \d+ \d+:\d+:\d+ \w+/, '_timestamp_')
-          line.should.equal(res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 -\n')
+          assert.equal(line, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 -\n')
           done()
         })
       })
@@ -406,7 +408,7 @@ describe('logger()', function () {
         .end(function (err, res) {
           if (err) return done(err)
           var line = lastLogLine.replace(/\w+, \d+ \w+ \d+ \d+:\d+:\d+ \w+/, '_timestamp_')
-          line.should.equal(res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 - "http://localhost/" "my-ua"\n')
+          assert.equal(line, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 - "http://localhost/" "my-ua"\n')
           done()
         })
       })
@@ -421,8 +423,8 @@ describe('logger()', function () {
         .end(function (err, res) {
           if (err) return done(err)
           lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          lastLogLine.should.startWith('_color_0_GET / _color_32_200 _color_0_')
-          lastLogLine.should.endWith('_color_0_\n')
+          assert.equal(lastLogLine.substr(0, 38), '_color_0_GET / _color_32_200 _color_0_')
+          assert.equal(lastLogLine.substr(-10), '_color_0_\n')
           done()
         })
       })
@@ -438,8 +440,8 @@ describe('logger()', function () {
         .end(function (err, res) {
           if (err) return done(err)
           lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          lastLogLine.should.startWith('_color_0_GET / _color_31_500 _color_0_')
-          lastLogLine.should.endWith('_color_0_\n')
+          assert.equal(lastLogLine.substr(0, 38), '_color_0_GET / _color_31_500 _color_0_')
+          assert.equal(lastLogLine.substr(-10), '_color_0_\n')
           done()
         })
       })
@@ -455,8 +457,8 @@ describe('logger()', function () {
         .end(function (err, res) {
           if (err) return done(err)
           lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          lastLogLine.should.startWith('_color_0_GET / _color_33_400 _color_0_')
-          lastLogLine.should.endWith('_color_0_\n')
+          assert.equal(lastLogLine.substr(0, 38), '_color_0_GET / _color_33_400 _color_0_')
+          assert.equal(lastLogLine.substr(-10), '_color_0_\n')
           done()
         })
       })
@@ -472,8 +474,8 @@ describe('logger()', function () {
         .end(function (err, res) {
           if (err) return done(err)
           lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          lastLogLine.should.startWith('_color_0_GET / _color_36_300 _color_0_')
-          lastLogLine.should.endWith('_color_0_\n')
+          assert.equal(lastLogLine.substr(0, 38), '_color_0_GET / _color_36_300 _color_0_')
+          assert.equal(lastLogLine.substr(-10), '_color_0_\n')
           done()
         })
       })
@@ -489,7 +491,7 @@ describe('logger()', function () {
         .end(function (err, res) {
           if (err) return done(err)
           var line = lastLogLine.replace(/\d+\.\d{3} ms/, '_timer_')
-          line.should.equal(res.text + ' tj GET / HTTP/1.1 200 - - _timer_\n')
+          assert.equal(line, res.text + ' tj GET / HTTP/1.1 200 - - _timer_\n')
           done()
         })
       })
@@ -504,7 +506,7 @@ describe('logger()', function () {
         .end(function (err, res) {
           if (err) return done(err)
           var line = lastLogLine.replace(/\d+\.\d{3} ms/, '_timer_')
-          line.should.equal('GET / 200 - - _timer_\n')
+          assert.equal(line, 'GET / 200 - - _timer_\n')
           done()
         })
       })
@@ -520,7 +522,7 @@ describe('logger()', function () {
       })
 
       function writeLog(log) {
-        log.should.equal('GET /first\nGET /second\n')
+        assert.equal(log, 'GET /first\nGET /second\n')
         server.close()
         done()
       }
@@ -548,7 +550,7 @@ describe('logger()', function () {
       })
 
       function writeLog(log) {
-        log.should.equal('GET /first\nGET /second\n')
+        assert.equal(log, 'GET /first\nGET /second\n')
         server.close()
         done()
       }
@@ -579,7 +581,7 @@ describe('logger()', function () {
       .get('/')
       .end(function (err, res) {
         if (err) return done(err)
-        lastLogLine.should.equal('GET / -\n')
+        assert.equal(lastLogLine, 'GET / -\n')
         done()
       })
     })
@@ -596,7 +598,7 @@ describe('logger()', function () {
       .set('Connection', 'close')
       .end(function (err, res) {
         if (err) return done(err)
-        should.not.exist(lastLogLine)
+        assert(lastLogLine == null)
         done()
       })
     })
@@ -610,7 +612,7 @@ describe('logger()', function () {
       .get('/')
       .end(function (err, res) {
         if (err) return done(err)
-        should.not.exist(lastLogLine)
+        assert(lastLogLine == null)
         done()
       })
     })
