@@ -96,19 +96,6 @@ The minimal output.
 
 #### Tokens
 
-- `:req[header]` ex: `:req[Accept]`
-- `:res[header]` ex: `:res[Content-Length]`
-- `:http-version`
-- `:response-time`
-- `:remote-addr`
-- `:remote-user`
-- `:date[format]`
-- `:method`
-- `:url`
-- `:referrer`
-- `:user-agent`
-- `:status`
-
 ##### Creating new tokens
 
 To define a token, simply invoke `morgan.token()` with the name and a callback function. This callback function is expected to return a string value. The value returned is then available as ":type" in this case:
@@ -135,6 +122,38 @@ The HTTP version of the request.
 ##### :method
 
 The HTTP version of the request.
+
+##### :referrer
+
+The Referrer header of the request. This will use the standard mis-spelled Referer header if exists, otherwise Referrer.
+
+##### :remote-addr
+
+The remote address of the request. This will use `req.ip`, otherwise the standard `req.connection.remoteAddress` value (socket address).
+
+##### :remote-user
+
+The user authenticated as part of Basic auth for the request.
+
+##### :req[header]
+
+The given `header` of the request.
+
+##### :res[header]
+
+The given `header` of the response.
+
+##### :response-time
+
+The time between the request coming into `morgan` and when the response headers are written, in milliseconds.
+
+##### :status
+
+The status code of the response.
+
+##### :url
+
+The URL of the request. This will use `req.originalUrl` if exists, otherwise `req.url`.
 
 ##### :user-agent
 
