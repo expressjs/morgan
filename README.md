@@ -133,6 +133,18 @@ The current date and time in UTC. The available formats are:
 
 If no format is given, then the default is `web`.
 
+##### :http-version
+
+The HTTP version of the request.
+
+##### :method
+
+The HTTP version of the request.
+
+##### :user-agent
+
+The contents of the User-Agent header of the request.
+
 ## Examples
 
 ### express/connect
