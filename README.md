@@ -26,11 +26,6 @@ a string of a format string, or a function that will produce a log entry.
 
 Morgan accepts these properties in the options object.
 
-#### buffer
-
-Buffer duration before writing logs to the `stream`, defaults to `false`. When
-set to `true`, defaults to `1000 ms`.
-
 #### immediate
 
 Write log line on request instead of response. This means that a requests will

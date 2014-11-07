@@ -67,12 +67,14 @@ exports = module.exports = function morgan(format, options) {
   // format function
   var fmt = compile(exports[format] || format || exports.default)
 
-  // options
+  // steam
+  var buffer = options.buffer
   var stream = options.stream || process.stdout
-    , buffer = options.buffer;
 
   // buffering support
   if (buffer) {
+    deprecate('buffer option')
+
     var realStream = stream
     var buf = []
     var timer = null

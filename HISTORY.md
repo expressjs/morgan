@@ -5,6 +5,7 @@ unreleased
     - `clf` for the common log format
     - `iso` for the common ISO 8601 date time format
     - `web` for the common RFC 1123 date time format
+  * Deprecate `buffer` option
   * Fix date format in `common` and `combined` formats
   * Fix token arguments to accept values with `"`
 
