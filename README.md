@@ -212,25 +212,30 @@ app.get('/', function (req, res) {
 
 ### use custom token formats
 
-Sample app that will use custom token formats like changing the ":date"
+Sample app that will use custom token formats. This adds an ID to all requests and displays it using the `:id` token.
 
 ```js
 var express = require('express')
 var morgan = require('morgan')
+var uuid = require('node-uuid')
 
-// alter :date token format
-// ex. 2011-10-05T14:48:00.000Z
-morgan.token('date', function () {
-  return new Date().toISOString()
+morgan.token('id', function () {
+  return req.id
 })
 
 var app = express()
 
-app.use(morgan('combined'))
+app.use(assignId)
+app.use(morgan(':id :method :url :response-time'))
 
 app.get('/', function (req, res) {
   res.send('hello, world!')
 })
+
+function assignId(req, res, next) {
+  req.id = uuid.v4()
+  next()
+}
 ```
 
 ## License
