@@ -1,5 +1,5 @@
-unreleased
-==========
+1.5.0 / 2014-11-06
+==================
 
   * Add multiple date formats
     - `clf` for the common log format
