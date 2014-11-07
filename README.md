@@ -62,7 +62,7 @@ There are various pre-defined formats provided:
 Standard Apache combined log output.
 
 ```
-:remote-addr - :remote-user [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"
+:remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"
 ```
 
 ##### common
@@ -70,7 +70,7 @@ Standard Apache combined log output.
 Standard Apache common log output.
 
 ```
-:remote-addr - :remote-user [:date] ":method :url HTTP/:http-version" :status :res[content-length]
+:remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length]
 ```
 
 ##### dev

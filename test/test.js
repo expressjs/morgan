@@ -435,7 +435,7 @@ describe('logger()', function () {
         .set('User-Agent', 'my-ua')
         .end(function (err, res) {
           if (err) return done(err)
-          var line = lastLogLine.replace(/\w+, \d+ \w+ \d+ \d+:\d+:\d+ \w+/, '_timestamp_')
+          var line = lastLogLine.replace(/\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2} \+0000/, '_timestamp_')
           assert.equal(line, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 - "http://localhost/" "my-ua"\n')
           done()
         })
@@ -451,7 +451,7 @@ describe('logger()', function () {
         .set('Authorization', 'Basic dGo6')
         .end(function (err, res) {
           if (err) return done(err)
-          var line = lastLogLine.replace(/\w+, \d+ \w+ \d+ \d+:\d+:\d+ \w+/, '_timestamp_')
+          var line = lastLogLine.replace(/\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2} \+0000/, '_timestamp_')
           assert.equal(line, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 -\n')
           done()
         })

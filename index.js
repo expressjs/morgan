@@ -194,13 +194,13 @@ exports.format = function(name, fmt){
  * Apache combined log format.
  */
 
-exports.format('combined', ':remote-addr - :remote-user [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"')
+exports.format('combined', ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"')
 
 /**
  * Apache common log format.
  */
 
-exports.format('common', ':remote-addr - :remote-user [:date] ":method :url HTTP/:http-version" :status :res[content-length]')
+exports.format('common', ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length]')
 
 /**
  * Default format.
