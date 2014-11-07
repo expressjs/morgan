@@ -145,7 +145,7 @@ function compile(format) {
 
   var fmt = format.replace(/"/g, '\\"')
   var js = '  return "' + fmt.replace(/:([-\w]{2,})(?:\[([^\]]+)\])?/g, function(_, name, arg){
-    return '"\n    + (tokens["' + name + '"](req, res, "' + arg + '") || "-") + "';
+    return '"\n    + (tokens["' + name + '"](req, res, ' + String(JSON.stringify(arg)) + ') || "-") + "';
   }) + '";'
 
   return new Function('tokens, req, res', js);

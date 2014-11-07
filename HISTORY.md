@@ -1,3 +1,8 @@
+unreleased
+==========
+
+  * Fix token arguments to accept values with `"`
+
 1.4.1 / 2014-10-22
 ==================
 
