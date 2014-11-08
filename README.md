@@ -233,7 +233,7 @@ var express = require('express')
 var morgan = require('morgan')
 var uuid = require('node-uuid')
 
-morgan.token('id', function () {
+morgan.token('id', function getId(req) {
   return req.id
 })
 
