@@ -1,4 +1,4 @@
-# morgan
+# morgan with mongodb option
 
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
@@ -13,7 +13,7 @@ HTTP request logger middleware for node.js
 ## API
 
 ```js
-var morgan = require('morgan')
+//var morgan = require('morgan')
 ```
 
 ### morgan(format, options)
