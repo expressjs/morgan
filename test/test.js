@@ -5,6 +5,7 @@ var assert = require('assert');
 var http = require('http');
 var morgan = require('..');
 var request = require('supertest');
+var MongoClient = require('mongodb').MongoClient;
 
 var lastLogLine;
 function saveLastLogLine(line) { lastLogLine = line; }
@@ -677,6 +678,88 @@ describe('logger()', function () {
         assert(lastLogLine == null)
         done()
       })
+    })
+  })
+
+  var mongodbUrl = 'mongodb://admin:123456@emech-Aspire-5738:27000/morgantest?authSource=admin';
+  describe('with mongodb option ' + mongodbUrl, function () {
+    it('should save log to default collection request', function (done) {
+      // removing all log containments
+      MongoClient.connect(mongodbUrl, function (error, db) {
+        // error occured in connecting to mongodb
+        if (error) return done('can not connect to mongodb: '+ error)
+        var collection = db.collection('request')
+        // removing the saved logs
+        collection.remove({}, function (error, result) {
+          // error in removing saved logs
+          if (error) return done('can not remove all logs saved to mongodb: '+ error)
+          // close db connection
+          db.close()
+
+          // create server with mongodb option
+          var server = createServer({'format': 'default', 'mongodb': mongodbUrl})
+          request(server)
+          .get('/')
+          .end(function (err, res) {
+            // connect to mongo for checking the log saved
+            MongoClient.connect(mongodbUrl, function (error, db) {
+              // cannot connect to mongo
+              if (error) return done('can not connect to mongodb: '+ error)
+
+              var collection = db.collection('request');
+              // counting the log count, there should be only one log
+              collection.count({}, function (error, result) {
+                // can not count the log collection
+                if (error) return done('can not count read count from mongodb: '+ error)
+
+                // check log count it should be 1
+                assert((result === 1), 'there should be 1 log but there is ' + result)
+                done()
+              })
+            })
+          })
+        })
+      })
+    })
+
+    var collectionName = 'log_request'
+    it('should save log to collection ' + collectionName, function (done) {
+      // removing all log containments
+      MongoClient.connect(mongodbUrl, function (error, db) {
+        // error occured in connecting to mongodb
+        if (error) return done('can not connect to mongodb: '+ error)
+        var collection = db.collection(collectionName)
+        // removing the saved logs
+        collection.remove({}, function (error, result) {
+          // error in removing saved logs
+          if (error) return done('can not remove all logs saved to mongodb: '+ error)
+          // close db connection
+          db.close()
+
+          // create server with mongodb option
+          var server = createServer({'format': 'default', 'mongodb': mongodbUrl, 'collection': collectionName})
+          request(server)
+          .get('/')
+          .end(function (err, res) {
+            // connect to mongo for checking the log saved
+            MongoClient.connect(mongodbUrl, function (error, db) {
+              // cannot connect to mongo
+              if (error) return done('can not connect to mongodb: '+ error)
+
+              var collection = db.collection(collectionName);
+              // counting the log count, there should be only one log
+              collection.count({}, function (error, result) {
+                // can not count the log collection
+                if (error) return done('can not count read count from mongodb: '+ error)
+
+                // check log count it should be 1
+                assert((result === 1), 'there should be 1 log but there is ' + result)
+                done()
+              })
+            })
+          })
+        })
+      })  
     })
   })
 })

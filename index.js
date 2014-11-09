@@ -16,6 +16,7 @@ var auth = require('basic-auth')
 var debug = require('debug')('morgan')
 var deprecate = require('depd')('morgan')
 var onFinished = require('on-finished')
+var MongoClient = require('mongodb').MongoClient;
 
 /**
  * Array of CLF month names.
@@ -66,6 +67,10 @@ exports = module.exports = function morgan(format, options) {
 
   // format function
   var fmt = compile(exports[format] || format || exports.default)
+
+  // url of mongodb options
+  var mongodbUrl = options.mongodb;
+  var mongodbCollection = options.collection || "request";
 
   // steam
   var buffer = options.buffer
@@ -122,8 +127,45 @@ exports = module.exports = function morgan(format, options) {
         return
       }
 
+      function logToMongodb (line)
+      {
+        if (!mongodbUrl) {
+          debug('no mongodb');
+          return;
+        }
+
+        // connect to mongodb
+        MongoClient.connect(mongodbUrl,function(error,db) { 
+          // check if error occured
+          if (error) {
+            debug("mongodb error", error);
+            db.close();
+            return;
+          } 
+          // get collection for the logs
+          var collection = db.collection(mongodbCollection);
+          // create log object
+          var requestlog = {
+            time: Date.now(),
+            request: line
+          };
+          // insert log object to collection
+          collection.insert(requestlog, function(error, result){
+            if (error) {
+              debug("mongodb write error", error);
+            } else {
+              debug("log saved to mongodb");
+            }
+
+            debug("mongodb closed");
+            db.close();
+          });
+        });
+      }
+
       debug('log request')
       stream.write(line + '\n')
+      logToMongodb(line)  
     };
 
     // immediate

@@ -1,19 +1,16 @@
-# morgan
-
-[![NPM Version][npm-image]][npm-url]
-[![NPM Downloads][downloads-image]][downloads-url]
-[![Build Status][travis-image]][travis-url]
-[![Test Coverage][coveralls-image]][coveralls-url]
-[![Gratipay][gratipay-image]][gratipay-url]
+# morgan with mongodb option
 
 HTTP request logger middleware for node.js
 
 > Named after [Dexter](http://en.wikipedia.org/wiki/Dexter_Morgan), a show you should not watch until completion.
 
+
+**This repository is a modified copy of [morgan](https://github.com/expressjs/morgan) and this copy is not on npm yet, so you need to manually copy this module to your project location**
+
 ## API
 
 ```js
-var morgan = require('morgan')
+var morgan = require('./path/to/morgan/module')
 ```
 
 ### morgan(format, options)
@@ -47,6 +44,30 @@ morgan('combined', {
 ##### stream
 
 Output stream for writing log lines, defaults to `process.stdout`.
+
+##### mongodb 
+
+Mongodb connection string which you want to save your logs to.
+
+```js
+// EXAMPLE: also save logs to localhost:27017/morgan database
+morgan('combined', {
+  mongodb: "mongodb://localhost:27017/morgan"
+})
+```
+
+##### collection 
+
+Name of the collection which you want to save your logs to, defaults to `request`
+
+```js
+// EXAMPLE: also save logs to localhost:27017/morgan database and the log_request collection
+morgan('combined', {
+  mongodb: "mongodb://localhost:27017/morgan",
+  collection: "log_request"
+})
+```
+
 
 #### Predefined Formats
 
