@@ -381,10 +381,12 @@ function clfdate(dateTime) {
  */
 
 function getip(req) {
-  return req.ip
+  return (req.headers['x-forwarded-for']
     || req._remoteAddress
-    || (req.connection && req.connection.remoteAddress)
-    || undefined;
+    || req.connection.remoteAddress
+    || req.socket.remoteAddress
+    || req.connection.socket.remoteAddress
+  ).split(',')[0];
 }
 
 /**
