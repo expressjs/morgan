@@ -58,18 +58,41 @@ describe('morgan()', function () {
         })
       })
 
-      it('should accept format in options for back-compat', function (done) {
-        request(createServer({format: ':method :url'}))
-        .get('/')
-        .end(function (err, res) {
-          if (err) return done(err)
-          assert.equal(lastLogLine, 'GET /\n')
-          done()
-        })
-      })
-
       it('should reject format as bool', function () {
         assert.throws(createServer.bind(null, true), /argument format/)
+      })
+
+      describe('back-compat', function () {
+        it('should accept options object', function (done) {
+          request(createServer({}))
+          .get('/')
+          .end(function (err, res) {
+            if (err) return done(err)
+            assert(res.text.length > 0)
+            assert.equal(lastLogLine.substr(0, res.text.length), res.text)
+            done()
+          })
+        })
+
+        it('should accept format in options for back-compat', function (done) {
+          request(createServer({format: ':method :url'}))
+          .get('/')
+          .end(function (err, res) {
+            if (err) return done(err)
+            assert.equal(lastLogLine, 'GET /\n')
+            done()
+          })
+        })
+
+        it('should accept format function in options for back-compat', function (done) {
+          request(createServer({format: function () { return 'apple' }}))
+          .get('/')
+          .end(function (err, res) {
+            if (err) return done(err)
+            assert.equal(lastLogLine, 'apple\n')
+            done()
+          })
+        })
       })
     })
   })
