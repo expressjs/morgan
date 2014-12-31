@@ -9,7 +9,7 @@ var request = require('supertest');
 var lastLogLine;
 function saveLastLogLine(line) { lastLogLine = line; }
 
-describe('logger()', function () {
+describe('morgan()', function () {
   describe('arguments', function () {
     it('should use default format', function (done) {
       request(createServer())
