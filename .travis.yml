@@ -4,6 +4,6 @@ node_js:
   - "0.10"
   - "0.12"
   - "1.0"
-  - "1.5"
+  - "1.6"
 script: "npm run-script test-travis"
 after_script: "npm install coveralls@2 && cat ./coverage/lcov.info | coveralls"
