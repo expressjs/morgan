@@ -256,13 +256,13 @@ function assignId(req, res, next) {
 
 [MIT](LICENSE)
 
-[npm-image]: https://img.shields.io/npm/v/morgan.svg?style=flat
+[npm-image]: https://img.shields.io/npm/v/morgan.svg
 [npm-url]: https://npmjs.org/package/morgan
-[travis-image]: https://img.shields.io/travis/expressjs/morgan.svg?style=flat
+[travis-image]: https://img.shields.io/travis/expressjs/morgan/master.svg
 [travis-url]: https://travis-ci.org/expressjs/morgan
-[coveralls-image]: https://img.shields.io/coveralls/expressjs/morgan.svg?style=flat
+[coveralls-image]: https://img.shields.io/coveralls/expressjs/morgan/master.svg
 [coveralls-url]: https://coveralls.io/r/expressjs/morgan?branch=master
-[downloads-image]: https://img.shields.io/npm/dm/morgan.svg?style=flat
+[downloads-image]: https://img.shields.io/npm/dm/morgan.svg
 [downloads-url]: https://npmjs.org/package/morgan
-[gratipay-image]: https://img.shields.io/gratipay/dougwilson.svg?style=flat
+[gratipay-image]: https://img.shields.io/gratipay/dougwilson.svg
 [gratipay-url]: https://www.gratipay.com/dougwilson/
