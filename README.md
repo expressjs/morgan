@@ -204,7 +204,10 @@ http.createServer(function (req, res) {
 
 ### write logs to a file
 
-Simple app that will log all request in the Apache combined format to the file "access.log"
+#### single file
+
+Simple app that will log all requests in the Apache combined format to the file
+`access.log`.
 
 ```js
 var express = require('express')
@@ -215,6 +218,39 @@ var app = express()
 
 // create a write stream (in append mode)
 var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
+
+// setup the logger
+app.use(morgan('combined', {stream: accessLogStream}))
+
+app.get('/', function (req, res) {
+  res.send('hello, world!')
+})
+```
+
+#### log file rotation
+
+Simple app that will log all requests in the Apache combined format to one log
+file per date in the `log/` directory using the
+[file-stream-rotator module](https://www.npmjs.com/package/file-stream-rotator).
+
+```js
+var createRotatingStream = require('file-stream-rotator').getStream
+var express = require('express')
+var fs = require('fs')
+var morgan = require('morgan')
+
+var app = express()
+var logDirectory = __dirname + '/log'
+
+// ensure log directory exists
+fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
+
+// create a rotating write stream
+var accessLogStream = createRotatingStream({
+  filename: logDirectory + '/access-%DATE%.log',
+  frequency: 'daily',
+  verbose: false
+})
 
 // setup the logger
 app.use(morgan('combined', {stream: accessLogStream}))
