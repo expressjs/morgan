@@ -2,6 +2,8 @@ unreleased
 ==========
 
   * deps: depd@~1.0.1
+  * deps: on-finished@~2.2.1
+    - Fix `isFinished(req)` when data buffered
 
 1.5.2 / 2015-03-15
 ==================
