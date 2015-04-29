@@ -234,7 +234,7 @@ file per date in the `log/` directory using the
 [file-stream-rotator module](https://www.npmjs.com/package/file-stream-rotator).
 
 ```js
-var createRotatingStream = require('file-stream-rotator').getStream
+var rotator = require('file-stream-rotator')
 var express = require('express')
 var fs = require('fs')
 var morgan = require('morgan')
@@ -246,7 +246,7 @@ var logDirectory = __dirname + '/log'
 fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
 
 // create a rotating write stream
-var accessLogStream = createRotatingStream({
+var accessLogStream = rotator.getStream({
   filename: logDirectory + '/access-%DATE%.log',
   frequency: 'daily',
   verbose: false
