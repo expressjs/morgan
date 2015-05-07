@@ -193,6 +193,25 @@ exports.format = function(name, fmt){
 };
 
 /**
+ * Returns formatted string. Useful when using a function as a format.
+ *
+ * @param {object} req
+ * @param {object} res
+ * @param {string} format
+ * @returns {string}
+ */
+exports.getFormatted = function(req, res, format) {
+  if(!req['headers']){
+    deprecate('getFormatted expects a req and request object as parameters.')
+    return ''
+  }
+  var fmt = (exports[format] || format || exports.default)
+  var formatted = compile(fmt);
+  return formatted(exports, req, res)
+
+}
+
+/**
  * Apache combined log format.
  */
 
