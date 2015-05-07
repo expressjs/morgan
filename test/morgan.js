@@ -632,21 +632,6 @@ describe('morgan()', function () {
             done()
           })
       })
-
-      it('should return empty string if req.headers not present', function(done) {
-        var line
-        var server = createServer(function(tokens, req, res){
-          line = tokens.getFormatted({}, res);
-        })
-
-        request(server)
-          .get('/')
-          .end(function (err, res) {
-            if (err) return done(err)
-            assert.equal(line, '')
-            done()
-          })
-      })
     })
   })
 

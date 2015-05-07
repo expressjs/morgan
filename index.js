@@ -200,15 +200,11 @@ exports.format = function(name, fmt){
  * @param {string} format
  * @returns {string}
  */
+
 exports.getFormatted = function(req, res, format) {
-  if(!req['headers']){
-    deprecate('getFormatted expects a req and request object as parameters.')
-    return ''
-  }
   var fmt = (exports[format] || format || exports.default)
   var formatted = compile(fmt);
   return formatted(exports, req, res)
-
 }
 
 /**
