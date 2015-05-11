@@ -2,6 +2,8 @@ unreleased
 ==========
 
   * deps: basic-auth@~1.0.1
+  * deps: debug@~2.2.0
+    - deps: ms@0.7.1
   * deps: depd@~1.0.1
   * deps: on-finished@~2.2.1
     - Fix `isFinished(req)` when data buffered
