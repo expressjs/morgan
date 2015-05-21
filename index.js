@@ -70,6 +70,7 @@ exports = module.exports = function morgan(format, options) {
   // steam
   var buffer = options.buffer
   var stream = options.stream || process.stdout
+  var includeTokens = options.stream ? options.stream.includeTokens === true : false
 
   // buffering support
   if (buffer) {
@@ -115,15 +116,24 @@ exports = module.exports = function morgan(format, options) {
         return
       }
 
-      var line = fmt(exports, req, res)
-
+      var formatted = fmt(exports, req, res);
+      var line;
+      var tokenPairs;
+      
+      if (typeof formatted === 'object') {
+        line = formatted.line;
+        tokenPairs = formatted.tokenPairs
+      } else {
+        line = formatted;
+      }
+      
       if (null == line) {
         debug('skip line')
         return
       }
 
-      debug('log request')
-      stream.write(line + '\n')
+      debug('log request');
+      includeTokens ? stream.write(line + '\n', tokenPairs) : stream.write(line + '\n');
     };
 
     // immediate
@@ -154,11 +164,29 @@ function compile(format) {
   if (typeof format !== 'string') {
     throw new TypeError('argument format must be a function or string')
   }
-
-  var fmt = format.replace(/"/g, '\\"')
-  var js = '  return "' + fmt.replace(/:([-\w]{2,})(?:\[([^\]]+)\])?/g, function(_, name, arg){
-    return '"\n    + (tokens["' + name + '"](req, res, ' + String(JSON.stringify(arg)) + ') || "-") + "';
-  }) + '";'
+  
+  var fmt = format.replace(/"/g, '\\"');
+  var tokens = [];
+  var line = '"' + fmt.replace(/:([-\w]{2,})(?:\[([^\]]+)\])?/g, function(_, name, arg){
+    tokens.push([name, arg]);
+    return '"\n    + values["' + name + '"] + "';
+  }) + '"';
+  
+  var values = ("var values = {"
+  + tokens.map(function(token, i) {
+    var name = token[0];
+    var arg = String(JSON.stringify(token[1]));
+    return '"' + name + '": (tokens["' + name + '"](req, res, ' + arg + ') || "-")' + (i < tokens.length - 1 ? ',' : '');
+  }).join('')
+  + "};");
+  
+  var js = (values
+    + "\n"
+    + "return {"
+      + "tokenPairs: values,"
+      + "line: " + line
+    + "};"
+  );
 
   return new Function('tokens, req, res', js);
 };
