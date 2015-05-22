@@ -48,7 +48,10 @@ morgan('combined', {
 
 Output stream for writing log lines, defaults to `process.stdout`.
 
-If the stream object has an `includeTokens` property set to `true`, the processed tokens from the format string will be available as the second argument to the write callback. This is useful for passing tokens as metadata to winston or another logger.
+##### logger
+
+Pass the formatted log line and the processed token/value pairs to a function. This can
+then be passed on to winston or another logger.
 
 #### Predefined Formats
 
