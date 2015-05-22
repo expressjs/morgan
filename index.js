@@ -70,8 +70,9 @@ exports = module.exports = function morgan(format, options) {
   // steam
   var buffer = options.buffer
   var stream = options.stream || process.stdout
-  var includeTokens = options.stream ? options.stream.includeTokens === true : false
-
+  // logger
+  var logger = options.logger
+  
   // buffering support
   if (buffer) {
     deprecate('buffer option')
@@ -105,7 +106,7 @@ exports = module.exports = function morgan(format, options) {
     };
   }
 
-  return function logger(req, res, next) {
+  return function(req, res, next) {
     req._startAt = process.hrtime();
     req._startTime = new Date;
     req._remoteAddress = getip(req);
@@ -122,7 +123,7 @@ exports = module.exports = function morgan(format, options) {
       
       if (typeof formatted === 'object') {
         line = formatted.line;
-        tokenPairs = formatted.tokenPairs
+        tokenPairs = formatted.tokenPairs;
       } else {
         line = formatted;
       }
@@ -133,7 +134,11 @@ exports = module.exports = function morgan(format, options) {
       }
 
       debug('log request');
-      includeTokens ? stream.write(line + '\n', tokenPairs) : stream.write(line + '\n');
+      if (logger) {
+        logger(line, tokenPairs);
+      } else {
+        stream.write(line + '\n');
+      }
     };
 
     // immediate
