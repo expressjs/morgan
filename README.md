@@ -48,6 +48,11 @@ morgan('combined', {
 
 Output stream for writing log lines, defaults to `process.stdout`.
 
+##### logger
+
+Pass the formatted log line and the processed token/value pairs to a function. This can
+then be passed on to winston or another logger.
+
 #### Predefined Formats
 
 There are various pre-defined formats provided:
