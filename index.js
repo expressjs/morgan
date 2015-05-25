@@ -70,7 +70,7 @@ exports = module.exports = function morgan(format, options) {
   // format function
   var fmt = compile(exports[format] || format || exports.default)
 
-  // steam
+  // stream
   var buffer = options.buffer
   var stream = options.stream || process.stdout
 
