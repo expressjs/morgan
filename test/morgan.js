@@ -447,6 +447,50 @@ describe('morgan()', function () {
   })
 
   describe('formats', function () {
+    describe('a function', function () {
+      it('should log result of function', function (done) {
+        function format(tokens, req, res) {
+          return [req.method, req.url, res.statusCode].join(' ')
+        }
+
+        request(createServer(format))
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          assert.equal(lastLogLine, 'GET / 200\n')
+          done()
+        })
+      })
+
+      it('should not log for undefined return', function (done) {
+        function format(tokens, req, res) {
+          return undefined
+        }
+
+        request(createServer(format))
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          assert.ok(lastLogLine === null)
+          done()
+        })
+      })
+
+      it('should not log for null return', function (done) {
+        function format(tokens, req, res) {
+          return null
+        }
+
+        request(createServer(format))
+        .get('/')
+        .end(function (err, res) {
+          if (err) return done(err)
+          assert.ok(lastLogLine === null)
+          done()
+        })
+      })
+    })
+
     describe('combined', function () {
       it('should match expectations', function (done) {
         var server = createServer('combined')
