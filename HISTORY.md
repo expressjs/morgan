@@ -1,3 +1,11 @@
+unreleased
+==========
+
+  * deps: on-finished@~2.3.0
+    - Add defined behavior for HTTP `CONNECT` requests
+    - Add defined behavior for HTTP `Upgrade` requests
+    - deps: ee-first@1.1.1
+
 1.5.3 / 2015-05-10
 ==================
 
