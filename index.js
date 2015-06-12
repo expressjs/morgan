@@ -10,6 +10,15 @@
 'use strict'
 
 /**
+ * Module exports.
+ * @public
+ */
+
+module.exports = morgan
+module.exports.format = format
+module.exports.token = token
+
+/**
  * Module dependencies.
  * @private
  */
@@ -46,7 +55,7 @@ var defaultBufferDuration = 1000;
  * @return {Function} middleware
  */
 
-exports = module.exports = function morgan(format, options) {
+function morgan(format, options) {
   var fmt = format
   var opts = options || {}
 
@@ -126,7 +135,7 @@ exports = module.exports = function morgan(format, options) {
         return
       }
 
-      var line = formatLine(exports, req, res)
+      var line = formatLine(morgan, req, res)
 
       if (null == line) {
         debug('skip line')
@@ -150,73 +159,44 @@ exports = module.exports = function morgan(format, options) {
 
     next();
   };
-};
-
-/**
- * Define a token function with the given `name`,
- * and callback `fn(req, res)`.
- *
- * @public
- * @param {String} name
- * @param {Function} fn
- * @return {Object} exports for chaining
- */
-
-exports.token = function(name, fn) {
-  exports[name] = fn;
-  return this;
-};
-
-/**
- * Define a `fmt` with the given `name`.
- *
- * @public
- * @param {String} name
- * @param {String|Function} fmt
- * @return {Object} exports for chaining
- */
-
-exports.format = function(name, fmt){
-  exports[name] = fmt;
-  return this;
-};
+}
 
 /**
  * Apache combined log format.
  */
 
-exports.format('combined', ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"')
+morgan.format('combined', ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"')
 
 /**
  * Apache common log format.
  */
 
-exports.format('common', ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length]')
+morgan.format('common', ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length]')
 
 /**
  * Default format.
  */
 
-exports.format('default', ':remote-addr - :remote-user [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"');
-deprecate.property(exports, 'default', 'default format: use combined format')
+morgan.format('default', ':remote-addr - :remote-user [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"')
+deprecate.property(morgan, 'default', 'default format: use combined format')
 
 /**
  * Short format.
  */
 
-exports.format('short', ':remote-addr :remote-user :method :url HTTP/:http-version :status :res[content-length] - :response-time ms');
+morgan.format('short', ':remote-addr :remote-user :method :url HTTP/:http-version :status :res[content-length] - :response-time ms')
 
 /**
  * Tiny format.
  */
 
-exports.format('tiny', ':method :url :status :res[content-length] - :response-time ms');
+morgan.format('tiny', ':method :url :status :res[content-length] - :response-time ms')
 
 /**
  * dev (colored)
  */
 
-exports.format('dev', function(tokens, req, res){
+morgan.format('dev', function developmentFormatLine(tokens, req, res) {
   var color = 32; // green
   var status = res.statusCode;
 
@@ -233,7 +213,7 @@ exports.format('dev', function(tokens, req, res){
  * request url
  */
 
-exports.token('url', function(req){
+morgan.token('url', function getUrlToken(req) {
   return req.originalUrl || req.url;
 });
 
@@ -241,7 +221,7 @@ exports.token('url', function(req){
  * request method
  */
 
-exports.token('method', function(req){
+morgan.token('method', function getMethodToken(req) {
   return req.method;
 });
 
@@ -249,7 +229,7 @@ exports.token('method', function(req){
  * response time in milliseconds
  */
 
-exports.token('response-time', function getResponseTimeToken(req, res) {
+morgan.token('response-time', function getResponseTimeToken(req, res) {
   if (!req._startAt || !res._startAt) {
     // missing request and/or response start time
     return
@@ -267,7 +247,7 @@ exports.token('response-time', function getResponseTimeToken(req, res) {
  * current date
  */
 
-exports.token('date', function(req, res, format){
+morgan.token('date', function getDateToken(req, res, format) {
   format = format || 'web'
 
   var date = new Date()
@@ -286,7 +266,7 @@ exports.token('date', function(req, res, format){
  * response status code
  */
 
-exports.token('status', function(req, res){
+morgan.token('status', function getStatusToken(req, res) {
   return res._header ? res.statusCode : null;
 });
 
@@ -294,7 +274,7 @@ exports.token('status', function(req, res){
  * normalized referrer
  */
 
-exports.token('referrer', function(req){
+morgan.token('referrer', function getReferrerToken(req) {
   return req.headers['referer'] || req.headers['referrer'];
 });
 
@@ -302,13 +282,13 @@ exports.token('referrer', function(req){
  * remote address
  */
 
-exports.token('remote-addr', getip);
+morgan.token('remote-addr', getip)
 
 /**
  * remote user
  */
 
-exports.token('remote-user', function (req) {
+morgan.token('remote-user', function getRemoteUserToken(req) {
   var creds = auth(req)
   var user = (creds && creds.name) || '-'
   return user;
@@ -318,7 +298,7 @@ exports.token('remote-user', function (req) {
  * HTTP version
  */
 
-exports.token('http-version', function(req){
+morgan.token('http-version', function getHttpVersionToken(req) {
   return req.httpVersionMajor + '.' + req.httpVersionMinor;
 });
 
@@ -326,7 +306,7 @@ exports.token('http-version', function(req){
  * UA string
  */
 
-exports.token('user-agent', function(req){
+morgan.token('user-agent', function getUserAgentToken(req) {
   return req.headers['user-agent'];
 });
 
@@ -334,7 +314,7 @@ exports.token('user-agent', function(req){
  * request header
  */
 
-exports.token('req', function(req, res, field){
+morgan.token('req', function getRequestToken(req, res, field) {
   return req.headers[field.toLowerCase()];
 });
 
@@ -342,7 +322,7 @@ exports.token('req', function(req, res, field){
  * response header
  */
 
-exports.token('res', function(req, res, field){
+morgan.token('res', function getResponseTime(req, res, field) {
   return (res._headers || {})[field.toLowerCase()];
 });
 
@@ -390,6 +370,19 @@ function compile(format) {
 }
 
 /**
+ * Define a format with the given name.
+ *
+ * @param {string} name
+ * @param {string|function} fmt
+ * @public
+ */
+
+function format(name, fmt) {
+  this[name] = fmt
+  return this
+}
+
+/**
  * Lookup and compile a named format function.
  *
  * @param {string} name
@@ -399,7 +392,7 @@ function compile(format) {
 
 function getFormatFunction(name) {
   // lookup format
-  var fmt = exports[name] || name || exports.default
+  var fmt = morgan[name] || name || morgan.default
 
   // return compiled format
   return typeof fmt !== 'function'
@@ -445,4 +438,18 @@ function pad2(num) {
 function recordStartTime() {
   this._startAt = process.hrtime()
   this._startTime = new Date()
+}
+
+/**
+ * Define a token function with the given name,
+ * and callback fn(req, res).
+ *
+ * @param {string} name
+ * @param {function} fn
+ * @public
+ */
+
+function token(name, fn) {
+  this[name] = fn
+  return this
 }
