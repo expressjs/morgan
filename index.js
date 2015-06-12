@@ -7,6 +7,8 @@
  * MIT Licensed
  */
 
+'use strict'
+
 /**
  * Module dependencies.
  * @private

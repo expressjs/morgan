@@ -5,6 +5,7 @@ unreleased
     - Add defined behavior for HTTP `CONNECT` requests
     - Add defined behavior for HTTP `Upgrade` requests
     - deps: ee-first@1.1.1
+  * pref: enable strict mode
 
 1.5.3 / 2015-05-10
 ==================
