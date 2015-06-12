@@ -47,17 +47,18 @@ var defaultBufferDuration = 1000;
  */
 
 exports = module.exports = function morgan(format, options) {
+  var fmt = format
   var opts = options || {}
 
-  if (typeof format === 'object') {
-    opts = format || {}
-    format = opts.format || 'default'
+  if (format && typeof format === 'object') {
+    opts = format
+    fmt = opts.format || 'default'
 
     // smart deprecation message
-    deprecate('morgan(options): use morgan(' + (typeof format === 'string' ? JSON.stringify(format) : 'format') + ', options) instead')
+    deprecate('morgan(options): use morgan(' + (typeof fmt === 'string' ? JSON.stringify(fmt) : 'format') + ', options) instead')
   }
 
-  if (format === undefined) {
+  if (fmt === undefined) {
     deprecate('undefined format: specify a format')
   }
 
@@ -68,7 +69,9 @@ exports = module.exports = function morgan(format, options) {
   var skip = opts.skip || false
 
   // format function
-  var fmt = compile(exports[format] || format || exports.default)
+  var formatLine = typeof fmt !== 'function'
+    ? getFormatFunction(fmt)
+    : fmt
 
   // stream
   var buffer = opts.buffer
@@ -123,7 +126,7 @@ exports = module.exports = function morgan(format, options) {
         return
       }
 
-      var line = fmt(exports, req, res)
+      var line = formatLine(exports, req, res)
 
       if (null == line) {
         debug('skip line')
@@ -147,32 +150,6 @@ exports = module.exports = function morgan(format, options) {
 
     next();
   };
-};
-
-/**
- * Compile `format` into a function.
- *
- * @private
- * @param {Function|String} format
- * @return {Function}
- */
-
-function compile(format) {
-  if (typeof format === 'function') {
-    // already compiled
-    return format
-  }
-
-  if (typeof format !== 'string') {
-    throw new TypeError('argument format must be a function or string')
-  }
-
-  var fmt = format.replace(/"/g, '\\"')
-  var js = '  return "' + fmt.replace(/:([-\w]{2,})(?:\[([^\]]+)\])?/g, function(_, name, arg){
-    return '"\n    + (tokens["' + name + '"](req, res, ' + String(JSON.stringify(arg)) + ') || "-") + "';
-  }) + '";'
-
-  return new Function('tokens, req, res', js);
 };
 
 /**
@@ -389,6 +366,45 @@ function clfdate(dateTime) {
   return pad2(date) + '/' + month + '/' + year
     + ':' + pad2(hour) + ':' + pad2(mins) + ':' + pad2(secs)
     + ' +0000'
+}
+
+/**
+ * Compile a format string into a function.
+ *
+ * @param {string} format
+ * @return {function}
+ * @private
+ */
+
+function compile(format) {
+  if (typeof format !== 'string') {
+    throw new TypeError('argument format must be a string')
+  }
+
+  var fmt = format.replace(/"/g, '\\"')
+  var js = '  return "' + fmt.replace(/:([-\w]{2,})(?:\[([^\]]+)\])?/g, function(_, name, arg) {
+    return '"\n    + (tokens["' + name + '"](req, res, ' + String(JSON.stringify(arg)) + ') || "-") + "'
+  }) + '";'
+
+  return new Function('tokens, req, res', js)
+}
+
+/**
+ * Lookup and compile a named format function.
+ *
+ * @param {string} name
+ * @return {function}
+ * @public
+ */
+
+function getFormatFunction(name) {
+  // lookup format
+  var fmt = exports[name] || name || exports.default
+
+  // return compiled format
+  return typeof fmt !== 'function'
+    ? compile(fmt)
+    : fmt
 }
 
 /**
