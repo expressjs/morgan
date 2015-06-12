@@ -505,7 +505,7 @@ describe('morgan()', function () {
 
         request(server)
         .get('/')
-        .end(function (err, res) {
+        .expect(200, function (err, res) {
           if (err) return done(err)
           lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
           assert.equal(lastLogLine.substr(0, 38), '_color_0_GET / _color_32_200 _color_0_')
@@ -522,7 +522,7 @@ describe('morgan()', function () {
 
         request(server)
         .get('/')
-        .end(function (err, res) {
+        .expect(500, function (err, res) {
           if (err) return done(err)
           lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
           assert.equal(lastLogLine.substr(0, 38), '_color_0_GET / _color_31_500 _color_0_')
@@ -539,7 +539,7 @@ describe('morgan()', function () {
 
         request(server)
         .get('/')
-        .end(function (err, res) {
+        .expect(400, function (err, res) {
           if (err) return done(err)
           lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
           assert.equal(lastLogLine.substr(0, 38), '_color_0_GET / _color_33_400 _color_0_')
@@ -556,7 +556,7 @@ describe('morgan()', function () {
 
         request(server)
         .get('/')
-        .end(function (err, res) {
+        .expect(300, function (err, res) {
           if (err) return done(err)
           lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
           assert.equal(lastLogLine.substr(0, 38), '_color_0_GET / _color_36_300 _color_0_')
