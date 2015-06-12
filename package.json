@@ -15,7 +15,7 @@
     "on-finished": "~2.2.1"
   },
   "devDependencies": {
-    "istanbul": "0.3.9",
+    "istanbul": "0.3.15",
     "mocha": "2.2.5",
     "supertest": "1.0.1"
   },
