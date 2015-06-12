@@ -91,30 +91,13 @@ function morgan(format, options) {
   if (buffer) {
     deprecate('buffer option')
 
-    var realStream = stream
-    var buf = []
-    var timer = null
-    var interval = 'number' == typeof buffer
-      ? buffer
-      : defaultBufferDuration
-
-    // flush function
-    var flush = function(){
-      timer = null
-      realStream.write(buf.join(''))
-      buf.length = 0
-    }
+    // flush interval
+    var interval = typeof buffer !== 'number'
+      ? defaultBufferDuration
+      : buffer
 
     // swap the stream
-    stream = {
-      write: function(str){
-        if (timer === null) {
-          timer = setTimeout(flush, interval)
-        }
-
-        buf.push(str);
-      }
-    };
+    stream = createBufferStream(stream, interval)
   }
 
   return function logger(req, res, next) {
@@ -368,6 +351,38 @@ function compile(format) {
   }) + '";'
 
   return new Function('tokens, req, res', js)
+}
+
+/**
+ * Create a basic buffering stream.
+ *
+ * @param {object} stream
+ * @param {number} interval
+ * @public
+ */
+
+function createBufferStream(stream, interval) {
+  var buf = []
+  var timer = null
+
+  // flush function
+  function flush() {
+    timer = null
+    stream.write(buf.join(''))
+    buf.length = 0
+  }
+
+  // write function
+  function write(str) {
+    if (timer === null) {
+      timer = setTimeout(flush, interval)
+    }
+
+    buf.push(str)
+  }
+
+  // return a minimal "stream"
+  return { write: write }
 }
 
 /**

@@ -8,6 +8,7 @@ unreleased
     - Add defined behavior for HTTP `Upgrade` requests
     - deps: ee-first@1.1.1
   * pref: enable strict mode
+  * pref: reduce function closure scopes
   * pref: remove an argument reassignment
   * pref: skip function call without `skip` option
 
