@@ -85,11 +85,8 @@ exports = module.exports = function morgan(format, options) {
     // flush function
     var flush = function(){
       timer = null
-
-      if (buf.length) {
-        realStream.write(buf.join(''));
-        buf.length = 0;
-      }
+      realStream.write(buf.join(''))
+      buf.length = 0
     }
 
     // swap the stream
