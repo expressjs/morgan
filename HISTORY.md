@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Fix `response-time` token to not include response latency
   * deps: on-finished@~2.3.0
     - Add defined behavior for HTTP `CONNECT` requests
     - Add defined behavior for HTTP `Upgrade` requests

@@ -12,7 +12,8 @@
     "basic-auth": "~1.0.1",
     "debug": "~2.2.0",
     "depd": "~1.0.1",
-    "on-finished": "~2.3.0"
+    "on-finished": "~2.3.0",
+    "on-headers": "~1.0.0"
   },
   "devDependencies": {
     "istanbul": "0.3.15",

@@ -506,6 +506,36 @@ describe('morgan()', function () {
         .expect(200, cb)
       })
 
+      it('should not include response latency', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          var ms = parseFloat(line)
+          assert.ok(ms > 0, 'positive milliseconds')
+          assert.ok(ms < end - start + 1, 'response time expected to be < ' + (end - start + 1) + ', but was ' + ms)
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':response-time', { stream: stream }, function (req, res) {
+          res.write('hello, ')
+          end = Date.now()
+
+          setTimeout(function () {
+            res.end('world!')
+          }, 50)
+        })
+
+        var end = undefined
+        var start = Date.now()
+
+        request(server)
+        .get('/')
+        .expect(200, cb)
+      })
+
       it('should be empty without hidden property', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)

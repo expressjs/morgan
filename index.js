@@ -18,6 +18,7 @@ var auth = require('basic-auth')
 var debug = require('debug')('morgan')
 var deprecate = require('depd')('morgan')
 var onFinished = require('on-finished')
+var onHeaders = require('on-headers')
 
 /**
  * Array of CLF month names.
@@ -104,9 +105,17 @@ exports = module.exports = function morgan(format, options) {
   }
 
   return function logger(req, res, next) {
-    req._startAt = process.hrtime();
-    req._startTime = new Date;
-    req._remoteAddress = getip(req);
+    // request data
+    req._startAt = undefined
+    req._startTime = undefined
+    req._remoteAddress = getip(req)
+
+    // response data
+    res._startAt = undefined
+    res._startTime = undefined
+
+    // record request start
+    recordStartTime.call(req)
 
     function logRequest(){
       if (skip(req, res)) {
@@ -125,10 +134,14 @@ exports = module.exports = function morgan(format, options) {
       stream.write(line + '\n')
     };
 
-    // immediate
     if (immediate) {
-      logRequest();
+      // immediate log
+      logRequest()
     } else {
+      // record response start
+      onHeaders(res, recordStartTime)
+
+      // log when response finished
       onFinished(res, logRequest)
     }
 
@@ -259,12 +272,19 @@ exports.token('method', function(req){
  * response time in milliseconds
  */
 
-exports.token('response-time', function(req, res){
-  if (!res._header || !req._startAt) return '';
-  var diff = process.hrtime(req._startAt);
-  var ms = diff[0] * 1e3 + diff[1] * 1e-6;
-  return ms.toFixed(3);
-});
+exports.token('response-time', function getResponseTimeToken(req, res) {
+  if (!req._startAt || !res._startAt) {
+    // missing request and/or response start time
+    return
+  }
+
+  // calculate diff
+  var ms = (res._startAt[0] - req._startAt[0]) * 1e3
+    + (res._startAt[1] - req._startAt[1]) * 1e-6
+
+  // return truncated value
+  return ms.toFixed(3)
+})
 
 /**
  * current date
@@ -399,4 +419,14 @@ function pad2(num) {
 
   return (str.length === 1 ? '0' : '')
     + str
+}
+
+/**
+ * Record the start time.
+ * @private
+ */
+
+function recordStartTime() {
+  this._startAt = process.hrtime()
+  this._startTime = new Date()
 }
