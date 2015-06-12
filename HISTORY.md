@@ -7,6 +7,7 @@ unreleased
     - Add defined behavior for HTTP `Upgrade` requests
     - deps: ee-first@1.1.1
   * pref: enable strict mode
+  * pref: remove an argument reassignment
 
 1.5.3 / 2015-05-10
 ==================

@@ -47,9 +47,11 @@ var defaultBufferDuration = 1000;
  */
 
 exports = module.exports = function morgan(format, options) {
+  var opts = options || {}
+
   if (typeof format === 'object') {
-    options = format
-    format = options.format || 'default'
+    opts = format || {}
+    format = opts.format || 'default'
 
     // smart deprecation message
     deprecate('morgan(options): use morgan(' + (typeof format === 'string' ? JSON.stringify(format) : 'format') + ', options) instead')
@@ -59,20 +61,18 @@ exports = module.exports = function morgan(format, options) {
     deprecate('undefined format: specify a format')
   }
 
-  options = options || {}
-
   // output on request instead of response
-  var immediate = options.immediate;
+  var immediate = opts.immediate
 
   // check if log entry should be skipped
-  var skip = options.skip || function () { return false; };
+  var skip = opts.skip || function () { return false }
 
   // format function
   var fmt = compile(exports[format] || format || exports.default)
 
   // stream
-  var buffer = options.buffer
-  var stream = options.stream || process.stdout
+  var buffer = opts.buffer
+  var stream = opts.stream || process.stdout
 
   // buffering support
   if (buffer) {
