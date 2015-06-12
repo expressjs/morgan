@@ -1,61 +1,82 @@
 
 process.env.NO_DEPRECATION = 'morgan'
 
-var assert = require('assert');
-var http = require('http');
-var morgan = require('..');
-var request = require('supertest');
-
-var lastLogLine;
-function saveLastLogLine(line) { lastLogLine = line; }
+var assert = require('assert')
+var http = require('http')
+var morgan = require('..')
+var request = require('supertest')
+var split = require('split')
 
 describe('morgan()', function () {
   describe('arguments', function () {
     it('should use default format', function (done) {
-      request(createServer())
-      .get('/')
-      .end(function (err, res) {
-        if (err) return done(err, res)
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
         assert(res.text.length > 0)
-        assert.equal(lastLogLine.substr(0, res.text.length), res.text)
+        assert.equal(line.substr(0, res.text.length), res.text)
         done()
       })
+
+      var stream = createLineStream(function (line) {
+        cb(null, null, line)
+      })
+
+      request(createServer(undefined, { stream: stream }))
+      .get('/')
+      .expect(200, cb)
     })
 
     describe('format', function () {
       it('should accept format as format name', function (done) {
-        request(createServer('tiny'))
-        .get('/')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert(/^GET \/ 200 - - \d+\.\d{3} ms\n$/.test(lastLogLine))
+          assert(/^GET \/ 200 - - \d+\.\d{3} ms$/.test(line))
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer('tiny', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
       })
 
       it('should accept format as format string', function (done) {
-        request(createServer(':method :url'))
-        .get('/')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(lastLogLine, 'GET /\n')
+          assert.equal(line, 'GET /')
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':method :url', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
       })
 
       it('should accept format as function', function (done) {
-        var line;
-        var server = createServer(function (tokens, req, res) {
-          line = [req.method, req.url, res.statusCode].join(' ') + '\n'
-        })
-
-        request(server)
-        .get('/')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, 'GET / 200\n')
+          assert.equal(line, 'GET / 200')
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        function format(tokens, req, res) {
+          return [req.method, req.url, res.statusCode].join(' ')
+        }
+
+        request(createServer(format, { stream: stream }))
+        .get('/')
+        .expect(200, cb)
       })
 
       it('should reject format as bool', function () {
@@ -64,34 +85,56 @@ describe('morgan()', function () {
 
       describe('back-compat', function () {
         it('should accept options object', function (done) {
-          request(createServer({}))
-          .get('/')
-          .end(function (err, res) {
+          var cb = after(2, function (err, res, line) {
             if (err) return done(err)
             assert(res.text.length > 0)
-            assert.equal(lastLogLine.substr(0, res.text.length), res.text)
+            assert.equal(line.substr(0, res.text.length), res.text)
             done()
           })
+
+          var stream = createLineStream(function (line) {
+            cb(null, null, line)
+          })
+
+          request(createServer({ stream: stream }))
+          .get('/')
+          .expect(200, cb)
         })
 
         it('should accept format in options for back-compat', function (done) {
-          request(createServer({format: ':method :url'}))
-          .get('/')
-          .end(function (err, res) {
+          var cb = after(2, function (err, res, line) {
             if (err) return done(err)
-            assert.equal(lastLogLine, 'GET /\n')
+            assert.equal(line, 'GET /')
             done()
           })
+
+          var stream = createLineStream(function (line) {
+            cb(null, null, line)
+          })
+
+          request(createServer({ format: ':method :url', stream: stream }))
+          .get('/')
+          .expect(200, cb)
         })
 
         it('should accept format function in options for back-compat', function (done) {
-          request(createServer({format: function () { return 'apple' }}))
-          .get('/')
-          .end(function (err, res) {
+          var cb = after(2, function (err, res, line) {
             if (err) return done(err)
-            assert.equal(lastLogLine, 'apple\n')
+            assert.equal(line, 'apple')
             done()
           })
+
+          var stream = createLineStream(function (line) {
+            cb(null, null, line)
+          })
+
+          function format() {
+            return 'apple'
+          }
+
+          request(createServer({ format: format, stream: stream }))
+          .get('/')
+          .expect(200, cb)
         })
       })
     })
@@ -100,131 +143,181 @@ describe('morgan()', function () {
   describe('tokens', function () {
     describe(':date', function () {
       it('should get current date in "web" format by default', function (done) {
-        var server = createServer(':date')
-
-        request(server)
-        .get('/')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert(/^\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT$/m.test(lastLogLine))
+          assert.ok(/^\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT$/.test(line))
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':date', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
       })
 
       it('should get current date in "clf" format', function (done) {
-        var server = createServer(':date[clf]')
-
-        request(server)
-        .get('/')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert(/^\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2} \+0000$/m.test(lastLogLine))
+          assert.ok(/^\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2} \+0000$/.test(line))
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':date[clf]', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
       })
 
       it('should get current date in "iso" format', function (done) {
-        var server = createServer(':date[iso]')
-
-        request(server)
-        .get('/')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/m.test(lastLogLine))
+          assert.ok(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/.test(line))
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':date[iso]', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
       })
 
       it('should get current date in "web" format', function (done) {
-        var server = createServer(':date[web]')
-
-        request(server)
-        .get('/')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert(/^\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT$/m.test(lastLogLine))
+          assert.ok(/^\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT$/.test(line))
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':date[web]', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
       })
 
       it('should be blank for unknown format', function (done) {
-        var server = createServer(':date[bogus]')
-
-        request(server)
-        .get('/')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(lastLogLine, '-\n')
+          assert.equal(line, '-')
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':date[bogus]', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
       })
     })
 
     describe(':req', function () {
       it('should get request properties', function (done) {
-        var server = createServer(':req[x-from-string]')
-
-        request(server)
-        .get('/')
-        .set('x-from-string', 'me')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(lastLogLine, 'me\n')
+          assert.equal(line, 'me')
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':req[x-from-string]', { stream: stream }))
+        .get('/')
+        .set('x-from-string', 'me')
+        .expect(200, cb)
       })
     })
 
     describe(':res', function () {
       it('should get response properties', function (done) {
-        var server = createServer(':res[x-sent]')
-
-        request(server)
-        .get('/')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(lastLogLine, 'true\n')
+          assert.equal(line, 'true')
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':res[x-sent]', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
       })
     })
 
     describe(':remote-addr', function () {
       it('should get remote address', function (done) {
-        var server = createServer(':remote-addr')
-
-        request(server)
-        .get('/')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(lastLogLine, res.text + '\n')
+          assert.ok(res.text.length > 0)
+          assert.equal(line, res.text)
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':remote-addr', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
       })
 
       it('should use req.ip if there', function (done) {
-        var server = createServer(':remote-addr', null, null, function (req) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.equal(line, '10.0.0.1')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':remote-addr', { stream: stream }, null, function (req) {
           req.ip = '10.0.0.1'
         })
 
         request(server)
         .get('/')
-        .end(function (err, res) {
-          if (err) return done(err)
-          assert.equal(lastLogLine, '10.0.0.1\n')
-          done()
-        })
+        .expect(200, cb)
       })
 
       it('should work on https server', function (done) {
         var fs = require('fs')
         var https = require('https')
         var cert = fs.readFileSync(__dirname + '/fixtures/server.crt', 'ascii')
-        var logger = createLogger(':remote-addr')
         var server = https.createServer({
           key: fs.readFileSync(__dirname + '/fixtures/server.key', 'ascii'),
           cert: cert
         })
+
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.ok(res.text.length > 0)
+          assert.equal(line, res.text)
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+        var logger = morgan(':remote-addr', { stream: stream })
 
         server.on('request', function (req, res) {
           logger(req, res, function (err) {
@@ -243,28 +336,44 @@ describe('morgan()', function () {
 
         var req = request(server).get('/')
         req.agent(agent)
-        req.end(function (err, res) {
-          if (err) return done(err)
-          assert.equal(lastLogLine, res.text + '\n')
-          done()
-        })
+        req.expect(200, cb)
       })
 
       it('should work when connection: close', function (done) {
-        var server = createServer(':remote-addr')
-
-        request(server)
-        .get('/')
-        .set('Connection', 'close')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(lastLogLine, res.text + '\n')
+          assert.ok(res.text.length > 0)
+          assert.equal(line, res.text)
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':remote-addr')
+
+        request(createServer(':remote-addr', { stream: stream }))
+        .get('/')
+        .set('Connection', 'close')
+        .expect(200, cb)
       })
 
       it('should work when connection: keep-alive', function (done) {
-        var server = createServer(':remote-addr', null, function (req, res, next) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.ok(res.text.length > 0)
+          assert.equal(line, res.text)
+
+          res.req.connection.destroy()
+          server.close(done)
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':remote-addr', { stream: stream }, function (req, res, next) {
           delete req._remoteAddress
           next()
         })
@@ -272,16 +381,21 @@ describe('morgan()', function () {
         request(server.listen())
         .get('/')
         .set('Connection', 'keep-alive')
-        .end(function (err, res) {
-          if (err) return done(err)
-          assert.equal(lastLogLine, res.text + '\n')
-          res.req.connection.destroy()
-          server.close(done)
-        })
+        .expect(200, cb)
       })
 
       it('should work when req.ip is a getter', function (done) {
-        var server = createServer(':remote-addr', null, null, function (req) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.equal(line, '10.0.0.1')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':remote-addr', { stream: stream }, null, function (req) {
           Object.defineProperty(req, 'ip', {
             get: function () { return req.connection.remoteAddress ? '10.0.0.1' : undefined }
           })
@@ -290,155 +404,198 @@ describe('morgan()', function () {
         request(server)
         .get('/')
         .set('Connection', 'close')
-        .end(function (err, res) {
-          if (err) return done(err)
-          assert.equal(lastLogLine, '10.0.0.1\n')
-          done()
-        })
+        .expect(200, cb)
       })
 
       it('should not fail if req.connection missing', function (done) {
-        var server = createServer(':remote-addr', null, null, function (req) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.ok(res.text.length > 0)
+          assert.equal(line, res.text)
+
+          res.req.connection.destroy()
+          server.close(done)
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':remote-addr', { stream: stream }, null, function (req) {
           delete req.connection
         })
 
         request(server.listen())
         .get('/')
         .set('Connection', 'keep-alive')
-        .end(function (err, res) {
-          if (err) return done(err)
-          assert.equal(lastLogLine, res.text + '\n')
-          res.req.connection.destroy()
-          server.close(done)
-        })
+        .expect(200, cb)
       })
     })
 
     describe(':remote-user', function () {
       it('should be empty if none present', function (done) {
-        var server = createServer(':remote-user')
-
-        request(server)
-        .get('/')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(lastLogLine, '-\n')
+          assert.equal(line, '-')
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':remote-user', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
       })
 
       it('should support Basic authorization', function (done) {
-        var server = createServer(':remote-user')
-
-        request(server)
-        .get('/')
-        .set('Authorization', 'Basic dGo6')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(lastLogLine, 'tj\n')
+          assert.equal(line, 'tj')
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':remote-user', { stream: stream }))
+        .get('/')
+        .set('Authorization', 'Basic dGo6')
+        .expect(200, cb)
       })
 
       it('should be empty for empty Basic authorization user', function (done) {
-        var server = createServer(':remote-user')
-
-        request(server)
-        .get('/')
-        .set('Authorization', 'Basic Og==')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(lastLogLine, '-\n')
+          assert.equal(line, '-')
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':remote-user', { stream: stream }))
+        .get('/')
+        .set('Authorization', 'Basic Og==')
+        .expect(200, cb)
       })
     })
 
     describe(':response-time', function () {
       it('should be in milliseconds', function (done) {
-        var start = Date.now()
-        var server = createServer(':response-time')
-
-        request(server)
-        .get('/')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           var end = Date.now()
-          var ms = parseFloat(lastLogLine)
+          var ms = parseFloat(line)
           assert(ms > 0)
           assert(ms < end - start + 1)
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var start = Date.now()
+
+        request(createServer(':response-time', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
       })
 
       it('should be empty without hidden property', function (done) {
-        var server = createServer(':response-time', null, function (req, res, next) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.equal(line, '-')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':response-time', { stream: stream }, function (req, res, next) {
           delete req._startAt
           next()
         })
 
         request(server)
         .get('/')
-        .end(function (err, res) {
-          if (err) return done(err)
-          assert.equal(lastLogLine, '-\n')
-          done()
-        })
+        .expect(200, cb)
       })
 
       it('should be empty before response', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.equal(line, '-')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
         var server = createServer(':response-time', {
-          immediate: true
+          immediate: true,
+          stream: stream
         })
 
         request(server)
         .get('/')
-        .end(function (err, res) {
-          if (err) return done(err)
-          assert.equal(lastLogLine, '-\n')
-          done()
-        })
+        .expect(200, cb)
       })
     })
 
     describe(':status', function () {
       it('should get response status', function (done) {
-        var server = createServer(':status')
-
-        request(server)
-        .get('/')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(lastLogLine, res.statusCode + '\n')
+          assert.equal(line, String(res.statusCode))
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':status', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
       })
 
       it('should not exist before response sent', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.equal(line, '-')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
         var server = createServer(':status', {
-          immediate: true
+          immediate: true,
+          stream: stream
         })
 
         request(server)
         .get('/')
-        .end(function (err, res) {
-          if (err) return done(err)
-          assert.equal(lastLogLine, '-\n')
-          done()
-        })
+        .expect(200, cb)
       })
 
       it('should not exist for aborted request', function (done) {
-        var stream = {write: writeLog}
-        var server = createServer(':status', {stream: stream}, function () {
-          test.abort()
+        var stream = createLineStream(function (line) {
+          assert.equal(line, '-')
+          server.close(done)
         })
 
-        function writeLog(log) {
-          assert.equal(log, '-\n')
-          server.close()
-          done()
-        }
+        var server = createServer(':status', { stream: stream }, function () {
+          test.abort()
+        })
 
         var test = request(server).post('/')
         test.write('0')
@@ -449,195 +606,243 @@ describe('morgan()', function () {
   describe('formats', function () {
     describe('a function', function () {
       it('should log result of function', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.equal(line, 'GET / 200')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
         function format(tokens, req, res) {
           return [req.method, req.url, res.statusCode].join(' ')
         }
 
-        request(createServer(format))
+        request(createServer(format, { stream: stream }))
         .get('/')
-        .end(function (err, res) {
-          if (err) return done(err)
-          assert.equal(lastLogLine, 'GET / 200\n')
-          done()
-        })
+        .expect(200, cb)
       })
 
       it('should not log for undefined return', function (done) {
+        var stream = createLineStream(function () {
+          throw new Error('should not log line')
+        })
+
         function format(tokens, req, res) {
           return undefined
         }
 
-        request(createServer(format))
+        request(createServer(format, { stream: stream }))
         .get('/')
-        .end(function (err, res) {
-          if (err) return done(err)
-          assert.ok(lastLogLine === null)
-          done()
-        })
+        .expect(200, done)
       })
 
       it('should not log for null return', function (done) {
+        var stream = createLineStream(function () {
+          throw new Error('should not log line')
+        })
+
         function format(tokens, req, res) {
           return null
         }
 
-        request(createServer(format))
+        request(createServer(format, { stream: stream }))
         .get('/')
-        .end(function (err, res) {
-          if (err) return done(err)
-          assert.ok(lastLogLine === null)
-          done()
-        })
+        .expect(200, done)
       })
     })
 
     describe('combined', function () {
       it('should match expectations', function (done) {
-        var server = createServer('combined')
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          var masked = line.replace(/\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2} \+0000/, '_timestamp_')
+          assert.equal(masked, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 - "http://localhost/" "my-ua"')
+          done()
+        })
 
-        request(server)
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer('combined', { stream: stream }))
         .get('/')
         .set('Authorization', 'Basic dGo6')
         .set('Referer', 'http://localhost/')
         .set('User-Agent', 'my-ua')
-        .end(function (err, res) {
-          if (err) return done(err)
-          var line = lastLogLine.replace(/\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2} \+0000/, '_timestamp_')
-          assert.equal(line, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 - "http://localhost/" "my-ua"\n')
-          done()
-        })
+        .expect(200, cb)
       })
     })
 
     describe('common', function () {
       it('should match expectations', function (done) {
-        var server = createServer('common')
-
-        request(server)
-        .get('/')
-        .set('Authorization', 'Basic dGo6')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          var line = lastLogLine.replace(/\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2} \+0000/, '_timestamp_')
-          assert.equal(line, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 -\n')
+          var masked = line.replace(/\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2} \+0000/, '_timestamp_')
+          assert.equal(masked, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 -')
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer('common', { stream: stream }))
+        .get('/')
+        .set('Authorization', 'Basic dGo6')
+        .expect(200, cb)
       })
     })
 
     describe('default', function () {
       it('should match expectations', function (done) {
-        var server = createServer('default')
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          var masked = line.replace(/\w+, \d+ \w+ \d+ \d+:\d+:\d+ \w+/, '_timestamp_')
+          assert.equal(masked, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 - "http://localhost/" "my-ua"')
+          done()
+        })
 
-        request(server)
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer('default', { stream: stream }))
         .get('/')
         .set('Authorization', 'Basic dGo6')
         .set('Referer', 'http://localhost/')
         .set('User-Agent', 'my-ua')
-        .end(function (err, res) {
-          if (err) return done(err)
-          var line = lastLogLine.replace(/\w+, \d+ \w+ \d+ \d+:\d+:\d+ \w+/, '_timestamp_')
-          assert.equal(line, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 - "http://localhost/" "my-ua"\n')
-          done()
-        })
+        .expect(200, cb)
       })
     })
 
     describe('dev', function () {
       it('should color 200 green', function (done) {
-        var server = createServer('dev')
-
-        request(server)
-        .get('/')
-        .expect(200, function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(lastLogLine.substr(0, 38), '_color_0_GET / _color_32_200 _color_0_')
-          assert.equal(lastLogLine.substr(-10), '_color_0_\n')
+          var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
+          assert.equal(masked.substr(0, 38), '_color_0_GET / _color_32_200 _color_0_')
+          assert.equal(masked.substr(-9), '_color_0_')
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer('dev', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
       })
 
       it('should color 500 red', function (done) {
-        var server = createServer('dev', null, function (req, res, next) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
+          assert.equal(masked.substr(0, 38), '_color_0_GET / _color_31_500 _color_0_')
+          assert.equal(masked.substr(-9), '_color_0_')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer('dev', { stream: stream }, function (req, res, next) {
           res.statusCode = 500
           next()
         })
 
         request(server)
         .get('/')
-        .expect(500, function (err, res) {
-          if (err) return done(err)
-          lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(lastLogLine.substr(0, 38), '_color_0_GET / _color_31_500 _color_0_')
-          assert.equal(lastLogLine.substr(-10), '_color_0_\n')
-          done()
-        })
+        .expect(500, cb)
       })
 
       it('should color 400 yelow', function (done) {
-        var server = createServer('dev', null, function (req, res, next) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
+          assert.equal(masked.substr(0, 38), '_color_0_GET / _color_33_400 _color_0_')
+          assert.equal(masked.substr(-9), '_color_0_')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer('dev', { stream: stream }, function (req, res, next) {
           res.statusCode = 400
           next()
         })
 
         request(server)
         .get('/')
-        .expect(400, function (err, res) {
-          if (err) return done(err)
-          lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(lastLogLine.substr(0, 38), '_color_0_GET / _color_33_400 _color_0_')
-          assert.equal(lastLogLine.substr(-10), '_color_0_\n')
-          done()
-        })
+        .expect(400, cb)
       })
 
       it('should color 300 cyan', function (done) {
-        var server = createServer('dev', null, function (req, res, next) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
+          assert.equal(masked.substr(0, 38), '_color_0_GET / _color_36_300 _color_0_')
+          assert.equal(masked.substr(-9), '_color_0_')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer('dev', { stream: stream }, function (req, res, next) {
           res.statusCode = 300
           next()
         })
 
         request(server)
         .get('/')
-        .expect(300, function (err, res) {
-          if (err) return done(err)
-          lastLogLine = lastLogLine.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(lastLogLine.substr(0, 38), '_color_0_GET / _color_36_300 _color_0_')
-          assert.equal(lastLogLine.substr(-10), '_color_0_\n')
-          done()
-        })
+        .expect(300, cb)
       })
     })
 
     describe('short', function () {
       it('should match expectations', function (done) {
-        var server = createServer('short')
-
-        request(server)
-        .get('/')
-        .set('Authorization', 'Basic dGo6')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          var line = lastLogLine.replace(/\d+\.\d{3} ms/, '_timer_')
-          assert.equal(line, res.text + ' tj GET / HTTP/1.1 200 - - _timer_\n')
+          var masked = line.replace(/\d+\.\d{3} ms/, '_timer_')
+          assert.equal(masked, res.text + ' tj GET / HTTP/1.1 200 - - _timer_')
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer('short', { stream: stream }))
+        .get('/')
+        .set('Authorization', 'Basic dGo6')
+        .expect(200, cb)
       })
     })
 
     describe('tiny', function () {
       it('should match expectations', function (done) {
-        var server = createServer('tiny')
-
-        request(server)
-        .get('/')
-        .end(function (err, res) {
+        var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          var line = lastLogLine.replace(/\d+\.\d{3} ms/, '_timer_')
-          assert.equal(line, 'GET / 200 - - _timer_\n')
+          var masked = line.replace(/\d+\.\d{3} ms/, '_timer_')
+          assert.equal(masked, 'GET / 200 - - _timer_')
           done()
         })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer('tiny', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
       })
     })
   })
@@ -702,74 +907,90 @@ describe('morgan()', function () {
 
   describe('with immediate option', function () {
     it('should log before response', function (done) {
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
+        assert.equal(line, 'GET / -')
+        done()
+      })
+
+      var stream = createLineStream(function (line) {
+        cb(null, null, line)
+      })
+
       var server = createServer(':method :url :res[x-sent]', {
-        immediate: true
+        immediate: true,
+        stream: stream
       })
 
       request(server)
       .get('/')
-      .end(function (err, res) {
-        if (err) return done(err)
-        assert.equal(lastLogLine, 'GET / -\n')
-        done()
-      })
+      .expect(200, cb)
     })
   })
 
   describe('with skip option', function () {
     it('should be able to skip based on request', function (done) {
-      function skip(req) { return ~req.url.indexOf('skip=true') }
+      var stream = createLineStream(function () {
+        throw new Error('should not log line')
+      })
 
-      var server = createServer({'format': 'default', 'skip': skip})
+      function skip(req) {
+        return req.url.indexOf('skip=true') !== -1
+      }
 
-      request(server)
+      request(createServer({ format: 'default', skip: skip, stream: stream }))
       .get('/?skip=true')
       .set('Connection', 'close')
-      .end(function (err, res) {
-        if (err) return done(err)
-        assert(lastLogLine == null)
-        done()
-      })
+      .expect(200, done)
     })
 
     it('should be able to skip based on response', function (done) {
-      function skip(req, res) { return res.statusCode === 200 }
-
-      var server = createServer({'format': 'default', 'skip': skip})
-
-      request(server)
-      .get('/')
-      .end(function (err, res) {
-        if (err) return done(err)
-        assert(lastLogLine == null)
-        done()
+      var stream = createLineStream(function () {
+        throw new Error('should not log line')
       })
+
+      function skip(req, res) {
+        return res.statusCode === 200
+      }
+
+      request(createServer({ format: 'default', skip: skip, stream: stream }))
+      .get('/')
+      .expect(200, done)
     })
   })
 })
 
-function createLogger(format, opts) {
-  var args = Array.prototype.slice.call(arguments)
-  var i = Number(typeof args[0] !== 'object')
-  var options = args[i] || {}
+function after(count, callback) {
+  var args = new Array(3)
+  var i = 0
 
-  if (typeof options === 'object' && !options.stream) {
-    options.stream = {'write': saveLastLogLine}
-    lastLogLine = null
-    args[i] = options
+  return function (err, arg1, arg2) {
+    assert.ok(i++ < count, 'callback called ' + count + ' times')
+
+    args[0] = args[0] || err
+    args[1] = args[1] || arg1
+    args[2] = args[2] || arg2
+
+    if (count === i) {
+      callback.apply(null, args)
+    }
   }
+}
 
-  return morgan.apply(null, args)
+function createLineStream(callback) {
+  return split().on('data', callback)
 }
 
 function createServer(format, opts, fn, fn1) {
-  var logger = createLogger(format, opts)
+  var logger = morgan(format, opts)
   var middle = fn || noopMiddleware
+
   return http.createServer(function onRequest(req, res) {
     // prior alterations
     if (fn1) {
       fn1(req, res)
     }
+
     logger(req, res, function onNext(err) {
       // allow req, res alterations
       middle(req, res, function onDone() {
