@@ -232,11 +232,9 @@ morgan.token('response-time', function getResponseTimeToken(req, res) {
  */
 
 morgan.token('date', function getDateToken(req, res, format) {
-  format = format || 'web'
-
   var date = new Date()
 
-  switch (format) {
+  switch (format || 'web') {
     case 'clf':
       return clfdate(date)
     case 'iso':
