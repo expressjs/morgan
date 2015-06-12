@@ -65,7 +65,7 @@ exports = module.exports = function morgan(format, options) {
   var immediate = opts.immediate
 
   // check if log entry should be skipped
-  var skip = opts.skip || function () { return false }
+  var skip = opts.skip || false
 
   // format function
   var fmt = compile(exports[format] || format || exports.default)
@@ -117,8 +117,8 @@ exports = module.exports = function morgan(format, options) {
     // record request start
     recordStartTime.call(req)
 
-    function logRequest(){
-      if (skip(req, res)) {
+    function logRequest() {
+      if (skip !== false && skip(req, res)) {
         debug('skip request')
         return
       }

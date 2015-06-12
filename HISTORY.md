@@ -8,6 +8,7 @@ unreleased
     - deps: ee-first@1.1.1
   * pref: enable strict mode
   * pref: remove an argument reassignment
+  * pref: skip function call without `skip` option
 
 1.5.3 / 2015-05-10
 ==================
