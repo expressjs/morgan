@@ -15,6 +15,7 @@
  */
 
 module.exports = morgan
+module.exports.compile = compile
 module.exports.format = format
 module.exports.token = token
 
@@ -353,7 +354,7 @@ function clfdate(dateTime) {
  *
  * @param {string} format
  * @return {function}
- * @private
+ * @public
  */
 
 function compile(format) {

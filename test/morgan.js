@@ -990,6 +990,30 @@ describe('morgan()', function () {
   })
 })
 
+describe('morgan.compile(format)', function () {
+  describe('arguments', function () {
+    describe('format', function () {
+      it('should be required', function () {
+        assert.throws(morgan.compile.bind(morgan), /argument format/)
+      })
+
+      it('should reject functions', function () {
+        assert.throws(morgan.compile.bind(morgan, function(){}), /argument format/)
+      })
+
+      it('should reject numbers', function () {
+        assert.throws(morgan.compile.bind(morgan, 42), /argument format/)
+      })
+
+      it('should compile a string into a function', function () {
+        var fn = morgan.compile(':method')
+        assert.ok(typeof fn === 'function')
+        assert.ok(fn.length === 3)
+      })
+    })
+  })
+})
+
 function after(count, callback) {
   var args = new Array(3)
   var i = 0

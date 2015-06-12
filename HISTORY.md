@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Add `morgan.compile(format)` export
   * Fix `response-time` token to not include response latency
   * deps: on-finished@~2.3.0
     - Add defined behavior for HTTP `CONNECT` requests

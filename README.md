@@ -159,6 +159,17 @@ The URL of the request. This will use `req.originalUrl` if exists, otherwise `re
 
 The contents of the User-Agent header of the request.
 
+### morgan.compile(format)
+
+Compile a format string into a function for use by `morgan`. A format string
+is a string that represents a single log line and can utilize token syntax.
+Tokens are references by `:token-name`. If tokens accept arguments, they can
+be passed using `[]`, for example: `:token-name[pretty]` would pass the string
+`'pretty'` as an argument to the token `token-name`.
+
+Normally formats are defined using `morgan.format(name, format)`, but for certain
+advanced uses, this compile function is directly available.
+
 ## Examples
 
 ### express/connect
