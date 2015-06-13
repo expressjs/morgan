@@ -223,6 +223,24 @@ describe('morgan()', function () {
       })
     })
 
+    describe(':http-version', function () {
+      it('should be 1.0 or 1.1', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.ok(/^1\.[01]$/.test(line))
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':http-version', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
+      })
+    })
+
     describe(':req', function () {
       it('should get request properties', function (done) {
         var cb = after(2, function (err, res, line) {

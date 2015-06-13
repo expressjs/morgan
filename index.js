@@ -293,8 +293,8 @@ morgan.token('remote-user', function getRemoteUserToken(req) {
  */
 
 morgan.token('http-version', function getHttpVersionToken(req) {
-  return req.httpVersionMajor + '.' + req.httpVersionMinor;
-});
+  return req.httpVersionMajor + '.' + req.httpVersionMinor
+})
 
 /**
  * UA string
