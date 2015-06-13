@@ -1,5 +1,5 @@
-unreleased
-==========
+1.6.0 / 2015-06-12
+==================
 
   * Add `morgan.compile(format)` export
   * Do not color 1xx status codes in `dev` format
