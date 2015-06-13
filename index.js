@@ -181,8 +181,10 @@ morgan.format('tiny', ':method :url :status :res[content-length] - :response-tim
  */
 
 morgan.format('dev', function developmentFormatLine(tokens, req, res) {
-  // get the status code
-  var status = res.statusCode
+  // get the status code if response written
+  var status = res._header
+    ? res.statusCode
+    : undefined
 
   // get status color
   var color = status >= 500 ? 31 // red

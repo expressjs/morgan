@@ -863,6 +863,30 @@ describe('morgan()', function () {
         .get('/')
         .expect(500, cb)
       })
+
+      describe('with "immediate: true" option', function () {
+        it('should not have color or response values', function (done) {
+          var cb = after(2, function (err, res, line) {
+            if (err) return done(err)
+            var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
+            assert.equal(masked, '_color_0_GET / _color_0_- _color_0_- ms - -_color_0_')
+            done()
+          })
+
+          var stream = createLineStream(function (line) {
+            cb(null, null, line)
+          })
+
+          var server = createServer('dev', {
+            immediate: true,
+            stream: stream
+          })
+
+          request(server)
+          .get('/')
+          .expect(200, cb)
+        })
+      })
     })
 
     describe('short', function () {
