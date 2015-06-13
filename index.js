@@ -317,8 +317,8 @@ morgan.token('req', function getRequestToken(req, res, field) {
  */
 
 morgan.token('res', function getResponseTime(req, res, field) {
-  return res._headers
-    ? res._headers[field.toLowerCase()]
+  return res._header
+    ? res.getHeader(field)
     : undefined
 })
 

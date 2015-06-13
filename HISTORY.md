@@ -6,6 +6,7 @@ unreleased
   * Fix `response-time` token to not include response latency
   * Fix `status` token incorrectly displaying before response in `dev` format
   * Fix token return values to be `undefined` or a string
+  * Use `res.getHeader` in `res` token
   * deps: basic-auth@~1.0.2
     - perf: enable strict mode
     - perf: hoist regular expression
