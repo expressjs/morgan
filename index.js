@@ -255,8 +255,10 @@ morgan.token('date', function getDateToken(req, res, format) {
  */
 
 morgan.token('status', function getStatusToken(req, res) {
-  return res._header ? res.statusCode : null;
-});
+  return res._header
+    ? String(res.statusCode)
+    : undefined
+})
 
 /**
  * normalized referrer
@@ -277,9 +279,13 @@ morgan.token('remote-addr', getip)
  */
 
 morgan.token('remote-user', function getRemoteUserToken(req) {
-  var creds = auth(req)
-  var user = (creds && creds.name) || '-'
-  return user;
+  // parse basic credentials
+  var credentials = auth(req)
+
+  // return username
+  return credentials
+    ? credentials.name
+    : undefined
 })
 
 /**
@@ -311,8 +317,10 @@ morgan.token('req', function getRequestToken(req, res, field) {
  */
 
 morgan.token('res', function getResponseTime(req, res, field) {
-  return (res._headers || {})[field.toLowerCase()];
-});
+  return res._headers
+    ? res._headers[field.toLowerCase()]
+    : undefined
+})
 
 /**
  * Format a Date in the common log format.

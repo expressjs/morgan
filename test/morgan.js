@@ -988,7 +988,7 @@ describe('morgan()', function () {
   })
 
   describe('with immediate option', function () {
-    it('should log before response', function (done) {
+    it('should not have value for :res', function (done) {
       var cb = after(2, function (err, res, line) {
         if (err) return done(err)
         assert.equal(line, 'GET / -')
@@ -1002,6 +1002,71 @@ describe('morgan()', function () {
       var server = createServer(':method :url :res[x-sent]', {
         immediate: true,
         stream: stream
+      })
+
+      request(server)
+      .get('/')
+      .expect(200, cb)
+    })
+
+    it('should not have value for :response-time', function (done) {
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
+        assert.equal(line, 'GET / -')
+        done()
+      })
+
+      var stream = createLineStream(function (line) {
+        cb(null, null, line)
+      })
+
+      var server = createServer(':method :url :response-time', {
+        immediate: true,
+        stream: stream
+      })
+
+      request(server)
+      .get('/')
+      .expect(200, cb)
+    })
+
+    it('should not have value for :status', function (done) {
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
+        assert.equal(line, 'GET / -')
+        done()
+      })
+
+      var stream = createLineStream(function (line) {
+        cb(null, null, line)
+      })
+
+      var server = createServer(':method :url :status', {
+        immediate: true,
+        stream: stream
+      })
+
+      request(server)
+      .get('/')
+      .expect(200, cb)
+    })
+
+    it('should log before response', function (done) {
+      var lineLogged = false
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
+        assert.equal(line, 'GET / -')
+        done()
+      })
+
+      var stream = createLineStream(function (line) {
+        lineLogged = true
+        cb(null, null, line)
+      })
+
+      var server = createServer(':method :url :res[x-sent]', { immediate: true, stream: stream }, function (req, res, next) {
+        assert.ok(lineLogged)
+        next()
       })
 
       request(server)

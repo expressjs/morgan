@@ -5,6 +5,7 @@ unreleased
   * Do not color 1xx status codes in `dev` format
   * Fix `response-time` token to not include response latency
   * Fix `status` token incorrectly displaying before response in `dev` format
+  * Fix token return values to be `undefined` or a string
   * deps: on-finished@~2.3.0
     - Add defined behavior for HTTP `CONNECT` requests
     - Add defined behavior for HTTP `Upgrade` requests
