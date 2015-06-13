@@ -181,17 +181,21 @@ morgan.format('tiny', ':method :url :status :res[content-length] - :response-tim
  */
 
 morgan.format('dev', function developmentFormatLine(tokens, req, res) {
-  var color = 32; // green
-  var status = res.statusCode;
+  // get the status code
+  var status = res.statusCode
 
-  if (status >= 500) color = 31; // red
-  else if (status >= 400) color = 33; // yellow
-  else if (status >= 300) color = 36; // cyan
+  // get status color
+  var color = status >= 500 ? 31 // red
+    : status >= 400 ? 33 // yellow
+    : status >= 300 ? 36 // cyan
+    : status >= 200 ? 32 // green
+    : 0 // no color
 
-  var fn = compile('\x1b[0m:method :url \x1b[' + color + 'm:status \x1b[0m:response-time ms - :res[content-length]\x1b[0m');
+  // compile colored function
+  var fn = compile('\x1b[0m:method :url \x1b[' + color + 'm:status \x1b[0m:response-time ms - :res[content-length]\x1b[0m')
 
-  return fn(tokens, req, res);
-});
+  return fn(tokens, req, res)
+})
 
 /**
  * request url

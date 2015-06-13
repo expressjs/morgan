@@ -2,6 +2,7 @@ unreleased
 ==========
 
   * Add `morgan.compile(format)` export
+  * Do not color 1xx status codes in `dev` format
   * Fix `response-time` token to not include response latency
   * deps: on-finished@~2.3.0
     - Add defined behavior for HTTP `CONNECT` requests
