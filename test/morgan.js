@@ -688,6 +688,59 @@ describe('morgan()', function () {
         test.write('0')
       })
     })
+
+    describe(':url', function () {
+      it('should get request URL', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.equal(line, '/foo')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':url', { stream: stream }))
+        .get('/foo')
+        .expect(200, cb)
+      })
+
+      it('should use req.originalUrl if exists', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.equal(line, '/bar')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':url', { stream: stream }, function (req, res, next) {
+          req.originalUrl = '/bar'
+          next()
+        })
+
+        request(server)
+        .get('/')
+        .expect(200, cb)
+      })
+
+      it('should not exist for aborted request', function (done) {
+        var stream = createLineStream(function (line) {
+          assert.equal(line, '-')
+          server.close(done)
+        })
+
+        var server = createServer(':status', { stream: stream }, function () {
+          test.abort()
+        })
+
+        var test = request(server).post('/')
+        test.write('0')
+      })
+    })
   })
 
   describe('formats', function () {

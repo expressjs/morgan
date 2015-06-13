@@ -204,8 +204,8 @@ morgan.format('dev', function developmentFormatLine(tokens, req, res) {
  */
 
 morgan.token('url', function getUrlToken(req) {
-  return req.originalUrl || req.url;
-});
+  return req.originalUrl || req.url
+})
 
 /**
  * request method
