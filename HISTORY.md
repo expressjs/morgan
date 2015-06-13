@@ -19,6 +19,7 @@ unreleased
     - deps: ee-first@1.1.1
   * pref: enable strict mode
   * pref: reduce function closure scopes
+  * pref: remove dynamic compile on every request for `dev` format
   * pref: remove an argument reassignment
   * pref: skip function call without `skip` option
 

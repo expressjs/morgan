@@ -193,8 +193,14 @@ morgan.format('dev', function developmentFormatLine(tokens, req, res) {
     : status >= 200 ? 32 // green
     : 0 // no color
 
-  // compile colored function
-  var fn = compile('\x1b[0m:method :url \x1b[' + color + 'm:status \x1b[0m:response-time ms - :res[content-length]\x1b[0m')
+  // get colored function
+  var fn = developmentFormatLine[color]
+
+  if (!fn) {
+    // compile
+    fn = developmentFormatLine[color] = compile('\x1b[0m:method :url \x1b['
+      + color + 'm:status \x1b[0m:response-time ms - :res[content-length]\x1b[0m')
+  }
 
   return fn(tokens, req, res)
 })
