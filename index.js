@@ -424,7 +424,7 @@ function createBufferStream(stream, interval) {
  */
 
 function format(name, fmt) {
-  this[name] = fmt
+  morgan[name] = fmt
   return this
 }
 
@@ -496,6 +496,6 @@ function recordStartTime() {
  */
 
 function token(name, fn) {
-  this[name] = fn
+  morgan[name] = fn
   return this
 }
