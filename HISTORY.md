@@ -6,6 +6,11 @@ unreleased
   * Fix `response-time` token to not include response latency
   * Fix `status` token incorrectly displaying before response in `dev` format
   * Fix token return values to be `undefined` or a string
+  * deps: basic-auth@~1.0.2
+    - perf: enable strict mode
+    - perf: hoist regular expression
+    - perf: parse with regular expressions
+    - perf: remove argument reassignment
   * deps: on-finished@~2.3.0
     - Add defined behavior for HTTP `CONNECT` requests
     - Add defined behavior for HTTP `Upgrade` requests
