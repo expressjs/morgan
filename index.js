@@ -309,17 +309,29 @@ morgan.token('user-agent', function getUserAgentToken(req) {
  */
 
 morgan.token('req', function getRequestToken(req, res, field) {
-  return req.headers[field.toLowerCase()];
-});
+  // get header
+  var header = req.headers[field.toLowerCase()]
+
+  return Array.isArray(header)
+    ? header.join(', ')
+    : header
+})
 
 /**
  * response header
  */
 
 morgan.token('res', function getResponseTime(req, res, field) {
-  return res._header
-    ? res.getHeader(field)
-    : undefined
+  if (!res._header) {
+    return undefined
+  }
+
+  // get header
+  var header = res.getHeader(field)
+
+  return Array.isArray(header)
+    ? header.join(', ')
+    : header
 })
 
 /**

@@ -258,6 +258,23 @@ describe('morgan()', function () {
         .set('x-from-string', 'me')
         .expect(200, cb)
       })
+
+      it('should display all values of array headers', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.equal(line, 'foo=bar, fizz=buzz')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':req[set-cookie]', { stream: stream }))
+        .get('/')
+        .set('Set-Cookie', ['foo=bar', 'fizz=buzz'])
+        .expect(200, cb)
+      })
     })
 
     describe(':res', function () {
@@ -274,6 +291,28 @@ describe('morgan()', function () {
 
         request(createServer(':res[x-sent]', { stream: stream }))
         .get('/')
+        .expect(200, cb)
+      })
+
+      it('should display all values of array headers', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.equal(line, 'foo, bar')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':res[x-keys]', { stream: stream }, function (req, res, next) {
+          res.setHeader('X-Keys', ['foo', 'bar'])
+          next()
+        })
+
+        request(server)
+        .get('/')
+        .expect('X-Keys', 'foo, bar')
         .expect(200, cb)
       })
     })
