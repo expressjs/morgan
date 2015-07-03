@@ -16,7 +16,7 @@
     "on-headers": "~1.0.0"
   },
   "devDependencies": {
-    "istanbul": "0.3.15",
+    "istanbul": "0.3.17",
     "mocha": "2.2.5",
     "split": "1.0.0",
     "supertest": "1.0.1"
