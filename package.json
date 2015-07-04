@@ -9,7 +9,7 @@
   "license": "MIT",
   "repository": "expressjs/morgan",
   "dependencies": {
-    "basic-auth": "~1.0.2",
+    "basic-auth": "~1.0.3",
     "debug": "~2.2.0",
     "depd": "~1.0.1",
     "on-finished": "~2.3.0",
