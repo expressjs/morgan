@@ -121,7 +121,7 @@ The HTTP version of the request.
 
 ##### :method
 
-The HTTP version of the request.
+The HTTP method of the request.
 
 ##### :referrer
 
