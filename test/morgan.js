@@ -634,6 +634,37 @@ describe('morgan()', function () {
         .get('/')
         .expect(200, cb)
       })
+
+      it('should be empty if morgan invoked after response sent', function (done) {
+        var cb = after(3, function (err, res, line) {
+          if (err) return done(err)
+          assert.equal(line, '-')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var logger = morgan(':response-time', {
+          immediate: true,
+          stream: stream
+        })
+
+        var server = http.createServer(function (req, res) {
+          setTimeout(function () {
+            logger(req, res, function (err) {
+              cb()
+            })
+          }, 10)
+
+          res.end()
+        })
+
+        request(server)
+        .get('/')
+        .expect(200, cb)
+      })
     })
 
     describe(':status', function () {
