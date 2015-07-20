@@ -139,6 +139,7 @@ function morgan(format, options) {
 
       // log when response finished
       res.on('finish', logRequest)
+      res.on('close', logRequest)
     }
 
     next();
