@@ -151,6 +151,10 @@ The time between the request coming into `morgan` and when the response headers 
 
 The status code of the response.
 
+If the request/response cycle completes before a response was sent to the
+client (for example, the TCP socket closed prematurely by a client aborting
+the request), then the status will be empty (displayed as `"-"` in the log).
+
 ##### :url
 
 The URL of the request. This will use `req.originalUrl` if exists, otherwise `req.url`.
