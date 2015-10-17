@@ -4,6 +4,8 @@ unreleased
   * deps: depd@~1.1.0
     - Enable strict mode in more places
     - Support web browser loading
+  * deps: on-headers@~1.0.1
+    - perf: enable strict mode
 
 1.6.1 / 2015-07-03
 ==================
