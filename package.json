@@ -19,7 +19,7 @@
     "istanbul": "0.3.17",
     "mocha": "2.2.5",
     "split": "1.0.0",
-    "supertest": "1.0.1"
+    "supertest": "1.1.0"
   },
   "files": [
     "LICENSE",
