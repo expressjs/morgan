@@ -56,6 +56,9 @@ var defaultBufferDuration = 1000;
  * @return {Function} middleware
  */
 
+// default color in 'dev' format
+var devDefaultColor;
+
 function morgan(format, options) {
   var fmt = format
   var opts = options || {}
@@ -71,6 +74,8 @@ function morgan(format, options) {
   if (fmt === undefined) {
     deprecate('undefined format: specify a format')
   }
+
+  devDefaultColor = opts.devDefaultColor || 0
 
   // output on request instead of response
   var immediate = opts.immediate
@@ -198,8 +203,8 @@ morgan.format('dev', function developmentFormatLine(tokens, req, res) {
 
   if (!fn) {
     // compile
-    fn = developmentFormatLine[color] = compile('\x1b[0m:method :url \x1b['
-      + color + 'm:status \x1b[0m:response-time ms - :res[content-length]\x1b[0m')
+    fn = developmentFormatLine[color] = compile('\x1b[' + devDefaultColor + 'm:method :url \x1b['
+      + color + 'm:status \x1b[' + devDefaultColor + 'm:response-time ms - :res[content-length]\x1b[0m')
   }
 
   return fn(tokens, req, res)
