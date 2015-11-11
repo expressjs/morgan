@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Add `digits` argument to `response-time` token
   * deps: depd@~1.1.0
     - Enable strict mode in more places
     - Support web browser loading

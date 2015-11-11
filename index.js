@@ -225,7 +225,7 @@ morgan.token('method', function getMethodToken(req) {
  * response time in milliseconds
  */
 
-morgan.token('response-time', function getResponseTimeToken(req, res) {
+morgan.token('response-time', function getResponseTimeToken(req, res, digits) {
   if (!req._startAt || !res._startAt) {
     // missing request and/or response start time
     return
@@ -236,7 +236,7 @@ morgan.token('response-time', function getResponseTimeToken(req, res) {
     + (res._startAt[1] - req._startAt[1]) * 1e-6
 
   // return truncated value
-  return ms.toFixed(3)
+  return ms.toFixed(digits === undefined ? 3 : digits)
 })
 
 /**

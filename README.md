@@ -143,9 +143,13 @@ The given `header` of the request.
 
 The given `header` of the response.
 
-##### :response-time
+##### :response-time[digits]
 
-The time between the request coming into `morgan` and when the response headers are written, in milliseconds.
+The time between the request coming into `morgan` and when the response
+headers are written, in milliseconds.
+
+The `digits` argument is a number that specifies the number of digits to
+include on the number, defaulting to `3`, which provides microsecond percision.
 
 ##### :status
 
