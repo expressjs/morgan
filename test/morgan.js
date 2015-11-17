@@ -9,23 +9,6 @@ var split = require('split')
 
 describe('morgan()', function () {
   describe('arguments', function () {
-    it('should use default format', function (done) {
-      var cb = after(2, function (err, res, line) {
-        if (err) return done(err)
-        assert(res.text.length > 0)
-        assert.equal(line.substr(0, res.text.length), res.text)
-        done()
-      })
-
-      var stream = createLineStream(function (line) {
-        cb(null, null, line)
-      })
-
-      request(createServer(undefined, { stream: stream }))
-      .get('/')
-      .expect(200, cb)
-    })
-
     describe('format', function () {
       it('should accept format as format name', function (done) {
         var cb = after(2, function (err, res, line) {
@@ -80,62 +63,7 @@ describe('morgan()', function () {
       })
 
       it('should reject format as bool', function () {
-        assert.throws(createServer.bind(null, true), /argument format/)
-      })
-
-      describe('back-compat', function () {
-        it('should accept options object', function (done) {
-          var cb = after(2, function (err, res, line) {
-            if (err) return done(err)
-            assert(res.text.length > 0)
-            assert.equal(line.substr(0, res.text.length), res.text)
-            done()
-          })
-
-          var stream = createLineStream(function (line) {
-            cb(null, null, line)
-          })
-
-          request(createServer({ stream: stream }))
-          .get('/')
-          .expect(200, cb)
-        })
-
-        it('should accept format in options for back-compat', function (done) {
-          var cb = after(2, function (err, res, line) {
-            if (err) return done(err)
-            assert.equal(line, 'GET /')
-            done()
-          })
-
-          var stream = createLineStream(function (line) {
-            cb(null, null, line)
-          })
-
-          request(createServer({ format: ':method :url', stream: stream }))
-          .get('/')
-          .expect(200, cb)
-        })
-
-        it('should accept format function in options for back-compat', function (done) {
-          var cb = after(2, function (err, res, line) {
-            if (err) return done(err)
-            assert.equal(line, 'apple')
-            done()
-          })
-
-          var stream = createLineStream(function (line) {
-            cb(null, null, line)
-          })
-
-          function format() {
-            return 'apple'
-          }
-
-          request(createServer({ format: format, stream: stream }))
-          .get('/')
-          .expect(200, cb)
-        })
+        assert.throws(createServer.bind(null, true), /Morgan\.getLogger\(format\): format must be a string or a function/)
       })
     })
   })
@@ -374,7 +302,7 @@ describe('morgan()', function () {
         var stream = createLineStream(function (line) {
           cb(null, null, line)
         })
-        var logger = morgan(':remote-addr', { stream: stream })
+        var logger = morgan({ stream: stream }).getLogger(':remote-addr')
 
         server.on('request', function (req, res) {
           logger(req, res, function (err) {
@@ -703,10 +631,10 @@ describe('morgan()', function () {
           cb(null, null, line)
         })
 
-        var logger = morgan(':response-time', {
+        var logger = morgan({
           immediate: true,
           stream: stream
-        })
+        }).getLogger(':response-time')
 
         var server = http.createServer(function (req, res) {
           setTimeout(function () {
@@ -920,28 +848,6 @@ describe('morgan()', function () {
         request(createServer('common', { stream: stream }))
         .get('/')
         .set('Authorization', 'Basic dGo6')
-        .expect(200, cb)
-      })
-    })
-
-    describe('default', function () {
-      it('should match expectations', function (done) {
-        var cb = after(2, function (err, res, line) {
-          if (err) return done(err)
-          var masked = line.replace(/\w+, \d+ \w+ \d+ \d+:\d+:\d+ \w+/, '_timestamp_')
-          assert.equal(masked, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 - "http://localhost/" "my-ua"')
-          done()
-        })
-
-        var stream = createLineStream(function (line) {
-          cb(null, null, line)
-        })
-
-        request(createServer('default', { stream: stream }))
-        .get('/')
-        .set('Authorization', 'Basic dGo6')
-        .set('Referer', 'http://localhost/')
-        .set('User-Agent', 'my-ua')
         .expect(200, cb)
       })
     })
@@ -1283,7 +1189,7 @@ describe('morgan()', function () {
         return req.url.indexOf('skip=true') !== -1
       }
 
-      request(createServer({ format: 'default', skip: skip, stream: stream }))
+      request(createServer('combined', { skip: skip, stream: stream }))
       .get('/?skip=true')
       .set('Connection', 'close')
       .expect(200, done)
@@ -1298,7 +1204,7 @@ describe('morgan()', function () {
         return res.statusCode === 200
       }
 
-      request(createServer({ format: 'default', skip: skip, stream: stream }))
+      request(createServer('combined', { skip: skip, stream: stream }))
       .get('/')
       .expect(200, done)
     })
@@ -1351,7 +1257,7 @@ function createLineStream(callback) {
 }
 
 function createServer(format, opts, fn, fn1) {
-  var logger = morgan(format, opts)
+  var logger = morgan(opts).getLogger(format)
   var middle = fn || noopMiddleware
 
   return http.createServer(function onRequest(req, res) {
