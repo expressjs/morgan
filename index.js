@@ -48,6 +48,12 @@ var clfmonth = [
 var defaultBufferDuration = 1000;
 
 /**
+ * Remember the last dev color used.
+ * @private
+ */
+var prevDevColor
+
+/**
  * Create a logger middleware.
  *
  * @public
@@ -100,6 +106,8 @@ function morgan(format, options) {
     stream = createBufferStream(stream, interval)
   }
 
+  var devColor = opts.devColor || 0
+
   return function logger(req, res, next) {
     // request data
     req._startAt = undefined
@@ -119,7 +127,7 @@ function morgan(format, options) {
         return
       }
 
-      var line = formatLine(morgan, req, res)
+      var line = formatLine(morgan, req, res, devColor)
 
       if (null == line) {
         debug('skip line')
@@ -180,7 +188,7 @@ morgan.format('tiny', ':method :url :status :res[content-length] - :response-tim
  * dev (colored)
  */
 
-morgan.format('dev', function developmentFormatLine(tokens, req, res) {
+morgan.format('dev', function developmentFormatLine(tokens, req, res, devColor) {
   // get the status code if response written
   var status = res._header
     ? res.statusCode
@@ -196,10 +204,11 @@ morgan.format('dev', function developmentFormatLine(tokens, req, res) {
   // get colored function
   var fn = developmentFormatLine[color]
 
-  if (!fn) {
+  if (!fn || prevDevColor !== devColor) {
+    prevDevColor = devColor
     // compile
-    fn = developmentFormatLine[color] = compile('\x1b[0m:method :url \x1b['
-      + color + 'm:status \x1b[0m:response-time ms - :res[content-length]\x1b[0m')
+    fn = developmentFormatLine[color] = compile('\x1b[' + devColor + 'm:method :url \x1b['
+      + color + 'm:status \x1b[' + devColor + 'm:response-time ms - :res[content-length]\x1b[0m')
   }
 
   return fn(tokens, req, res)
@@ -377,10 +386,10 @@ function compile(format) {
 
   var fmt = format.replace(/"/g, '\\"')
   var js = '  return "' + fmt.replace(/:([-\w]{2,})(?:\[([^\]]+)\])?/g, function(_, name, arg) {
-    return '"\n    + (tokens["' + name + '"](req, res, ' + String(JSON.stringify(arg)) + ') || "-") + "'
+    return '"\n    + (tokens["' + name + '"](req, res, ' + String(JSON.stringify(arg)) + ', devColor) || "-") + "'
   }) + '";'
 
-  return new Function('tokens, req, res', js)
+  return new Function('tokens, req, res, devColor', js)
 }
 
 /**

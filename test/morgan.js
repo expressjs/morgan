@@ -1062,6 +1062,29 @@ describe('morgan()', function () {
         .expect(500, cb)
       })
 
+      it('should color text gray', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
+          assert.equal(masked.substr(0, 39), '_color_90_GET / _color_0_102 _color_90_')
+          assert.equal(masked.substr(-9), '_color_0_')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer('dev', { stream: stream, devColor: 90 }, function (req, res, next) {
+          res.statusCode = 102
+          next()
+        })
+
+        request(server)
+        .get('/')
+        .expect(102, cb)
+      })
+
       describe('with "immediate: true" option', function () {
         it('should not have color or response values', function (done) {
           var cb = after(2, function (err, res, line) {
@@ -1323,7 +1346,7 @@ describe('morgan.compile(format)', function () {
       it('should compile a string into a function', function () {
         var fn = morgan.compile(':method')
         assert.ok(typeof fn === 'function')
-        assert.ok(fn.length === 3)
+        assert.ok(fn.length === 4)
       })
     })
   })
