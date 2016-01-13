@@ -29,6 +29,7 @@ var debug = require('debug')('morgan')
 var deprecate = require('depd')('morgan')
 var onFinished = require('on-finished')
 var onHeaders = require('on-headers')
+var requestIp = require('request-ip')
 
 /**
  * Array of CLF month names.
@@ -455,10 +456,7 @@ function getFormatFunction(name) {
  */
 
 function getip(req) {
-  return req.ip
-    || req._remoteAddress
-    || (req.connection && req.connection.remoteAddress)
-    || undefined;
+  return requestIp.getClientIp(req)
 }
 
 /**
