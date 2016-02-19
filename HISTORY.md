@@ -1,5 +1,5 @@
-unreleased
-==========
+1.7.0 / 2016-02-18
+==================
 
   * Add `digits` argument to `response-time` token
   * deps: depd@~1.1.0
