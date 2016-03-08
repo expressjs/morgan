@@ -251,7 +251,7 @@ morgan.token('date', function getDateToken(req, res, format) {
       return clfdate(date)
     case 'iso':
       return date.toISOString()
-    case 'local'
+    case 'local':
       return localdate(date)
     case 'web':
       return date.toUTCString()
