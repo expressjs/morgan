@@ -251,8 +251,8 @@ morgan.token('date', function getDateToken(req, res, format) {
       return clfdate(date)
     case 'iso':
       return date.toISOString()
-    case 'local':
-      return localdate(date)
+    case 'locale':
+      return date.toLocaleString()
     case 'web':
       return date.toUTCString()
   }
@@ -364,18 +364,6 @@ function clfdate(dateTime) {
     + ' +0000'
 }
 
-function localdate(dateTime) {
-  var date = dateTime.getDate()
-  var hour = dateTime.getHours()
-  var mins = dateTime.getMinutes()
-  var secs = dateTime.getSeconds()
-  var year = dateTime.getFullYear()
-  var month = dateTime.getMonth() + 1;
-  
-  return pad2(date) + '/' + pd2(month) + '/' + year
-    + ' ' + pad2(hour) + ':' + pad2(mins) + ':' + pad2(secs)
-    + ' +0000'
-}
 /**
  * Compile a format string into a function.
  *
