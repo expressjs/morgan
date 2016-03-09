@@ -190,6 +190,22 @@ describe('morgan()', function () {
         .expect(200, cb)
       })
 
+      it('should get current date in "locale" format', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.ok(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(line))
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':date[locale]', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
+      })
+
       it('should get current date in "web" format', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
