@@ -6,6 +6,8 @@ var http = require('http')
 var morgan = require('..')
 var request = require('supertest')
 var split = require('split')
+var kayvee = require('kayvee')
+var uuid = require('node-uuid')
 
 describe('morgan()', function () {
   describe('arguments', function () {
@@ -1103,6 +1105,40 @@ describe('morgan()', function () {
         request(createServer('short', { stream: stream }))
         .get('/')
         .set('Authorization', 'Basic dGo6')
+        .expect(200, cb)
+      })
+    })
+
+    describe('clever', function () {
+      it('should match expectations', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          var masked = line.replace(/response-time\":\d+/, 'response-time":99999')
+          expected = kayvee.format({
+            "method": "GET",
+            "path": "/hello/world",
+            "params": "?a=1&b=2",
+            "response-size": 12345,
+            "response-time": 99999,
+            "status-code": 200,
+            "header-x-forwarded-for": "foo",
+          })
+          assert.equal(masked, expected)
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer('clever', { stream: stream }, function (req, res, next) {
+          res.setHeader('content-length', 12345)
+          next()
+        })
+
+        request(server)
+        .get('/hello/world?a=1&b=2')
+        .set('x-forwarded-for', 'foo')
         .expect(200, cb)
       })
     })
