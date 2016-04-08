@@ -12,10 +12,12 @@
     "basic-auth": "~1.0.3",
     "debug": "~2.2.0",
     "depd": "~1.1.0",
+    "node-uuid": "^1.4.7",
     "on-finished": "~2.3.0",
     "on-headers": "~1.0.1"
   },
   "devDependencies": {
+    "express": "^4.13.4",
     "istanbul": "0.4.2",
     "mocha": "2.4.5",
     "split": "1.0.0",
@@ -32,6 +34,7 @@
   },
   "scripts": {
     "test": "mocha --check-leaks --reporter spec --bail",
+    "test:watch": "npm test -- --watch",
     "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --check-leaks --reporter dot",
     "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --check-leaks --reporter spec"
   }

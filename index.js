@@ -29,6 +29,8 @@ var debug = require('debug')('morgan')
 var deprecate = require('depd')('morgan')
 var onFinished = require('on-finished')
 var onHeaders = require('on-headers')
+var kayvee = require('kayvee')
+var uuid = require('node-uuid')
 
 /**
  * Array of CLF month names.
@@ -46,6 +48,17 @@ var clfmonth = [
  */
 
 var defaultBufferDuration = 1000;
+
+/**
+ * Assign a Unique ID to each request
+ * @private
+ */
+function assignId(req, res, next) {
+  // TODO: Get existing ID for request, if it exists
+  req.id = uuid.v4()
+  // TODO: Add this ID to the request headers?
+  next()
+}
 
 /**
  * Create a logger middleware.
@@ -74,6 +87,10 @@ function morgan(format, options) {
 
   // output on request instead of response
   var immediate = opts.immediate
+
+  // TODO: consider passing 'kayvee' as an option
+  // ... would need to separate log printing from data itself
+  // kayvee = opts.kayvee
 
   // check if log entry should be skipped
   var skip = opts.skip || false
@@ -113,6 +130,9 @@ function morgan(format, options) {
     // record request start
     recordStartTime.call(req)
 
+    //TODO: assign unique ID
+    //assignId(req, res, next)
+
     function logRequest() {
       if (skip !== false && skip(req, res)) {
         debug('skip request')
@@ -127,8 +147,12 @@ function morgan(format, options) {
       }
 
       debug('log request')
+      // TODO: Use kayvee logger and log at correct log level
       stream.write(line + '\n')
     };
+
+    // TODO: if possible, log even if request fails
+    // ... on sigterm, logRequest
 
     if (immediate) {
       // immediate log
@@ -206,11 +230,81 @@ morgan.format('dev', function developmentFormatLine(tokens, req, res) {
 })
 
 /**
+ * Clever kayvee format
+ */
+
+morgan.format('clever', function cleverFormatLine(tokens, req, res) {
+  var data = {
+    // SHOULD create UniqueID for the request (capture from existing header, if available)
+    //"id": tokens["id"](req, res, undefined),
+    "method": tokens["method"](req, res, undefined),
+    "path": tokens["path"](req, res, undefined),
+    "params": tokens["query-params"](req, res, undefined),
+    "response-size": tokens["response-size"](req, res, undefined),
+    "response-time": tokens["response-time-ns"](req, res, undefined),
+    "status-code": tokens["status-numeric"](req, res, undefined),
+    "header-x-forwarded-for": tokens["x-forwarded-for"](req, res, undefined),
+  }
+  // Add user-configured headers
+
+  // Add request-specific data
+  if (req._logger && req._logger.data) {
+    // add keys to data, only if they're strings or numbers
+    // TODO
+  }
+
+  return kayvee.format(data)
+})
+
+/**
+ * request unique ID
+ */
+
+morgan.token('id', function getId(req) {
+    return req.id
+})
+
+/**
  * request url
  */
 
 morgan.token('url', function getUrlToken(req) {
   return req.originalUrl || req.url
+})
+
+/**
+ * request path
+ */
+
+morgan.token('path', function getBaseUrl(req) {
+  var url = req.originalUrl || req.url
+  var parsed = require('url').parse(url, true)
+  return parsed.pathname
+})
+
+/**
+ * request query params
+ */
+
+morgan.token('query-params', function getQueryParams(req) {
+  var url = req.originalUrl || req.url
+  var parsed = require('url').parse(url, true)
+  return parsed.search
+})
+
+/**
+ * response size
+ */
+
+morgan.token('response-size', function getResponseSize(req, res) {
+  var headers = res.headers || res._headers
+  if (headers && headers['content-length']) {
+    console.log("header:content-length")
+    return headers['content-length']
+  } else if (res.data) {
+    console.log("data length")
+    return res.data.length
+  }
 })
 
 /**
@@ -240,6 +334,22 @@ morgan.token('response-time', function getResponseTimeToken(req, res, digits) {
 })
 
 /**
+ * response time in nanoseconds
+ */
+
+morgan.token('response-time-ns', function getResponseTimeToken(req, res, digits) {
+  if (!req._startAt || !res._startAt) {
+    // missing request and/or response start time
+    return
+  }
+
+  // calculate diff
+  var ns = (res._startAt[0] - req._startAt[0]) * 1e9
+    + (res._startAt[1] - req._startAt[1])
+  return ns
+})
+
+/**
  * current date
  */
 
@@ -263,6 +373,12 @@ morgan.token('date', function getDateToken(req, res, format) {
 morgan.token('status', function getStatusToken(req, res) {
   return res._header
     ? String(res.statusCode)
+    : undefined
+})
+
+morgan.token('status-numeric', function getStatusToken(req, res) {
+  return res._header
+    ? res.statusCode
     : undefined
 })
 
@@ -308,6 +424,14 @@ morgan.token('http-version', function getHttpVersionToken(req) {
 
 morgan.token('user-agent', function getUserAgentToken(req) {
   return req.headers['user-agent'];
+});
+
+/**
+ * UA string
+ */
+
+morgan.token('x-forwarded-for', function getUserAgentToken(req) {
+  return req.headers['x-forwarded-for'];
 });
 
 /**
