@@ -9,9 +9,16 @@ node_js:
   - "4.4"
   - "5.10"
 sudo: false
+cache:
+  directories:
+    - node_modules
 before_install:
   # Setup Node.js version-specific dependencies
   - "test $TRAVIS_NODE_VERSION != '0.8' || npm rm --save-dev istanbul"
+
+  # Update Node.js modules
+  - "test ! -d node_modules || npm prune"
+  - "test ! -d node_modules || npm rebuild"
 script:
   # Run test script, depending on istanbul install
   - "test ! -z $(npm -ps ls istanbul) || npm test"
