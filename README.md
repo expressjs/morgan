@@ -189,7 +189,6 @@ var express = require('express')
 var morgan = require('morgan')
 
 var app = express()
-
 app.use(morgan('combined'))
 
 app.get('/', function (req, res) {
@@ -239,6 +238,9 @@ var app = express()
 var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
 
 // setup the logger
+// NOTE: the use of morgan needs to be done immediately after the creation
+//       of express, before any other use calls are made.  If it is not,
+//       log files may be created but may not be written to.
 app.use(morgan('combined', {stream: accessLogStream}))
 
 app.get('/', function (req, res) {
@@ -273,6 +275,9 @@ var accessLogStream = FileStreamRotator.getStream({
 })
 
 // setup the logger
+// NOTE: the use of morgan needs to be done immediately after the creation
+//       of express, before any other use calls are made.  If it is not,
+//       log files may be created but may not be written to.
 app.use(morgan('combined', {stream: accessLogStream}))
 
 app.get('/', function (req, res) {
