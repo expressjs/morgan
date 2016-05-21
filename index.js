@@ -180,7 +180,7 @@ morgan.format('tiny', ':method :url :status :res[content-length] - :response-tim
  * dev (colored)
  */
 
-morgan.format('dev', ':method :url :colorstatus :response-time ms - :res[content-length]');
+morgan.format('dev', ':method :url :colorstatus :response-time ms - :res[content-length]')
 
 
 /**
@@ -262,7 +262,7 @@ morgan.token('colorstatus', function(req, res){
       : 0 // no color
 
   //build color wrapped return
-  var colorStatus = '\x1b[' + color + 'm'+status+'\x1b[0m'
+  var colorStatus = '\x1b[' + color + 'm'+status+' \x1b[0m'
 
   //return colorized status
   return res._header 
