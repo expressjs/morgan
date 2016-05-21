@@ -270,7 +270,7 @@ morgan.token('status', function getStatusToken(req, res) {
  * response colorized status code
  */
 
-exports.token('colorstatus', function(req, res){
+morgan.token('colorstatus', function(req, res){
   var color = 32; // green
   var status = res.statusCode;
 
