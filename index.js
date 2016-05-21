@@ -267,6 +267,22 @@ morgan.token('status', function getStatusToken(req, res) {
 })
 
 /**
+ * response colorized status code
+ */
+
+exports.token('colorstatus', function(req, res){
+  var color = 32; // green
+  var status = res.statusCode;
+
+  if (status >= 500) color = 31; // red
+  else if (status >= 400) color = 33; // yellow
+  else if (status >= 300) color = 36; // cyan
+
+  var colorStatus = '\x1b[' + color + 'm'+status+'\x1b[0m'
+  return res._header ? colorStatus : null;
+});
+
+/**
  * normalized referrer
  */
 
