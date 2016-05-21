@@ -777,6 +777,163 @@ describe('morgan()', function () {
       })
     })
 
+    describe(':colorstatus', function () {
+
+
+      it('should not color 1xx', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
+          assert.equal(masked, '_color_0_102 _color_0_')
+          assert.equal(masked.substr(-9), '_color_0_')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':colorstatus', { stream: stream }, function (req, res, next) {
+          res.statusCode = 102
+          next()
+        })
+
+        request(server)
+            .get('/')
+            .expect(102, cb)
+      })
+
+      it('should color 2xx green', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
+          assert.equal(masked, '_color_32_200 _color_0_')
+          assert.equal(masked.substr(-9), '_color_0_')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':colorstatus', { stream: stream }, function (req, res, next) {
+          res.statusCode = 200
+          next()
+        })
+
+        request(server)
+            .get('/')
+            .expect(200, cb)
+      })
+
+      it('should color 3xx cyan', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
+          assert.equal(masked, '_color_36_300 _color_0_')
+          assert.equal(masked.substr(-9), '_color_0_')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':colorstatus', { stream: stream }, function (req, res, next) {
+          res.statusCode = 300
+          next()
+        })
+
+        request(server)
+            .get('/')
+            .expect(300, cb)
+      })
+
+      it('should color 4xx yelow', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
+          assert.equal(masked, '_color_33_400 _color_0_')
+          assert.equal(masked.substr(-9), '_color_0_')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':colorstatus', { stream: stream }, function (req, res, next) {
+          res.statusCode = 400
+          next()
+        })
+
+        request(server)
+            .get('/')
+            .expect(400, cb)
+      })
+
+      it('should color 5xx red', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
+          assert.equal(masked, '_color_31_500 _color_0_')
+          assert.equal(masked.substr(-9), '_color_0_')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':colorstatus', { stream: stream }, function (req, res, next) {
+          res.statusCode = 500
+          next()
+        })
+
+        request(server)
+            .get('/')
+            .expect(500, cb)
+      })
+
+
+
+
+      it('should not exist before response sent', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.equal(line, '-')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':colorstatus', {
+          immediate: true,
+          stream: stream
+        })
+
+        request(server)
+            .get('/')
+            .expect(200, cb)
+      })
+
+      it('should not exist for aborted request', function (done) {
+        var stream = createLineStream(function (line) {
+          assert.equal(line, '-')
+          server.close(done)
+        })
+
+        var server = createServer(':colorstatus', { stream: stream }, function () {
+          test.abort()
+        })
+
+        var test = request(server).post('/')
+        test.write('0')
+      })
+    })
+
     describe(':url', function () {
       it('should get request URL', function (done) {
         var cb = after(2, function (err, res, line) {
@@ -951,8 +1108,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(masked.substr(0, 37), '_color_0_GET / _color_0_102 _color_0_')
-          assert.equal(masked.substr(-9), '_color_0_')
+          assert.equal(masked.substr(0, 28), 'GET / _color_0_102 _color_0_')
           done()
         })
 
@@ -974,8 +1130,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(masked.substr(0, 38), '_color_0_GET / _color_32_200 _color_0_')
-          assert.equal(masked.substr(-9), '_color_0_')
+          assert.equal(masked.substr(0, 29), 'GET / _color_32_200 _color_0_')
           done()
         })
 
@@ -997,8 +1152,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(masked.substr(0, 38), '_color_0_GET / _color_36_300 _color_0_')
-          assert.equal(masked.substr(-9), '_color_0_')
+          assert.equal(masked.substr(0, 29), 'GET / _color_36_300 _color_0_')
           done()
         })
 
@@ -1020,8 +1174,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(masked.substr(0, 38), '_color_0_GET / _color_33_400 _color_0_')
-          assert.equal(masked.substr(-9), '_color_0_')
+          assert.equal(masked.substr(0, 29), 'GET / _color_33_400 _color_0_')
           done()
         })
 
@@ -1043,8 +1196,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(masked.substr(0, 38), '_color_0_GET / _color_31_500 _color_0_')
-          assert.equal(masked.substr(-9), '_color_0_')
+          assert.equal(masked.substr(0, 29), 'GET / _color_31_500 _color_0_')
           done()
         })
 
@@ -1067,7 +1219,7 @@ describe('morgan()', function () {
           var cb = after(2, function (err, res, line) {
             if (err) return done(err)
             var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-            assert.equal(masked, '_color_0_GET / _color_0_- _color_0_- ms - -_color_0_')
+            assert.equal(masked, 'GET / - - ms - -')
             done()
           })
 
