@@ -159,6 +159,10 @@ If the request/response cycle completes before a response was sent to the
 client (for example, the TCP socket closed prematurely by a client aborting
 the request), then the status will be empty (displayed as `"-"` in the log).
 
+##### :colorstatus
+
+The colorized :status of the response.
+
 ##### :url
 
 The URL of the request. This will use `req.originalUrl` if exists, otherwise `req.url`.
