@@ -180,30 +180,8 @@ morgan.format('tiny', ':method :url :status :res[content-length] - :response-tim
  * dev (colored)
  */
 
-morgan.format('dev', function developmentFormatLine(tokens, req, res) {
-  // get the status code if response written
-  var status = res._header
-    ? res.statusCode
-    : undefined
+morgan.format('dev', ':method :url :colorstatus :response-time ms - :res[content-length]');
 
-  // get status color
-  var color = status >= 500 ? 31 // red
-    : status >= 400 ? 33 // yellow
-    : status >= 300 ? 36 // cyan
-    : status >= 200 ? 32 // green
-    : 0 // no color
-
-  // get colored function
-  var fn = developmentFormatLine[color]
-
-  if (!fn) {
-    // compile
-    fn = developmentFormatLine[color] = compile('\x1b[0m:method :url \x1b['
-      + color + 'm:status \x1b[0m:response-time ms - :res[content-length]\x1b[0m')
-  }
-
-  return fn(tokens, req, res)
-})
 
 /**
  * request url
@@ -271,15 +249,25 @@ morgan.token('status', function getStatusToken(req, res) {
  */
 
 morgan.token('colorstatus', function(req, res){
-  var color = 32; // green
-  var status = res.statusCode;
+  //get the status code if response written
+  var status = res.statusCode
+      ? res.statusCode
+      : undefined
 
-  if (status >= 500) color = 31; // red
-  else if (status >= 400) color = 33; // yellow
-  else if (status >= 300) color = 36; // cyan
+  //get status color
+  var color = status >= 500 ? 31 // red
+      : status >= 400 ? 33 // yellow
+      : status >= 300 ? 36 // cyan
+      : status >= 200 ? 32 // green
+      : 0 // no color
 
+  //build color wrapped return
   var colorStatus = '\x1b[' + color + 'm'+status+'\x1b[0m'
-  return res._header ? colorStatus : null;
+
+  //return colorized status
+  return res._header 
+      ? colorStatus 
+      : undefined
 });
 
 /**
