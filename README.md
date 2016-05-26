@@ -149,7 +149,7 @@ The time between the request coming into `morgan` and when the response
 headers are written, in milliseconds.
 
 The `digits` argument is a number that specifies the number of digits to
-include on the number, defaulting to `3`, which provides microsecond percision.
+include on the number, defaulting to `3`, which provides microsecond precision.
 
 ##### :status
 
