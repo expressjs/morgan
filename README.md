@@ -26,7 +26,7 @@ a string of a format string, or a function that will produce a log entry.
 
 Morgan accepts these properties in the options object.
 
-#### immediate
+##### immediate
 
 Write log line on request instead of response. This means that a requests will
 be logged even if the server crashes, _but data from the response (like the
