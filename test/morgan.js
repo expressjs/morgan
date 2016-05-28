@@ -408,8 +408,6 @@ describe('morgan()', function () {
           cb(null, null, line)
         })
 
-        var server = createServer(':remote-addr')
-
         request(createServer(':remote-addr', { stream: stream }))
         .get('/')
         .set('Connection', 'close')
@@ -566,7 +564,6 @@ describe('morgan()', function () {
       it('should have three digits by default', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          var end = Date.now()
           assert.ok(/^[0-9]+\.[0-9]{3}$/.test(line))
           done()
         })
@@ -574,8 +571,6 @@ describe('morgan()', function () {
         var stream = createLineStream(function (line) {
           cb(null, null, line)
         })
-
-        var start = Date.now()
 
         request(createServer(':response-time', { stream: stream }))
         .get('/')
@@ -585,7 +580,6 @@ describe('morgan()', function () {
       it('should have five digits with argument "5"', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          var end = Date.now()
           assert.ok(/^[0-9]+\.[0-9]{5}$/.test(line))
           done()
         })
@@ -593,8 +587,6 @@ describe('morgan()', function () {
         var stream = createLineStream(function (line) {
           cb(null, null, line)
         })
-
-        var start = Date.now()
 
         request(createServer(':response-time[5]', { stream: stream }))
         .get('/')
@@ -604,7 +596,6 @@ describe('morgan()', function () {
       it('should have no digits with argument "0"', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          var end = Date.now()
           assert.ok(/^[0-9]+$/.test(line))
           done()
         })
@@ -612,8 +603,6 @@ describe('morgan()', function () {
         var stream = createLineStream(function (line) {
           cb(null, null, line)
         })
-
-        var start = Date.now()
 
         request(createServer(':response-time[0]', { stream: stream }))
         .get('/')
