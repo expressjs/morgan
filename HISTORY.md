@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Fix sending unnecessary `undefined` argument to token functions
   * deps: basic-auth@~1.0.4
 
 1.7.0 / 2016-02-18
