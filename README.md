@@ -100,7 +100,7 @@ The minimal output.
 
 To define a token, simply invoke `morgan.token()` with the name and a callback function. This callback function is expected to return a string value. The value returned is then available as ":type" in this case:
 ```js
-morgan.token('type', function(req, res){ return req.headers['content-type']; })
+morgan.token('type', function (req, res) { return req.headers['content-type'] })
 ```
 
 Calling `morgan.token()` using the same name as an existing token will overwrite that token definition.
@@ -232,11 +232,12 @@ Simple app that will log all requests in the Apache combined format to the file
 var express = require('express')
 var fs = require('fs')
 var morgan = require('morgan')
+var path = require('path')
 
 var app = express()
 
 // create a write stream (in append mode)
-var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
+var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {flags: 'a'})
 
 // setup the logger
 app.use(morgan('combined', {stream: accessLogStream}))
@@ -257,9 +258,10 @@ var FileStreamRotator = require('file-stream-rotator')
 var express = require('express')
 var fs = require('fs')
 var morgan = require('morgan')
+var path = require('path')
 
 var app = express()
-var logDirectory = __dirname + '/log'
+var logDirectory = path.join(__dirname, 'log')
 
 // ensure log directory exists
 fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
@@ -267,7 +269,7 @@ fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
 // create a rotating write stream
 var accessLogStream = FileStreamRotator.getStream({
   date_format: 'YYYYMMDD',
-  filename: logDirectory + '/access-%DATE%.log',
+  filename: path.join(logDirectory, 'access-%DATE%.log'),
   frequency: 'daily',
   verbose: false
 })
@@ -289,7 +291,7 @@ var express = require('express')
 var morgan = require('morgan')
 var uuid = require('node-uuid')
 
-morgan.token('id', function getId(req) {
+morgan.token('id', function getId (req) {
   return req.id
 })
 
@@ -302,7 +304,7 @@ app.get('/', function (req, res) {
   res.send('hello, world!')
 })
 
-function assignId(req, res, next) {
+function assignId (req, res, next) {
   req.id = uuid.v4()
   next()
 }
