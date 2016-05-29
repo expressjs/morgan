@@ -939,13 +939,12 @@ describe('morgan()', function () {
       it('should not color 1xx', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(masked.substr(0, 37), '_color_0_GET / _color_0_102 _color_0_')
-          assert.equal(masked.substr(-9), '_color_0_')
+          assert.equal(line.substr(0, 37), '_color_0_GET / _color_0_102 _color_0_')
+          assert.equal(line.substr(-9), '_color_0_')
           done()
         })
 
-        var stream = createLineStream(function (line) {
+        var stream = createColorLineStream(function onLine(line) {
           cb(null, null, line)
         })
 
@@ -962,13 +961,12 @@ describe('morgan()', function () {
       it('should color 2xx green', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(masked.substr(0, 38), '_color_0_GET / _color_32_200 _color_0_')
-          assert.equal(masked.substr(-9), '_color_0_')
+          assert.equal(line.substr(0, 38), '_color_0_GET / _color_32_200 _color_0_')
+          assert.equal(line.substr(-9), '_color_0_')
           done()
         })
 
-        var stream = createLineStream(function (line) {
+        var stream = createColorLineStream(function onLine(line) {
           cb(null, null, line)
         })
 
@@ -985,13 +983,12 @@ describe('morgan()', function () {
       it('should color 3xx cyan', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(masked.substr(0, 38), '_color_0_GET / _color_36_300 _color_0_')
-          assert.equal(masked.substr(-9), '_color_0_')
+          assert.equal(line.substr(0, 38), '_color_0_GET / _color_36_300 _color_0_')
+          assert.equal(line.substr(-9), '_color_0_')
           done()
         })
 
-        var stream = createLineStream(function (line) {
+        var stream = createColorLineStream(function onLine(line) {
           cb(null, null, line)
         })
 
@@ -1008,13 +1005,12 @@ describe('morgan()', function () {
       it('should color 4xx yelow', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(masked.substr(0, 38), '_color_0_GET / _color_33_400 _color_0_')
-          assert.equal(masked.substr(-9), '_color_0_')
+          assert.equal(line.substr(0, 38), '_color_0_GET / _color_33_400 _color_0_')
+          assert.equal(line.substr(-9), '_color_0_')
           done()
         })
 
-        var stream = createLineStream(function (line) {
+        var stream = createColorLineStream(function onLine(line) {
           cb(null, null, line)
         })
 
@@ -1031,13 +1027,12 @@ describe('morgan()', function () {
       it('should color 5xx red', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(masked.substr(0, 38), '_color_0_GET / _color_31_500 _color_0_')
-          assert.equal(masked.substr(-9), '_color_0_')
+          assert.equal(line.substr(0, 38), '_color_0_GET / _color_31_500 _color_0_')
+          assert.equal(line.substr(-9), '_color_0_')
           done()
         })
 
-        var stream = createLineStream(function (line) {
+        var stream = createColorLineStream(function onLine(line) {
           cb(null, null, line)
         })
 
@@ -1055,12 +1050,11 @@ describe('morgan()', function () {
         it('should not have color or response values', function (done) {
           var cb = after(2, function (err, res, line) {
             if (err) return done(err)
-            var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-            assert.equal(masked, '_color_0_GET / _color_0_- _color_0_- ms - -_color_0_')
+            assert.equal(line, '_color_0_GET / _color_0_- _color_0_- ms - -_color_0_')
             done()
           })
 
-          var stream = createLineStream(function (line) {
+          var stream = createColorLineStream(function onLine(line) {
             cb(null, null, line)
           })
 
@@ -1335,6 +1329,12 @@ function after(count, callback) {
   }
 }
 
+function createColorLineStream(callback) {
+  return createLineStream(function onLine(line) {
+    callback(expandColorCharacters(line))
+  })
+}
+
 function createLineStream(callback) {
   return split().on('data', callback)
 }
@@ -1362,6 +1362,10 @@ function createServer(format, opts, fn, fn1) {
       })
     })
   })
+}
+
+function expandColorCharacters(str) {
+  return str.replace(/\x1b\[(\d+)m/g, '_color_$1_')
 }
 
 function noopMiddleware(req, res, next) {
