@@ -105,6 +105,15 @@ morgan.token('type', function(req, res){ return req.headers['content-type']; })
 
 Calling `morgan.token()` using the same name as an existing token will overwrite that token definition.
 
+##### :colorstatus
+
+The colorized :status of the response.  Inserts the status code with colors applied coordinating to their group.
+ - `2XX` - Green
+ - `3XX` - Cyan
+ - `4XX` - Yellow
+ - `5XX` - Red
+
+
 ##### :date[format]
 
 The current date and time in UTC. The available formats are:
@@ -158,10 +167,6 @@ The status code of the response.
 If the request/response cycle completes before a response was sent to the
 client (for example, the TCP socket closed prematurely by a client aborting
 the request), then the status will be empty (displayed as `"-"` in the log).
-
-##### :colorstatus
-
-The colorized :status of the response.
 
 ##### :url
 

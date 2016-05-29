@@ -180,7 +180,7 @@ morgan.format('tiny', ':method :url :status :res[content-length] - :response-tim
  * dev (colored)
  */
 
-morgan.format('dev', ':method :url :colorstatus :response-time ms - :res[content-length]')
+morgan.format('dev', ':colorreset :method :url :colorstatus :response-time ms - :res[content-length] :colorreset')
 
 
 /**
@@ -269,6 +269,14 @@ morgan.token('colorstatus', function(req, res){
       ? colorStatus 
       : undefined
 });
+
+/**
+ * color reset
+ */
+
+morgan.token('colorreset', function(req, res) {
+  return '\x1b[0m'
+})
 
 /**
  * normalized referrer

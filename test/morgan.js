@@ -1108,7 +1108,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(masked.substr(0, 28), 'GET / _color_0_102 _color_0_')
+          assert.equal(masked.substr(0, 38), '_color_0_ GET / _color_0_102 _color_0_')
           done()
         })
 
@@ -1130,7 +1130,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(masked.substr(0, 29), 'GET / _color_32_200 _color_0_')
+          assert.equal(masked.substr(0, 39), '_color_0_ GET / _color_32_200 _color_0_')
           done()
         })
 
@@ -1152,7 +1152,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(masked.substr(0, 29), 'GET / _color_36_300 _color_0_')
+          assert.equal(masked.substr(0, 39), '_color_0_ GET / _color_36_300 _color_0_')
           done()
         })
 
@@ -1174,7 +1174,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(masked.substr(0, 29), 'GET / _color_33_400 _color_0_')
+          assert.equal(masked.substr(0, 39), '_color_0_ GET / _color_33_400 _color_0_')
           done()
         })
 
@@ -1196,7 +1196,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-          assert.equal(masked.substr(0, 29), 'GET / _color_31_500 _color_0_')
+          assert.equal(masked.substr(0, 39), '_color_0_ GET / _color_31_500 _color_0_')
           done()
         })
 
@@ -1219,7 +1219,7 @@ describe('morgan()', function () {
           var cb = after(2, function (err, res, line) {
             if (err) return done(err)
             var masked = line.replace(/\x1b\[(\d+)m/g, '_color_$1_')
-            assert.equal(masked, 'GET / - - ms - -')
+            assert.equal(masked.substr(0, 26), '_color_0_ GET / - - ms - -')
             done()
           })
 
