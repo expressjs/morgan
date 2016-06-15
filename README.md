@@ -112,6 +112,7 @@ The current date and time in UTC. The available formats are:
   - `clf` for the common log format (`"10/Oct/2000:13:55:36 +0000"`)
   - `iso` for the common ISO 8601 date time format (`2000-10-10T13:55:36.000Z`)
   - `web` for the common RFC 1123 date time format (`Tue, 10 Oct 2000 13:55:36 GMT`)
+  - `local` for the local string format (`"10/Oct/2000:15:55:36 UTC+2"`)
 
 If no format is given, then the default is `web`.
 
