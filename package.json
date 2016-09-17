@@ -35,7 +35,7 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "lint": "eslint **/*.js",
+    "lint": "eslint .",
     "test": "mocha --check-leaks --reporter spec --bail",
     "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --check-leaks --reporter dot",
     "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --check-leaks --reporter spec"
