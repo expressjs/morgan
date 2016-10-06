@@ -822,6 +822,79 @@ describe('morgan()', function () {
         test.write('0')
       })
     })
+
+    describe('a custom', function () {
+      function token (req, res, arg) {
+        return arg
+      }
+      var url
+      beforeEach(function () {
+        url = morgan.url
+        morgan.token('url', token)
+      })
+      afterEach(function () {
+        morgan.url = url
+      })
+
+      it('should overwrite existing', function (done) {
+        assert.equal(morgan.url, token)
+        done()
+      })
+
+      it('should use - if result is falsey', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.equal(line, '-')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':url', { stream: stream }, function (req, res, next) {
+          next()
+        })
+
+        request(server)
+        .get('/')
+        .expect(200, cb)
+      })
+
+      it('should not see empty brackets', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.equal(line, '-[]')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':url[]', { stream: stream }, function (req, res, next) {
+          next()
+        })
+
+        request(server)
+        .get('/')
+        .expect(200, cb)
+      })
+
+      it('should use the result', function (done) {
+        var stream = createLineStream(function (line) {
+          assert.equal(line, 'HIDDEN')
+          server.close(done)
+        })
+
+        var server = createServer(':url[HIDDEN]', { stream: stream }, function () {
+          test.abort()
+        })
+
+        var test = request(server).post('/')
+        test.write('0')
+      })
+    })
   })
 
   describe('formats', function () {

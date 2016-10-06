@@ -22,6 +22,8 @@ Create a new morgan logger middleware function using the given `format` and `opt
 The `format` argument may be a string of a predefined name (see below for the names),
 a string of a format string, or a function that will produce a log entry.
 
+For the syntax of strings and functions see [morgan.compile](#morgancompileformat).
+
 #### Options
 
 Morgan accepts these properties in the options object.
@@ -103,6 +105,14 @@ To define a token, simply invoke `morgan.token()` with the name and a callback f
 morgan.token('type', function (req, res) { return req.headers['content-type'] })
 ```
 
+Tokens can accept a string argument passed in from `[]` brackets by specifying
+a third argument `arg`:
+```js
+morgan.token('type', function (req, res, arg) { return arg })
+```
+
+Falsey values returned from this function will be replaced with `-`.
+
 Calling `morgan.token()` using the same name as an existing token will overwrite that token definition.
 
 ##### :date[format]
@@ -177,6 +187,11 @@ be passed using `[]`, for example: `:token-name[pretty]` would pass the string
 
 Normally formats are defined using `morgan.format(name, format)`, but for certain
 advanced uses, this compile function is directly available.
+
+The function returned takes arguments `tokens` , `req`, and `res` where `tokens`
+refers to `morgan` itself. If a log should be skipped the function will return
+`null`. The function returned or a custom function can be passed directly to 
+morgan using `morgan(myFn)`.
 
 ## Examples
 
@@ -308,6 +323,54 @@ function assignId (req, res, next) {
   req.id = uuid.v4()
   next()
 }
+```
+
+#### arguments to custom token formats
+
+Example of a custom token format that uses an argument. It will echo the
+argument passed to the token.
+
+```js
+var express = require('express')
+var morgan = require('morgan')
+
+morgan.token('echo', function getId (req, res, arg) {
+  return arg
+})
+
+var app = express()
+
+app.use(morgan(':echo[hello world!] :response-time'))
+
+app.get('/', function (req, res) {
+  res.send('hello, world!')
+})
+```
+
+### use custom format function
+
+Sample app that will use a custom formatting function. This will print JSON
+instead of a simple string.
+
+```js
+var express = require('express')
+var morgan = require('morgan')
+
+var combined = morgan.compile('[:date[clf]] :method :url :res[content-length]')
+var JSONOutput = function (morgan, req, res) {
+  return JSON.stringify({
+    status: morgan.status(req,res),
+    default: combined(morgan, req, res),
+  })
+}
+
+var app = express()
+
+app.use(morgan(JSONOutput))
+
+app.get('/', function (req, res) {
+  res.send('hello, world!')
+})
 ```
 
 ## License
