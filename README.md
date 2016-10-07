@@ -24,6 +24,43 @@ Create a new morgan logger middleware function using the given `format` and `opt
 The `format` argument may be a string of a predefined name (see below for the names),
 a string of a format string, or a function that will produce a log entry.
 
+The `format` function will be called with three arguments `tokens`, `req`, and `res`,
+where `tokens` is object with all defined tokens, `req` is the HTTP request and `res`
+is the HTTP response. The function is expected to return a string that will be the log
+line, or `undefined` / `null` to skip logging.
+
+#### Using a predefined format string
+
+<!-- eslint-disable no-undef -->
+
+```
+morgan('tiny')
+```
+
+#### Using format string of predefined tokens
+
+<!-- eslint-disable no-undef -->
+
+```js
+morgan(':method :url :status :res[content-length] - :response-time ms')
+```
+
+#### Using a custom format function
+
+<!-- eslint-disable no-undef -->
+
+``` js
+morgan(function (tokens, req, res) {
+  return [
+    tokens.method(req, res),
+    tokens.url(req, res),
+    tokens.status(req, res),
+    tokens.res(req, res, 'content-length'), '-',
+    tokens['response-time'](req, res), 'ms'
+  ].join(' ')
+})
+```
+
 #### Options
 
 Morgan accepts these properties in the options object.
@@ -102,7 +139,9 @@ The minimal output.
 
 ##### Creating new tokens
 
-To define a token, simply invoke `morgan.token()` with the name and a callback function. This callback function is expected to return a string value. The value returned is then available as ":type" in this case:
+To define a token, simply invoke `morgan.token()` with the name and a callback function.
+This callback function is expected to return a string value. The value returned is then
+available as ":type" in this case:
 
 <!-- eslint-disable no-undef -->
 
@@ -110,7 +149,12 @@ To define a token, simply invoke `morgan.token()` with the name and a callback f
 morgan.token('type', function (req, res) { return req.headers['content-type'] })
 ```
 
-Calling `morgan.token()` using the same name as an existing token will overwrite that token definition.
+Calling `morgan.token()` using the same name as an existing token will overwrite that
+token definition.
+
+The token function is expected to be called with the arguments `req` and `res`, representing
+the HTTP request and HTTP response. Additionally, the token can accept further arguments of
+it's choosing to customize behavior.
 
 ##### :date[format]
 
@@ -176,11 +220,16 @@ The contents of the User-Agent header of the request.
 
 ### morgan.compile(format)
 
-Compile a format string into a function for use by `morgan`. A format string
+Compile a format string into a `format` function for use by `morgan`. A format string
 is a string that represents a single log line and can utilize token syntax.
 Tokens are references by `:token-name`. If tokens accept arguments, they can
 be passed using `[]`, for example: `:token-name[pretty]` would pass the string
 `'pretty'` as an argument to the token `token-name`.
+
+The function returned from `morgan.compile` takes three arguments `tokens`, `req`, and
+`res`, where `tokens` is object with all defined tokens, `req` is the HTTP request and
+`res` is the HTTP response. The function will return a string that will be the log line,
+or `undefined` / `null` to skip logging.
 
 Normally formats are defined using `morgan.format(name, format)`, but for certain
 advanced uses, this compile function is directly available.
