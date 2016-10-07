@@ -825,47 +825,61 @@ describe('morgan()', function () {
     })
 
     describe('a custom token function provided to .token(name,fn)', function () {
-      function token (req, res, arg) {
-        return arg && url.parse(req.url)[arg]
-      }
-      var urlToken = morgan.url
-      beforeEach(function (done) {
-        // test clobbering
+      it('should overwrite existing', function (done) {
+        function token (req, res, arg) {
+          return arg && url.parse(req.url)[arg]
+        }
+        var urlToken = morgan.url
         morgan.token('url', token)
-        done();
-      })
-      afterEach(function (done) {
+        assert.equal(morgan.url, token)
         morgan.token('url', urlToken)
         done()
       })
 
-      it('should overwrite existing', function (done) {
-        assert.equal(morgan.url, token)
-        done()
-      })
+      describe('should use the string `-` if return value of the token function is falsey', function () {
+        function test (v, done) {
+          morgan.token('ret', function ret (req, res, arg) {
+            return arg
+          })
+          var cb = after(2, function (err, res, line) {
+            if (err) return done(err)
+            assert.equal(line, '-')
+            done()
+          })
 
-      it('should use the string `-` if return value of the token function is falsey', function (done) {
-        var cb = after(2, function (err, res, line) {
-          if (err) return done(err)
-          assert.equal(line, '-')
-          done()
+          var stream = createLineStream(function (line) {
+            cb(null, null, line)
+          })
+
+          var server = createServer(':ret', { stream: stream }, function (req, res, next) {
+            next()
+          })
+
+          request(server)
+          .get('/')
+          .expect(200, cb)
+        }
+        [
+          0,
+          NaN,
+          false,
+          '',
+          null,
+          undefined
+        ].forEach(function (v) {
+          it('for ' + (String(v) || JSON.stringify(v)), function (done) {
+            test(v, done)
+          })
         })
-
-        var stream = createLineStream(function (line) {
-          cb(null, null, line)
-        })
-
-        var server = createServer(':url', { stream: stream }, function (req, res, next) {
-          next()
-        })
-
-        request(server)
-        .get('/')
-        .expect(200, cb)
       })
 
       it('should not see empty brackets as an argument value', function (done) {
-        var cb = after(2, function (err, res, line) {
+        morgan.token('checkempty', function ret (req, res, arg) {
+          assert.equal(arg, undefined)
+          assert.equal(arguments.length, 2)
+          cb(null)
+        })
+        var cb = after(3, function (err, res, line) {
           if (err) return done(err)
           assert.equal(line, '-[]')
           done()
@@ -875,7 +889,7 @@ describe('morgan()', function () {
           cb(null, null, line)
         })
 
-        var server = createServer(':url[]', { stream: stream }, function (req, res, next) {
+        var server = createServer(':checkempty[]', { stream: stream }, function (req, res, next) {
           next()
         })
 
@@ -885,22 +899,24 @@ describe('morgan()', function () {
       })
 
       it('should use the result', function (done) {
+        morgan.token('urlpart', function ret (req, res, arg) {
+          return url.parse(req.url)[arg]
+        })
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           assert.equal(line, 'foo=bar')
           done()
         })
 
-
         var stream = createLineStream(function (line) {
           cb(null, null, line)
         })
 
-        var server = createServer(':url[query]', { stream: stream }, function (req, res, next) {
+        var server = createServer(':urlpart[query]', { stream: stream }, function (req, res, next) {
           next()
         })
 
-        var test = request(server).post('/test').query('foo=bar').expect(200, cb)
+        request(server).post('/test').query('foo=bar').expect(200, cb)
       })
     })
   })

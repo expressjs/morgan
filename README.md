@@ -356,11 +356,11 @@ instead of a simple string.
 var express = require('express')
 var morgan = require('morgan')
 
-var combined = morgan.compile('[:date[clf]] :method :url :res[content-length]')
+var formatter = morgan.compile('[:date[clf]] :method :url :res[content-length]')
 var JSONOutput = function (morgan, req, res) {
   return JSON.stringify({
     status: morgan.status(req,res),
-    default: combined(morgan, req, res),
+    default: formatter(morgan, req, res),
   })
 }
 
