@@ -34,7 +34,7 @@ morgan(':method :url :status')
 **Using a format function**
 ``` js
 morgan(function (tokens, req, res) {
-  return [tokens.method(), tokens.url(), tokens.status()].join(' ')
+  return [tokens.method(req, res), tokens.url(req, res), tokens.status(req, res)].join(' ')
 })
 ```
 
@@ -121,6 +121,8 @@ morgan.token('type', function (req, res) { return req.headers['content-type'] })
 
 There are a few pieces of behavior you should be aware of when using tokens:
 
+- `morgan.token('name', callback)` corresponds to `:name` in any string passed to `morgan(format, options)`.
+- `morgan.token('name', callback)` defines the function `morgan.name(req, res, arg)` which may be used in any functions passed to `morgan(format, options)`.
 - Falsey values returned from the `callback` function will be replaced with `-` in your log output.
 - Calling `morgan.token()` using the same name as an existing token will overwrite that token definition.
 - Tokens can accept a string argument passed in from `[]` brackets by specifying
@@ -130,7 +132,7 @@ outputs an arbitrary `req` header. For example:
 morgan.token('header', function (req, res, arg) { return req.headers[arg] })
 ```
 Using the above example `:header[content-type]` would be the equivalent to the less generic
-`:token` in the first example.
+`:type` in the first example.
 
 ##### :date[format]
 
@@ -196,19 +198,18 @@ The contents of the User-Agent header of the request.
 
 ### morgan.compile(format)
 
-Compile a format string into a function for use by `morgan`. A format string
+Compile a format string into a format function for use by `morgan`. A format string
 is a string that represents a single log line and can utilize token syntax.
 Tokens are references by `:token-name`. If tokens accept arguments, they can
 be passed using `[]`, for example: `:token-name[pretty]` would pass the string
 `'pretty'` as an argument to the token `token-name`.
 
-Normally formats are defined using `morgan.format(name, format)`, but for certain
-advanced uses, this compile function is directly available.
+The function returned from `morgan.compile` takes three arguments `tokens` , `req`, and `res`
+where `tokens` represents an object with all known tokens. If a log should be skipped the
+function will return `null`.
 
-The function returned takes three arguments `tokens` , `req`, and `res` where `tokens`
-refers to `morgan` itself. If a log should be skipped the function will return
-`null`. The function returned or a custom function can be passed directly to
-morgan using `morgan(myFn)`. In other words, `morgan.compile` is a quick short-hand to turn format strings into format functions. It can also be used to to [have `morgan` output JSON](#output-json-logs).
+Normally formats are defined using `morgan.format(name, format)`, but for certain
+advanced uses, this compile function is directly available. The function returned can be passed directly to morgan using `morgan(morgan.compile(format))`. In other words, `morgan.compile` is a quick short-hand to turn format strings into format functions. Format functions can also be used to to [have `morgan` output JSON](#output-json-logs).
 
 ## Examples
 
@@ -354,11 +355,11 @@ var morgan = require('morgan')
 
 morgan.token('process', function getId (req, res, arg) {
   if (typeof process[arg] === 'function') {
-    return String(process[arg]());
+    return String(process[arg]())
   } else if (process[arg]) {
-    return String(process[arg]);
+    return String(process[arg])
   }
-};
+})
 ```
 
 ### output JSON logs
@@ -367,21 +368,28 @@ morgan.token('process', function getId (req, res, arg) {
 var express = require('express')
 var morgan = require('morgan')
 
-var formatter = morgan.compile('[:date[clf]] :method :url :res[content-length]')
-var JSONOutput = function (morgan, req, res) {
+var route = morgan.compile(':method :url')
+var outputJson = function (tokens, req, res) {
   return JSON.stringify({
-    status: morgan.status(req,res),
-    default: formatter(morgan, req, res),
+    route: route(tokens, req, res),
+    status: morgan.status(req, res),
+    'content-length': morgan.res(req, res, 'content-length')
   })
 }
 
 var app = express()
 
-app.use(morgan(JSONOutput))
+app.use(morgan(outputJson))
 
 app.get('/', function (req, res) {
   res.send('hello, world!')
 })
+```
+
+A request to `GET /` would cause `morgan` to log the following JSON:
+
+``` json
+{ "route": "GET /", "status": 200, "content-length": 13 }
 ```
 
 ## License
