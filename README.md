@@ -20,21 +20,37 @@ var morgan = require('morgan')
 
 Create a new morgan logger middleware function using the given `format` and `options`.
 The `format` argument may be a string of a predefined name (see below for the names),
-a string of a format string, or a function that will produce a log entry.
+a string of a format string, or a format function that will produce a log entry.
 
-Functions that will produce a log entry accepts three arguments `tokens`, `req`,
-and `res` where `tokens` represents an object with all known tokens. It is expected to
-return a string. For example, the following two code snippets are equivalent:
+Format functions accept three arguments `tokens`, `req`, and `res` where `tokens` represents
+an object with all known tokens. It is expected to return a string. For the sake of example, the
+following four code snippets are equivalent.
 
-**Using predefined tokens**
-```js
-morgan(':method :url :status')
+##### Using a [predefined format string](#predefined-formats)
+```
+morgan(':tiny')
 ```
 
-**Using a format function**
+##### Using format string of [predefined tokens](#tokens)
+```js
+morgan(':method :url :status :res[content-length] - :response-time ms')
+```
+
+##### Using a format function [from `morgan.compile`](#morgancompileformat)
+``` js
+morgan(morgan.compile(':method :url :status :res[content-length] - :response-time ms'))
+```
+
+##### Using a custom format function
 ``` js
 morgan(function (tokens, req, res) {
-  return [tokens.method(req, res), tokens.url(req, res), tokens.status(req, res)].join(' ')
+  return [
+    tokens.method(req, res),
+    tokens.url(req, res),
+    tokens.status(req, res),
+    tokens.res(req, res, 'content-length'), '-',
+    tokens['response-time'](req, res), 'ms'
+  ].join(' ')
 })
 ```
 
@@ -209,7 +225,9 @@ where `tokens` represents an object with all known tokens. If a log should be sk
 function will return `null`.
 
 Normally formats are defined using `morgan.format(name, format)`, but for certain
-advanced uses, this compile function is directly available. The function returned can be passed directly to morgan using `morgan(morgan.compile(format))`. In other words, `morgan.compile` is a quick short-hand to turn format strings into format functions. Format functions can also be used to to [have `morgan` output JSON](#output-json-logs).
+advanced uses, this compile function is directly available. The function returned can be passed directly to morgan using `morgan(morgan.compile(format))`. In other words, `morgan.compile` is a quick short-hand to turn format strings into format functions.
+
+In some rare cases (such as [outputting JSON logs from `morgan`](#output-json-logs)) you may want to write your own custom format function. These functions should have the same API as functions returned from `morgan.compile` accepting three arguments: `tokens`, `req`, and `res`.
 
 ## Examples
 
