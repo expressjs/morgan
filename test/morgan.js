@@ -7,6 +7,7 @@ var join = require('path').join
 var morgan = require('..')
 var request = require('supertest')
 var split = require('split')
+var url = require('url')
 
 describe('morgan()', function () {
   describe('arguments', function () {
@@ -823,17 +824,19 @@ describe('morgan()', function () {
       })
     })
 
-    describe('a custom', function () {
+    describe('a custom token function provided to .token(name,fn)', function () {
       function token (req, res, arg) {
-        return arg
+        return arg && url.parse(req.url)[arg]
       }
-      var url
-      beforeEach(function () {
-        url = morgan.url
+      var urlToken = morgan.url
+      beforeEach(function (done) {
+        // test clobbering
         morgan.token('url', token)
+        done();
       })
-      afterEach(function () {
-        morgan.url = url
+      afterEach(function (done) {
+        morgan.token('url', urlToken)
+        done()
       })
 
       it('should overwrite existing', function (done) {
@@ -841,7 +844,7 @@ describe('morgan()', function () {
         done()
       })
 
-      it('should use - if result is falsey', function (done) {
+      it('should use the string `-` if return value of the token function is falsey', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           assert.equal(line, '-')
@@ -861,7 +864,7 @@ describe('morgan()', function () {
         .expect(200, cb)
       })
 
-      it('should not see empty brackets', function (done) {
+      it('should not see empty brackets as an argument value', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           assert.equal(line, '-[]')
@@ -882,17 +885,22 @@ describe('morgan()', function () {
       })
 
       it('should use the result', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.equal(line, 'foo=bar')
+          done()
+        })
+
+
         var stream = createLineStream(function (line) {
-          assert.equal(line, 'HIDDEN')
-          server.close(done)
+          cb(null, null, line)
         })
 
-        var server = createServer(':url[HIDDEN]', { stream: stream }, function () {
-          test.abort()
+        var server = createServer(':url[query]', { stream: stream }, function (req, res, next) {
+          next()
         })
 
-        var test = request(server).post('/')
-        test.write('0')
+        var test = request(server).post('/test').query('foo=bar').expect(200, cb)
       })
     })
   })

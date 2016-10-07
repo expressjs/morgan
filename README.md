@@ -327,20 +327,20 @@ function assignId (req, res, next) {
 
 #### arguments to custom token formats
 
-Example of a custom token format that uses an argument. It will echo the
-argument passed to the token.
+Example of a custom token format that uses an argument. It will output the
+header related to the argument passed to the token.
 
 ```js
 var express = require('express')
 var morgan = require('morgan')
 
-morgan.token('echo', function getId (req, res, arg) {
-  return arg
+morgan.token('header', function getId (req, res, arg) {
+  return String(req.headers[arg])
 })
 
 var app = express()
 
-app.use(morgan(':echo[hello world!] :response-time'))
+app.use(morgan(':header[host] :response-time'))
 
 app.get('/', function (req, res) {
   res.send('hello, world!')
