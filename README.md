@@ -342,6 +342,25 @@ function assignId (req, res, next) {
 }
 ```
 
+### arguments to custom token formats
+
+Example of a custom token format that uses an argument. It will output the
+property from `process` related to the argument passed to the token. If that property
+is a function then it will return the value returned from that function.
+
+```js
+var express = require('express')
+var morgan = require('morgan')
+
+morgan.token('process', function getId (req, res, arg) {
+  if (typeof process[arg] === 'function') {
+    return String(process[arg]());
+  } else if (process[arg]) {
+    return String(process[arg]);
+  }
+};
+```
+
 ### output JSON logs
 
 ``` js
