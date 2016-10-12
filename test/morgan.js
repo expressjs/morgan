@@ -1366,15 +1366,14 @@ describe('morgan.token(name, function)', function () {
     })
   })
 
-  it('should not see empty brackets as an argument value', function (done) {
+  it('should see empty brackets as an argument value', function (done) {
     morgan.token('checkempty', function ret (req, res, arg) {
-      assert.equal(arg, undefined)
-      assert.equal(arguments.length, 2)
+      assert.equal(arg, '')
       cb(null)
     })
     var cb = after(3, function (err, res, line) {
       if (err) return done(err)
-      assert.equal(line, '-[]')
+      assert.equal(line, '-')
       done()
     })
 
@@ -1382,9 +1381,7 @@ describe('morgan.token(name, function)', function () {
       cb(null, null, line)
     })
 
-    var server = createServer(':checkempty[]', { stream: stream }, function (req, res, next) {
-      next()
-    })
+    var server = createServer(':checkempty[]', { stream: stream })
 
     request(server)
     .get('/')
@@ -1405,11 +1402,12 @@ describe('morgan.token(name, function)', function () {
       cb(null, null, line)
     })
 
-    var server = createServer(':urlpart[query]', { stream: stream }, function (req, res, next) {
-      next()
-    })
+    var server = createServer(':urlpart[query]', { stream: stream })
 
-    request(server).post('/test').query('foo=bar').expect(200, cb)
+    request(server)
+    .post('/test')
+    .query('foo=bar')
+    .expect(200, cb)
   })
 })
 
