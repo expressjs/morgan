@@ -383,6 +383,9 @@ function compile (format) {
     if (arg !== undefined) {
       tokenArguments += ', ' + String(JSON.stringify(arg))
     }
+    else {
+      tokenArguments += ', undefined'
+    }
 
     return '" +\n    (' + tokenFunction + '(' + tokenArguments + ') || "-") + "'
   }) + '"'
