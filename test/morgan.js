@@ -1330,9 +1330,9 @@ describe('morgan.token(name, function)', function () {
   })
 
   describe('should use the string `-` if return value of the token function is falsey', function () {
-    function test (v, done) {
-      morgan.token('ret', function ret (req, res, arg) {
-        return arg
+    it('for NaN', function (done) {
+      morgan.token('NaN', function ret (req, res, arg) {
+        return NaN
       })
       var cb = after(2, function (err, res, line) {
         if (err) return done(err)
@@ -1344,25 +1344,111 @@ describe('morgan.token(name, function)', function () {
         cb(null, null, line)
       })
 
-      var server = createServer(':ret', { stream: stream }, function (req, res, next) {
-        next()
-      })
+      var server = createServer(':NaN', { stream: stream })
 
       request(server)
       .get('/')
       .expect(200, cb)
-    }
-    [
-      0,
-      NaN,
-      false,
-      '',
-      null,
-      undefined
-    ].forEach(function (v) {
-      it('for ' + (String(v) || JSON.stringify(v)), function (done) {
-        test(v, done)
+    })
+    it('for 0', function (done) {
+      morgan.token('zero', function ret (req, res, arg) {
+        return 0
       })
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
+        assert.equal(line, '-')
+        done()
+      })
+
+      var stream = createLineStream(function (line) {
+        cb(null, null, line)
+      })
+
+      var server = createServer(':zero', { stream: stream })
+
+      request(server)
+      .get('/')
+      .expect(200, cb)
+    })
+    it('for undefined', function (done) {
+      morgan.token('undefined', function ret (req, res, arg) {
+        return undefined
+      })
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
+        assert.equal(line, '-')
+        done()
+      })
+
+      var stream = createLineStream(function (line) {
+        cb(null, null, line)
+      })
+
+      var server = createServer(':undefined', { stream: stream })
+
+      request(server)
+      .get('/')
+      .expect(200, cb)
+    })
+    it('for null', function (done) {
+      morgan.token('null', function ret (req, res, arg) {
+        return null
+      })
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
+        assert.equal(line, '-')
+        done()
+      })
+
+      var stream = createLineStream(function (line) {
+        cb(null, null, line)
+      })
+
+      var server = createServer(':null', { stream: stream })
+
+      request(server)
+      .get('/')
+      .expect(200, cb)
+    })
+    it('for ""', function (done) {
+      morgan.token('empty', function ret (req, res, arg) {
+        return ''
+      })
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
+        assert.equal(line, '-')
+        done()
+      })
+
+      var stream = createLineStream(function (line) {
+        cb(null, null, line)
+      })
+
+      var server = createServer(':empty', { stream: stream })
+
+      request(server)
+      .get('/')
+      .expect(200, cb)
+    })
+    it('for false', function (done) {
+      morgan.token('false', function ret (req, res, arg) {
+        return false
+      })
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
+        assert.equal(line, '-')
+        done()
+      })
+
+      var stream = createLineStream(function (line) {
+        cb(null, null, line)
+      })
+
+      var server = createServer(':false', { stream: stream })
+
+      request(server)
+      .get('/')
+      .expect(200, cb)
     })
   })
 
