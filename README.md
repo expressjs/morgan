@@ -20,28 +20,24 @@ var morgan = require('morgan')
 
 Create a new morgan logger middleware function using the given `format` and `options`.
 The `format` argument may be a string of a predefined name (see below for the names),
-a string of a format string, or a format function that will produce a log entry.
+a string of a format string, or a function that will format a log entry.
 
-Format functions accept three arguments `tokens`, `req`, and `res` where `tokens` represents
-an object with all known tokens. It is expected to return a string. For the sake of example, the
-following four code snippets are equivalent.
+The function will be called with three arguments `tokens`, `req`, and `res` where `tokens`
+represents an object with all known tokens. It is expected to return a string. If a log
+should be skipped the function will return `null`. For the sake of example, the following
+three code snippets are equivalent.
 
-##### Using a [predefined format string](#predefined-formats)
+#### Using a [predefined format string](#predefined-formats)
 ```
 morgan(':tiny')
 ```
 
-##### Using format string of [predefined tokens](#tokens)
+#### Using format string of [predefined tokens](#tokens)
 ```js
 morgan(':method :url :status :res[content-length] - :response-time ms')
 ```
 
-##### Using a format function [from `morgan.compile`](#morgancompileformat)
-``` js
-morgan(morgan.compile(':method :url :status :res[content-length] - :response-time ms'))
-```
-
-##### Using a custom format function
+#### Using a custom format function
 ``` js
 morgan(function (tokens, req, res) {
   return [
@@ -137,11 +133,11 @@ morgan.token('type', function (req, res) { return req.headers['content-type'] })
 
 There are a few pieces of behavior you should be aware of when using tokens:
 
-- `morgan.token('name', callback)` corresponds to `:name` in any string passed to `morgan(format, options)`.
-- `morgan.token('name', callback)` defines the function `morgan.name(req, res, arg)` which may be used in any functions passed to `morgan(format, options)`.
-- Falsey values returned from the `callback` function will be replaced with `-` in your log output.
-- Calling `morgan.token()` using the same name as an existing token will overwrite that token definition.
-- Tokens can accept a string argument passed in from `[]` brackets by specifying
+  * `morgan.token('name', tokenFn)` corresponds to `:name` in any string passed to `morgan(format, options)`.
+  * `morgan.token('name', tokenFn)` defines the function `morgan.name(req, res, arg)`.
+  * Falsey values returned from the `tokenFn` function will be replaced with `-` in your log output.
+  * Calling `morgan.token()` using the same name as an existing token will overwrite that token definition.
+  * Tokens can accept a string argument passed in from `[]` brackets by specifying
 a third argument `arg`. In this way we could define a more generic `header` token that
 outputs an arbitrary `req` header. For example:
 ```js
@@ -225,9 +221,10 @@ where `tokens` represents an object with all known tokens. If a log should be sk
 function will return `null`.
 
 Normally formats are defined using `morgan.format(name, format)`, but for certain
-advanced uses, this compile function is directly available. The function returned can be passed directly to morgan using `morgan(morgan.compile(format))`. In other words, `morgan.compile` is a quick short-hand to turn format strings into format functions.
-
-In some rare cases (such as [outputting JSON logs from `morgan`](#output-json-logs)) you may want to write your own custom format function. These functions should have the same API as functions returned from `morgan.compile` accepting three arguments: `tokens`, `req`, and `res`.
+advanced uses, this compile function is directly available. In some rare cases (such as
+[outputting JSON logs from `morgan`](#output-json-logs)) you may want to write your own
+custom format function. These functions should have the same API as functions returned from
+`morgan.compile` accepting three arguments: `tokens`, `req`, and `res`.
 
 ## Examples
 
@@ -371,9 +368,9 @@ is a function then it will return the value returned from that function.
 var express = require('express')
 var morgan = require('morgan')
 
-morgan.token('process', function getId (req, res, arg) {
+morgan.token('process', function getFromProcess (req, res, arg) {
   if (typeof process[arg] === 'function') {
-    return String(process[arg]())
+    return process[arg]()
   } else if (process[arg]) {
     return String(process[arg])
   }
@@ -387,11 +384,11 @@ var express = require('express')
 var morgan = require('morgan')
 
 var route = morgan.compile(':method :url')
-var outputJson = function (tokens, req, res) {
+function outputJson (tokens, req, res) {
   return JSON.stringify({
     route: route(tokens, req, res),
-    status: morgan.status(req, res),
-    'content-length': morgan.res(req, res, 'content-length')
+    status: tokens.status(req, res),
+    'content-length': tokens.res(req, res, 'content-length')
   })
 }
 
@@ -407,7 +404,7 @@ app.get('/', function (req, res) {
 A request to `GET /` would cause `morgan` to log the following JSON:
 
 ``` json
-{ "route": "GET /", "status": 200, "content-length": 13 }
+{"route":"GET /","status":200,"content-length":13}
 ```
 
 ## License
