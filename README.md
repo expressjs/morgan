@@ -48,6 +48,10 @@ morgan('combined', {
 
 Output stream for writing log lines, defaults to `process.stdout`.
 
+##### objectMode
+
+Interpret log lines as objects when writing to `stream`.
+
 #### Predefined Formats
 
 There are various pre-defined formats provided:
