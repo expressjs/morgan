@@ -1298,7 +1298,7 @@ describe('morgan()', function () {
         done()
       })
 
-      function format(tokens, req, res) {
+      function format (tokens, req, res) {
         return {
           method: tokens.method(req, res),
           url: tokens.url(req, res),
@@ -1308,9 +1308,9 @@ describe('morgan()', function () {
 
       var stream = {
         write: function (obj) {
-          assert.equal(obj.method, 'GET');
-          assert.equal(obj.url, '/');
-          assert.equal(obj.status, 200);
+          assert.equal(obj.method, 'GET')
+          assert.equal(obj.url, '/')
+          assert.equal(obj.status, 200)
         }
       }
 
@@ -1322,8 +1322,8 @@ describe('morgan()', function () {
       request(server)
       .get('/')
       .expect(200, cb)
-    });
-  });
+    })
+  })
 })
 
 describe('morgan.compile(format)', function () {
