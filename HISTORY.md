@@ -2,7 +2,7 @@ unreleased
 ==========
 
   * Fix sending unnecessary `undefined` argument to token functions
-  * deps: basic-auth@~1.0.4
+  * deps: basic-auth@~1.1.0
   * perf: enable strict mode in compiled functions
 
 1.7.0 / 2016-02-18
