@@ -3,6 +3,11 @@ unreleased
 
   * Fix sending unnecessary `undefined` argument to token functions
   * deps: basic-auth@~1.1.0
+  * deps: debug@2.4.5
+    - Allow colors in workers
+    - Fix error when running under React Native
+    - Use same color for same namespace
+    - deps: ms@0.7.2
   * perf: enable strict mode in compiled functions
 
 1.7.0 / 2016-02-18
