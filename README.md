@@ -115,6 +115,10 @@ The current date and time in UTC. The available formats are:
 
 If no format is given, then the default is `web`.
 
+##### :locdate[format]
+
+The current date and time in the local timezone. Same formats as above.
+
 ##### :http-version
 
 The HTTP version of the request.

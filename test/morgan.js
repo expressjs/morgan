@@ -207,6 +207,70 @@ describe('morgan()', function () {
         .expect(200, cb)
       })
 
+      it('should get current date/time in local timezone in "web" format by default', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.ok(/^\w{3} \w{3} \d{2} \d{4} \d{2}:\d{2}:\d{2} GMT[+-]\d{3}0 \(\w{3}\)$/.test(line))
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':locdate', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
+      })
+
+      it('should get current date/time in local timezone in "clf" format', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.ok(/^\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2} \+\d{3}0$/.test(line))
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':locdate[clf]', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
+      })
+
+      it('should get current date/time in local timezone in "iso" format', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.ok(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/.test(line))
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':locdate[iso]', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
+      })
+
+      it('should get current date/time in local timezone in "web" format', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.ok(/^\w{3} \w{3} \d{2} \d{4} \d{2}:\d{2}:\d{2} GMT[+-]\d{3}0 \(\w{3}\)$/.test(line))
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':locdate[web]', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
+      })
+
       it('should be blank for unknown format', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)

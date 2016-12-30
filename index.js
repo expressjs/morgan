@@ -239,6 +239,23 @@ morgan.token('response-time', function getResponseTimeToken (req, res, digits) {
   return ms.toFixed(digits === undefined ? 3 : digits)
 })
 
+
+/**
+ * date in local timezone
+ */
+
+morgan.token('locdate', function getDateToken (req, res, format) {
+  var date = new Date()
+  switch (format || 'web') {
+    case 'clf':
+      return clfdateLocal(date)
+    case 'iso':
+      return toLocalISOString(date)
+    case 'web':
+      return date.toString()
+  }
+})
+
 /**
  * current date
  */
@@ -361,6 +378,52 @@ function clfdate (dateTime) {
     ':' + pad2(hour) + ':' + pad2(mins) + ':' + pad2(secs) +
     ' +0000'
 }
+
+/**
+ * Format a Date in ISO format, using the local timezone.
+ *
+ * @private
+ * @param {Date} dateTime
+ * @return {string}
+ */
+
+function toLocalISOString(dateTime) {
+  var millis = (dateTime.getUTCMilliseconds()/1000).toFixed(3)
+  var datestr = dateTime.getFullYear()
+    + '-' + pad2(dateTime.getMonth()+1)
+    + '-' + pad2(dateTime.getDate())
+    + 'T' + pad2(dateTime.getHours())
+    + ':' + pad2(dateTime.getMinutes())
+    + ':' + pad2(dateTime.getSeconds())
+    + '.' + (millis+'').slice(2, 5)
+    + 'Z'
+  return datestr;
+}
+
+/**
+ * Format a Date in the common log format, using the local timezone.
+ *
+ * @private
+ * @param {Date} dateTime
+ * @return {string}
+ */
+
+function clfdateLocal (dateTime) {
+  var date = dateTime.getDate()
+  var hour = dateTime.getHours()
+  var mins = dateTime.getMinutes()
+  var secs = dateTime.getSeconds()
+  var year = dateTime.getFullYear()
+  var month = CLF_MONTH[dateTime.getMonth()]
+
+  var tzo = -dateTime.getTimezoneOffset()
+  var dif = tzo >= 0 ? '+' : '-'
+
+  return pad2(date) + '/' + month + '/' + year +
+    ':' + pad2(hour) + ':' + pad2(mins) + ':' + pad2(secs) +
+    ' ' + dif + pad2(tzo / 60) + pad2(tzo % 60);
+}
+
 
 /**
  * Compile a format string into a function.
