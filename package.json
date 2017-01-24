@@ -7,6 +7,12 @@
     "Jonathan Ong <me@jongleberry.com> (http://jongleberry.com)"
   ],
   "license": "MIT",
+  "keywords": [
+    "express",
+    "http",
+    "logger",
+    "middleware"
+  ],
   "repository": "expressjs/morgan",
   "dependencies": {
     "basic-auth": "~1.1.0",
