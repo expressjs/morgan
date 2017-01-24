@@ -6,6 +6,14 @@
     "Douglas Christopher Wilson <doug@somethingdoug.com>",
     "Jonathan Ong <me@jongleberry.com> (http://jongleberry.com)"
   ],
+  "keywords": [
+    "morgan",
+    "HTTP",
+    "logger",
+    "request logger",
+    "middleware",
+    "node.js"
+  ],
   "license": "MIT",
   "repository": "expressjs/morgan",
   "dependencies": {
