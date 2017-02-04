@@ -15,7 +15,8 @@ cache:
     - node_modules
 before_install:
   # Setup Node.js version-specific dependencies
-  - "test $TRAVIS_NODE_VERSION != '0.8' || npm rm --save-dev eslint eslint-config-standard eslint-plugin-promise eslint-plugin-standard istanbul"
+  - "test $TRAVIS_NODE_VERSION != '0.8' || npm rm --save-dev istanbul"
+  - "test $(echo $TRAVIS_NODE_VERSION | cut -d. -f1) -ge 4 || npm rm --save-dev eslint eslint-config-standard eslint-plugin-promise eslint-plugin-standard"
 
   # Update Node.js modules
   - "test ! -d node_modules || npm prune"
