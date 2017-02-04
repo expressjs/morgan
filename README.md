@@ -12,6 +12,8 @@ HTTP request logger middleware for node.js
 
 ## API
 
+<!-- eslint-disable no-unused-vars -->
+
 ```js
 var morgan = require('morgan')
 ```
@@ -36,6 +38,8 @@ response code, content length, etc.) cannot be logged_.
 
 Function to determine if logging is skipped, defaults to `false`. This function
 will be called as `skip(req, res)`.
+
+<!-- eslint-disable no-undef -->
 
 ```js
 // EXAMPLE: only log error responses
@@ -99,6 +103,9 @@ The minimal output.
 ##### Creating new tokens
 
 To define a token, simply invoke `morgan.token()` with the name and a callback function. This callback function is expected to return a string value. The value returned is then available as ":type" in this case:
+
+<!-- eslint-disable no-undef -->
+
 ```js
 morgan.token('type', function (req, res) { return req.headers['content-type'] })
 ```
