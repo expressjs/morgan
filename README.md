@@ -22,7 +22,35 @@ var morgan = require('morgan')
 
 Create a new morgan logger middleware function using the given `format` and `options`.
 The `format` argument may be a string of a predefined name (see below for the names),
-a string of a format string, or a function that will produce a log entry.
+a string of a format string, or a function that will format a log entry.
+
+The function will be called with three arguments `tokens`, `req`, and `res` where `tokens`
+represents an object with all known tokens. It is expected to return a string. If a log
+should be skipped the function will return `null`. For the sake of example, the following
+three code snippets are equivalent.
+
+#### Using a [predefined format string](#predefined-formats)
+```
+morgan(':tiny')
+```
+
+#### Using format string of [predefined tokens](#tokens)
+```js
+morgan(':method :url :status :res[content-length] - :response-time ms')
+```
+
+#### Using a custom format function
+``` js
+morgan(function (tokens, req, res) {
+  return [
+    tokens.method(req, res),
+    tokens.url(req, res),
+    tokens.status(req, res),
+    tokens.res(req, res, 'content-length'), '-',
+    tokens['response-time'](req, res), 'ms'
+  ].join(' ')
+})
+```
 
 #### Options
 
@@ -110,7 +138,20 @@ To define a token, simply invoke `morgan.token()` with the name and a callback f
 morgan.token('type', function (req, res) { return req.headers['content-type'] })
 ```
 
-Calling `morgan.token()` using the same name as an existing token will overwrite that token definition.
+There are a few pieces of behavior you should be aware of when using tokens:
+
+  * `morgan.token('name', tokenFn)` corresponds to `:name` in any string passed to `morgan(format, options)`.
+  * `morgan.token('name', tokenFn)` defines the function `morgan.name(req, res, arg)`.
+  * Falsey values returned from the `tokenFn` function will be replaced with `-` in your log output.
+  * Calling `morgan.token()` using the same name as an existing token will overwrite that token definition.
+  * Tokens can accept a string argument passed in from `[]` brackets by specifying
+a third argument `arg`. In this way we could define a more generic `header` token that
+outputs an arbitrary `req` header. For example:
+```js
+morgan.token('header', function (req, res, arg) { return req.headers[arg] })
+```
+Using the above example `:header[content-type]` would be the equivalent to the less generic
+`:type` in the first example.
 
 ##### :date[format]
 
@@ -176,14 +217,21 @@ The contents of the User-Agent header of the request.
 
 ### morgan.compile(format)
 
-Compile a format string into a function for use by `morgan`. A format string
+Compile a format string into a format function for use by `morgan`. A format string
 is a string that represents a single log line and can utilize token syntax.
 Tokens are references by `:token-name`. If tokens accept arguments, they can
 be passed using `[]`, for example: `:token-name[pretty]` would pass the string
 `'pretty'` as an argument to the token `token-name`.
 
+The function returned from `morgan.compile` takes three arguments `tokens` , `req`, and `res`
+where `tokens` represents an object with all known tokens. If a log should be skipped the
+function will return `null`.
+
 Normally formats are defined using `morgan.format(name, format)`, but for certain
-advanced uses, this compile function is directly available.
+advanced uses, this compile function is directly available. In some rare cases (such as
+[outputting JSON logs from `morgan`](#output-json-logs)) you may want to write your own
+custom format function. These functions should have the same API as functions returned from
+`morgan.compile` accepting three arguments: `tokens`, `req`, and `res`.
 
 ## Examples
 
@@ -313,6 +361,55 @@ function assignId (req, res, next) {
   req.id = uuid.v4()
   next()
 }
+```
+
+### arguments to custom token formats
+
+Example of a custom token format that uses an argument. It will output the
+property from `process` related to the argument passed to the token. If that property
+is a function then it will return the value returned from that function.
+
+```js
+var express = require('express')
+var morgan = require('morgan')
+
+morgan.token('process', function getFromProcess (req, res, arg) {
+  if (typeof process[arg] === 'function') {
+    return process[arg]()
+  } else if (process[arg]) {
+    return String(process[arg])
+  }
+})
+```
+
+### output JSON logs
+
+``` js
+var express = require('express')
+var morgan = require('morgan')
+
+var route = morgan.compile(':method :url')
+function outputJson (tokens, req, res) {
+  return JSON.stringify({
+    route: route(tokens, req, res),
+    status: tokens.status(req, res),
+    'content-length': tokens.res(req, res, 'content-length')
+  })
+}
+
+var app = express()
+
+app.use(morgan(outputJson))
+
+app.get('/', function (req, res) {
+  res.send('hello, world!')
+})
+```
+
+A request to `GET /` would cause `morgan` to log the following JSON:
+
+``` json
+{"route":"GET /","status":200,"content-length":13}
 ```
 
 ## License
