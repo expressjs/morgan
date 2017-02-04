@@ -3,8 +3,9 @@ unreleased
 
   * Fix sending unnecessary `undefined` argument to token functions
   * deps: basic-auth@~1.1.0
-  * deps: debug@2.4.5
+  * deps: debug@2.6.0
     - Allow colors in workers
+    - Deprecated `DEBUG_FD` environment variable
     - Fix error when running under React Native
     - Use same color for same namespace
     - deps: ms@0.7.2

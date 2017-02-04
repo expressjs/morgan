@@ -10,7 +10,7 @@
   "repository": "expressjs/morgan",
   "dependencies": {
     "basic-auth": "~1.1.0",
-    "debug": "2.4.5",
+    "debug": "2.6.0",
     "depd": "~1.1.0",
     "on-finished": "~2.3.0",
     "on-headers": "~1.0.1"
