@@ -258,10 +258,10 @@ app.get('/', function (req, res) {
 
 Simple app that will log all requests in the Apache combined format to one log
 file per date in the `log/` directory using the
-[file-stream-rotator module](https://www.npmjs.com/package/file-stream-rotator).
+[rotating-file-stream module](https://www.npmjs.com/package/rotating-file-stream).
 
 ```js
-var FileStreamRotator = require('file-stream-rotator')
+var rotatingFileStream = require('rotating-file-stream')
 var express = require('express')
 var fs = require('fs')
 var morgan = require('morgan')
@@ -274,11 +274,12 @@ var logDirectory = path.join(__dirname, 'log')
 fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
 
 // create a rotating write stream
-var accessLogStream = FileStreamRotator.getStream({
-  date_format: 'YYYYMMDD',
-  filename: path.join(logDirectory, 'access-%DATE%.log'),
-  frequency: 'daily',
-  verbose: false
+var accessLogStream = rotatingFileStream(function(time, index) {
+    if (!time) time = new Date()
+    return 'access-' + time.toISOString().substr(0,10).split('-').join('') + '.log'
+}, {
+    interval: '1d',  // rotate daily
+    path: logDirectory
 })
 
 // setup the logger
