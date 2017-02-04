@@ -1116,58 +1116,58 @@ describe('morgan()', function () {
 
   describe('with buffer option', function () {
     it('should flush log periodically', function (done) {
-      var count = 0
+      var cb = after(2, function (err, res, log) {
+        if (err) return done(err)
+        assert.equal(log, 'GET /first\nGET /second\n')
+        assert.ok(Date.now() - time >= 1000)
+        assert.ok(Date.now() - time <= 1100)
+        done()
+      })
       var server = createServer(':method :url', {
         buffer: true,
         stream: {write: writeLog}
       })
+      var time = Date.now()
 
       function writeLog (log) {
-        assert.equal(log, 'GET /first\nGET /second\n')
-        server.close()
-        done()
+        cb(null, null, log)
       }
 
-      server = server.listen()
       request(server)
       .get('/first')
-      .end(function (err, res) {
-        if (err) throw err
-        count++
+      .expect(200, function (err) {
+        if (err) return cb(err)
         request(server)
         .get('/second')
-        .end(function (err, res) {
-          if (err) throw err
-          count++
-        })
+        .expect(200, cb)
       })
     })
 
     it('should accept custom interval', function (done) {
-      var count = 0
+      var cb = after(2, function (err, res, log) {
+        if (err) return done(err)
+        assert.equal(log, 'GET /first\nGET /second\n')
+        assert.ok(Date.now() - time >= 200)
+        assert.ok(Date.now() - time <= 300)
+        done()
+      })
       var server = createServer(':method :url', {
         buffer: 200,
         stream: {write: writeLog}
       })
+      var time = Date.now()
 
       function writeLog (log) {
-        assert.equal(log, 'GET /first\nGET /second\n')
-        server.close()
-        done()
+        cb(null, null, log)
       }
 
-      server = server.listen()
       request(server)
       .get('/first')
-      .end(function (err, res) {
-        if (err) throw err
-        count++
+      .expect(200, function (err) {
+        if (err) return cb(err)
         request(server)
         .get('/second')
-        .end(function (err, res) {
-          if (err) throw err
-          count++
-        })
+        .expect(200, cb)
       })
     })
   })
