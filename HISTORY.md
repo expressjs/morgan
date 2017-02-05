@@ -1,5 +1,5 @@
-unreleased
-==========
+1.8.0 / 2017-02-04
+==================
 
   * Fix sending unnecessary `undefined` argument to token functions
   * deps: basic-auth@~1.1.0
