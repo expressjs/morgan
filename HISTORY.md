@@ -1,3 +1,10 @@
+unreleased
+==========
+
+  * deps: debug@2.6.1
+    - Fix deprecation messages in WebStorm and other editors
+    - Undeprecate `DEBUG_FD` set to `1` or `2`
+
 1.8.0 / 2017-02-04
 ==================
 
