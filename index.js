@@ -18,6 +18,7 @@ module.exports = morgan
 module.exports.compile = compile
 module.exports.format = format
 module.exports.token = token
+module.exports.silent = false
 
 /**
  * Module dependencies.
@@ -101,6 +102,10 @@ function morgan (format, options) {
   }
 
   return function logger (req, res, next) {
+
+    if (module.exports.silent)
+      return next()
+
     // request data
     req._startAt = undefined
     req._startTime = undefined

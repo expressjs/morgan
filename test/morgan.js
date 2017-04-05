@@ -1290,6 +1290,26 @@ describe('morgan()', function () {
       .expect(200, done)
     })
   })
+
+  describe('on silent mode', function () {
+
+    before(function () { 
+      morgan.silent = true 
+    })
+    after(function () {
+      morgan.silent = false
+    })
+    
+    it ('should not log any output', function (done) {
+      var stream = createLineStream(function () {
+        throw new Error('should not log line')
+      })
+
+      request(createServer({ format: 'default', stream: stream }))
+      .get('/')
+      .expect(200, done)
+    })
+  })
 })
 
 describe('morgan.compile(format)', function () {
