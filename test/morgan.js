@@ -1292,15 +1292,14 @@ describe('morgan()', function () {
   })
 
   describe('on silent mode', function () {
-
-    before(function () { 
-      morgan.silent = true 
+    before(function () {
+      morgan.silent = true
     })
     after(function () {
       morgan.silent = false
     })
-    
-    it ('should not log any output', function (done) {
+
+    it('should not log any output', function (done) {
       var stream = createLineStream(function () {
         throw new Error('should not log line')
       })
