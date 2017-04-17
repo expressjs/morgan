@@ -139,6 +139,56 @@ describe('morgan()', function () {
         })
       })
     })
+
+    describe('stream', function () {
+      beforeEach(function () {
+        this.stdout = process.stdout
+      })
+
+      afterEach(function () {
+        Object.defineProperty(process, 'stdout', {
+          value: this.stdout
+        })
+      })
+
+      it('should default to process.stdout', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert(res.text.length > 0)
+          assert.equal(line.substr(0, res.text.length), res.text)
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        Object.defineProperty(process, 'stdout', {
+          value: stream
+        })
+
+        request(createServer(undefined, { stream: undefined }))
+        .get('/')
+        .expect(200, cb)
+      })
+
+      it('should set stream to write logs to', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert(res.text.length > 0)
+          assert.equal(line.substr(0, res.text.length), res.text)
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(undefined, { stream: stream }))
+        .get('/')
+        .expect(200, cb)
+      })
+    })
   })
 
   describe('tokens', function () {
