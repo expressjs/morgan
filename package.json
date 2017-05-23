@@ -1,7 +1,7 @@
 {
   "name": "morgan",
   "description": "HTTP request logger middleware for node.js",
-  "version": "1.8.1",
+  "version": "1.8.2",
   "contributors": [
     "Douglas Christopher Wilson <doug@somethingdoug.com>",
     "Jonathan Ong <me@jongleberry.com> (http://jongleberry.com)"
@@ -16,7 +16,7 @@
   "repository": "expressjs/morgan",
   "dependencies": {
     "basic-auth": "~1.1.0",
-    "debug": "2.6.1",
+    "debug": "2.6.8",
     "depd": "~1.1.0",
     "on-finished": "~2.3.0",
     "on-headers": "~1.0.1"
