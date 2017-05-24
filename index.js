@@ -18,6 +18,7 @@ module.exports = morgan
 module.exports.compile = compile
 module.exports.format = format
 module.exports.token = token
+module.exports.silent = false
 
 /**
  * Module dependencies.
@@ -101,6 +102,10 @@ function morgan (format, options) {
   }
 
   return function logger (req, res, next) {
+    if (module.exports.silent) {
+      return next()
+    }
+
     // request data
     req._startAt = undefined
     req._startTime = undefined
@@ -182,7 +187,7 @@ morgan.format('tiny', ':method :url :status :res[content-length] - :response-tim
 
 morgan.format('dev', function developmentFormatLine (tokens, req, res) {
   // get the status code if response written
-  var status = res._header
+  var status = headersSent(res)
     ? res.statusCode
     : undefined
 
@@ -261,7 +266,7 @@ morgan.token('date', function getDateToken (req, res, format) {
  */
 
 morgan.token('status', function getStatusToken (req, res) {
-  return res._header
+  return headersSent(res)
     ? String(res.statusCode)
     : undefined
 })
@@ -328,7 +333,7 @@ morgan.token('req', function getRequestToken (req, res, field) {
  */
 
 morgan.token('res', function getResponseHeader (req, res, field) {
-  if (!res._header) {
+  if (!headersSent(res)) {
     return undefined
   }
 
@@ -467,6 +472,20 @@ function getip (req) {
     req._remoteAddress ||
     (req.connection && req.connection.remoteAddress) ||
     undefined
+}
+
+/**
+ * Determine if the response headers have been sent.
+ *
+ * @param {object} res
+ * @returns {boolean}
+ * @private
+ */
+
+function headersSent (res) {
+  return typeof res.headersSent !== 'boolean'
+    ? Boolean(res._header)
+    : res.headersSent
 }
 
 /**
