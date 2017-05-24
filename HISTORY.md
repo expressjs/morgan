@@ -1,3 +1,8 @@
+unreleased
+==========
+
+  * Use `res.headersSent` when available
+
 1.8.1 / 2017-02-04
 ==================
 
