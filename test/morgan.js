@@ -257,6 +257,22 @@ describe('morgan()', function () {
         .expect(200, cb)
       })
 
+      it('should get current date in "local" format', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.ok(/^\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2} UTC[+-]\d$/.test(line))
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':date[local]', { stream: stream }))
+        .get('/')
+        .expect(200, cb)
+      })
+
       it('should be blank for unknown format', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)

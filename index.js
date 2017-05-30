@@ -253,6 +253,8 @@ morgan.token('date', function getDateToken (req, res, format) {
       return date.toISOString()
     case 'web':
       return date.toUTCString()
+    case 'local':
+      return localdate(date)
   }
 })
 
@@ -360,6 +362,29 @@ function clfdate (dateTime) {
   return pad2(date) + '/' + month + '/' + year +
     ':' + pad2(hour) + ':' + pad2(mins) + ':' + pad2(secs) +
     ' +0000'
+}
+
+/**
+ * Format a Date in a local log format.
+ *
+ * @private
+ * @param {Date} dateTime
+ * @return {string}
+ */
+
+function localdate(dateTime) {
+  var date = dateTime.getDate()
+  var hour = dateTime.getHours()
+  var mins = dateTime.getMinutes()
+  var secs = dateTime.getSeconds()
+  var year = dateTime.getFullYear()
+  var offset = dateTime.getTimezoneOffset()
+
+  var month = CLF_MONTH[dateTime.getMonth()]
+
+  return pad2(date) + '/' + month + '/' + year
+    + ':' + pad2(hour) + ':' + pad2(mins) + ':' + pad2(secs)
+    + ' UTC' + minToHour(offset)
 }
 
 /**
@@ -505,4 +530,18 @@ function recordStartTime () {
 function token (name, fn) {
   morgan[name] = fn
   return this
+}
+
+/**
+ * Convert offset minutes into hours
+ *
+ * @private
+ * @param {offset} offset
+ * @return {string}
+ */
+
+function minToHour(offset) {
+  var sign = String(offset).substring(0, 1)
+  var min = String(offset).slice(1)
+  return (sign === '+' ? '-' : '+') + String(min / 60)
 }
