@@ -138,7 +138,8 @@ function morgan (format, options) {
       onHeaders(res, recordStartTime)
 
       // log when response finished
-      onFinished(res, logRequest)
+      res.on('finish', logRequest)
+      res.on('close', logRequest)
     }
 
     next()
