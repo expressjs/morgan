@@ -363,6 +363,42 @@ function assignId (req, res, next) {
   next()
 }
 ```
+### using a function as a format.
+Sending log data to a separate logger. 
+
+```javascript 
+var express = require('express')
+var morgan = require('morgan')
+var logger = require('myCustomLogger')
+var app = express()
+
+
+app.use(morgan(function(tokens, req, res){
+
+	// Extract your data from the request.
+	var reqData = {
+     "remote-addr": tokens['remote-addr'](req, res),
+     "date": tokens['date'](req, res),
+     "method": tokens['method'](req, res),
+     "status": tokens['status'](req, res),
+     "response-time": tokens['response-time'](req, res)
+	}
+	
+	// tokens.getFormatted returns a formatted string.
+	var formatLine = tokens.getFormatted(req, res, 'common')
+	
+	logger.log(formatLine, reqData)
+	
+	//or do something with your data and return the formatted string.
+	logger.writeData(reqData)
+	return formatLine
+	
+	//or do something async and write your formatted line manually.
+	logger.writeAsyncData(reqData, function(err){
+		console.log(formatLine)
+	})
+});
+```
 
 ## License
 

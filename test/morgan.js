@@ -1162,6 +1162,43 @@ describe('morgan()', function () {
         .expect(200, cb)
       })
     })
+
+    describe('function()', function(){
+      it('getFormat should return a formatted string', function(done) {
+        var line
+        var server = createServer(function(tokens, req, res){
+          line = tokens.getFormatted(req, res, 'common');
+        })
+
+        request(server)
+          .get('/')
+          .end(function (err, res) {
+            if (err) return done(err)
+            line = line.replace(/\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2} \+0000/, '_timestamp_')
+            assert.equal(line, res.text + ' - - [_timestamp_] "GET / HTTP/1.1" 200 -')
+            done()
+          })
+      })
+
+      it('should return default format if none specified', function(done) {
+        var line
+        var server = createServer(function(tokens, req, res){
+          line = tokens.getFormatted(req, res);
+        })
+
+        request(server)
+          .get('/')
+          .set('Authorization', 'Basic dGo6')
+          .set('Referer', 'http://localhost/')
+          .set('User-Agent', 'my-ua')
+          .end(function (err, res) {
+            if (err) return done(err)
+            line = line.replace(/\w+, \d+ \w+ \d+ \d+:\d+:\d+ \w+/, '_timestamp_')
+            assert.equal(line, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 - "http://localhost/" "my-ua"')
+            done()
+          })
+      })
+    })
   })
 
   describe('with buffer option', function () {
