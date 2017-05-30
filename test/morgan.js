@@ -7,6 +7,7 @@ var join = require('path').join
 var morgan = require('..')
 var request = require('supertest')
 var split = require('split')
+var url = require('url')
 
 describe('morgan()', function () {
   describe('arguments', function () {
@@ -1363,6 +1364,186 @@ describe('morgan.compile(format)', function () {
         assert.ok(fn.length === 3)
       })
     })
+  })
+})
+
+describe('morgan.token(name, function)', function () {
+  it('should overwrite existing functions if called multiple times', function (done) {
+    function token (req, res, arg) {
+      return arg && url.parse(req.url)[arg]
+    }
+    var urlToken = morgan.url
+    morgan.token('url', token)
+    assert.equal(morgan.url, token)
+    morgan.token('url', urlToken)
+    done()
+  })
+
+  describe('should use the string `-` if return value of the token function is falsey', function () {
+    it('for NaN', function (done) {
+      morgan.token('NaN', function ret (req, res, arg) {
+        return NaN
+      })
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
+        assert.equal(line, '-')
+        done()
+      })
+
+      var stream = createLineStream(function (line) {
+        cb(null, null, line)
+      })
+
+      var server = createServer(':NaN', { stream: stream })
+
+      request(server)
+      .get('/')
+      .expect(200, cb)
+    })
+    it('for 0', function (done) {
+      morgan.token('zero', function ret (req, res, arg) {
+        return 0
+      })
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
+        assert.equal(line, '-')
+        done()
+      })
+
+      var stream = createLineStream(function (line) {
+        cb(null, null, line)
+      })
+
+      var server = createServer(':zero', { stream: stream })
+
+      request(server)
+      .get('/')
+      .expect(200, cb)
+    })
+    it('for undefined', function (done) {
+      morgan.token('undefined', function ret (req, res, arg) {
+        return undefined
+      })
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
+        assert.equal(line, '-')
+        done()
+      })
+
+      var stream = createLineStream(function (line) {
+        cb(null, null, line)
+      })
+
+      var server = createServer(':undefined', { stream: stream })
+
+      request(server)
+      .get('/')
+      .expect(200, cb)
+    })
+    it('for null', function (done) {
+      morgan.token('null', function ret (req, res, arg) {
+        return null
+      })
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
+        assert.equal(line, '-')
+        done()
+      })
+
+      var stream = createLineStream(function (line) {
+        cb(null, null, line)
+      })
+
+      var server = createServer(':null', { stream: stream })
+
+      request(server)
+      .get('/')
+      .expect(200, cb)
+    })
+    it('for ""', function (done) {
+      morgan.token('empty', function ret (req, res, arg) {
+        return ''
+      })
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
+        assert.equal(line, '-')
+        done()
+      })
+
+      var stream = createLineStream(function (line) {
+        cb(null, null, line)
+      })
+
+      var server = createServer(':empty', { stream: stream })
+
+      request(server)
+      .get('/')
+      .expect(200, cb)
+    })
+    it('for false', function (done) {
+      morgan.token('false', function ret (req, res, arg) {
+        return false
+      })
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
+        assert.equal(line, '-')
+        done()
+      })
+
+      var stream = createLineStream(function (line) {
+        cb(null, null, line)
+      })
+
+      var server = createServer(':false', { stream: stream })
+
+      request(server)
+      .get('/')
+      .expect(200, cb)
+    })
+  })
+
+  it('should see empty brackets as an argument value', function (done) {
+    morgan.token('checkempty', function ret (req, res, arg) {
+      assert.equal(arg, '')
+      cb(null)
+    })
+    var cb = after(3, function (err, res, line) {
+      if (err) return done(err)
+      assert.equal(line, '-')
+      done()
+    })
+
+    var stream = createLineStream(function (line) {
+      cb(null, null, line)
+    })
+
+    var server = createServer(':checkempty[]', { stream: stream })
+
+    request(server)
+    .get('/')
+    .expect(200, cb)
+  })
+
+  it('should use the result', function (done) {
+    morgan.token('urlpart', function ret (req, res, arg) {
+      return url.parse(req.url)[arg]
+    })
+    var cb = after(2, function (err, res, line) {
+      if (err) return done(err)
+      assert.equal(line, 'foo=bar')
+      done()
+    })
+
+    var stream = createLineStream(function (line) {
+      cb(null, null, line)
+    })
+
+    var server = createServer(':urlpart[query]', { stream: stream })
+
+    request(server)
+    .post('/test')
+    .query('foo=bar')
+    .expect(200, cb)
   })
 })
 

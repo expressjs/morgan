@@ -376,12 +376,15 @@ function compile (format) {
   }
 
   var fmt = format.replace(/"/g, '\\"')
-  var js = '  "use strict"\n  return "' + fmt.replace(/:([-\w]{2,})(?:\[([^\]]+)\])?/g, function (_, name, arg) {
+  var js = '  "use strict"\n  return "' + fmt.replace(/:([-\w]{2,})(?:\[([^\]]*)\])?/g, function (_, name, arg) {
     var tokenArguments = 'req, res'
     var tokenFunction = 'tokens[' + String(JSON.stringify(name)) + ']'
 
     if (arg !== undefined) {
       tokenArguments += ', ' + String(JSON.stringify(arg))
+    }
+    else {
+      tokenArguments += ', undefined'
     }
 
     return '" +\n    (' + tokenFunction + '(' + tokenArguments + ') || "-") + "'
