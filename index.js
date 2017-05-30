@@ -68,6 +68,7 @@ function morgan (format, options) {
     deprecate('morgan(options): use morgan(' + (typeof fmt === 'string' ? JSON.stringify(fmt) : 'format') + ', options) instead')
   }
 
+  fmt = fmt || opts.format
   if (fmt === undefined) {
     deprecate('undefined format: specify a format')
   }
@@ -372,6 +373,12 @@ function clfdate (dateTime) {
 
 function compile (format) {
   if (typeof format !== 'string') {
+    if (format && typeof format === 'object') {
+      var fmt = compileObject(format)
+      return function (tokens, req, res) {
+        return JSON.stringify(fmt(tokens, req, res))
+      }
+    }
     throw new TypeError('argument format must be a string')
   }
 
@@ -389,6 +396,24 @@ function compile (format) {
 
   // eslint-disable-next-line no-new-func
   return new Function('tokens, req, res', js)
+}
+
+function compileObject(obj) {
+  var keys = Object.keys(obj);
+  var formatters = [];
+  for (var i = 0; i < keys.length; i++) {
+    var value = obj[keys[i]];
+    formatters[i] = typeof value === 'string' ?
+      compile(value) :
+      compileObject(value); 
+  }
+  return function (tokens, req, res) {
+    var obj = {};
+    for (var i = 0; i < keys.length; i++) {
+      obj[keys[i]] = formatters[i](tokens, req, res);
+    }
+    return obj;
+  }
 }
 
 /**
@@ -446,7 +471,13 @@ function format (name, fmt) {
 
 function getFormatFunction (name) {
   // lookup format
-  var fmt = morgan[name] || name || morgan.default
+  var fmt
+  if (typeof name === 'object' && name) {
+    fmt = compile(name)
+  }
+  else {
+    fmt = morgan[name] || name || morgan.default
+  }
 
   // return compiled format
   return typeof fmt !== 'function'
