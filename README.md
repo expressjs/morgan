@@ -1,4 +1,4 @@
-# morgan
+n
 
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
@@ -245,13 +245,27 @@ var express = require('express')
 var morgan = require('morgan')
 
 var app = express()
-
 app.use(morgan('combined'))
 
 app.get('/', function (req, res) {
   res.send('hello, world!')
 })
 ```
+**note:**
+when using morgan with express, it is important that morgan is used by the express app before any routing is configured.  For example, this will **not** work:
+```javascript
+var express = require('express')
+var morgan = require('morgan')
+
+var app = express()
+
+app.get('/', function (req, res) {
+  res.send('hello, world!')
+})
+app.use(morgan('combined'))
+```
+This is because the usage of morgan is done after the configuration of the route.
+This also applies to the configuration of static resources.
 
 ### vanilla http server
 
@@ -329,6 +343,9 @@ var accessLogStream = rfs('access.log', {
 })
 
 // setup the logger
+// NOTE: the use of morgan needs to be done immediately after the creation
+//       of express, before any other use calls are made.  If it is not,
+//       log files may be created but may not be written to.
 app.use(morgan('combined', {stream: accessLogStream}))
 
 app.get('/', function (req, res) {
@@ -378,3 +395,4 @@ function assignId (req, res, next) {
 [downloads-url]: https://npmjs.org/package/morgan
 [gratipay-image]: https://img.shields.io/gratipay/dougwilson.svg
 [gratipay-url]: https://www.gratipay.com/dougwilson/
+
