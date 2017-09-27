@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Use `res.headersSent` when available
   * deps: basic-auth@~2.0.0
      - Use `safe-buffer` for improved Buffer API
   * deps: debug@2.6.9
