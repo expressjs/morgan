@@ -25,7 +25,7 @@ The `format` argument may be a string of a predefined name (see below for the na
 a string of a format string, or a function that will produce a log entry.
 
 The `format` function will be called with three arguments `tokens`, `req`, and `res`,
-where `tokens` is object with all defined tokens, `req` is the HTTP request and `res`
+where `tokens` is an object with all defined tokens, `req` is the HTTP request and `res`
 is the HTTP response. The function is expected to return a string that will be the log
 line, or `undefined` / `null` to skip logging.
 
