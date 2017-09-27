@@ -1,5 +1,5 @@
-unreleased
-==========
+1.9.0 / 2017-09-26
+==================
 
   * Use `res.headersSent` when available
   * deps: basic-auth@~2.0.0
