@@ -33,7 +33,7 @@ line, or `undefined` / `null` to skip logging.
 
 <!-- eslint-disable no-undef -->
 
-```
+```js
 morgan('tiny')
 ```
 
