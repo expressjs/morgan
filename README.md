@@ -336,6 +336,41 @@ app.get('/', function (req, res) {
 })
 ```
 
+### split / dual logging
+
+The `morgan` middleware can be used as many times as needed, enabling
+combinations like:
+
+  * Log entry on request and one on response
+  * Log all requests to file, but errors to console
+  * ... and more!
+
+Sample app that will log all requests to a file using Apache format, but
+error responses are logged to the console:
+
+```js
+var express = require('express')
+var fs = require('fs')
+var morgan = require('morgan')
+var path = require('path')
+
+var app = express()
+
+// log only 4xx and 5xx responses to console
+app.use(morgan('dev', {
+  skip: function (req, res) { return res.statusCode < 400 }
+}))
+
+// log all requests to access.log
+app.use(morgan('common', {
+  stream: fs.createWriteStream(path.join(__dirname, 'access.log'), {flags: 'a'})
+}))
+
+app.get('/', function (req, res) {
+  res.send('hello, world!')
+})
+```
+
 ### use custom token formats
 
 Sample app that will use custom token formats. This adds an ID to all requests and displays it using the `:id` token.
