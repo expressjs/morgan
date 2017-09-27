@@ -1,6 +1,8 @@
 unreleased
 ==========
 
+  * deps: basic-auth@~2.0.0
+     - Use `safe-buffer` for improved Buffer API
   * deps: debug@2.6.9
   * deps: depd@~1.1.1
     - Remove unnecessary `Buffer` loading
