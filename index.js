@@ -72,6 +72,10 @@ function morgan (format, options) {
     deprecate('undefined format: specify a format')
   }
 
+  if (morgan[fmt] === undefined) {
+    deprecate('unidentified format: specify a proper format')
+  }
+
   // output on request instead of response
   var immediate = opts.immediate
 
