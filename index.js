@@ -72,8 +72,11 @@ function morgan (format, options) {
     deprecate('undefined format: specify a format')
   }
 
-  if (morgan[fmt] === undefined) {
-    deprecate('unidentified format: specify a proper format')
+  if (typeof fmt === 'string' && morgan[fmt] === undefined) {
+    if(fmt.split(':').length <= 1) {
+      deprecate('unidentified format: specify a proper format')
+      fmt = 'default'
+    }
   }
 
   // output on request instead of response
