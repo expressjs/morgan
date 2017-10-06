@@ -73,7 +73,7 @@ function morgan (format, options) {
   }
 
   if (typeof fmt === 'string' && morgan[fmt] === undefined) {
-    if(fmt.split(':').length <= 1) {
+    if (fmt.split(':').length <= 1) {
       deprecate('unidentified format: specify a proper format')
       fmt = 'default'
     }
