@@ -141,7 +141,9 @@ function morgan (format, options) {
       onFinished(res, logRequest)
     }
 
-    next()
+    if (next) {
+      next()
+    }
   }
 }
 
