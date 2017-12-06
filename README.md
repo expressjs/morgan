@@ -188,11 +188,11 @@ The user authenticated as part of Basic auth for the request.
 
 ##### :req[header]
 
-The given `header` of the request.
+The given `header` of the request or `-` if not present.
 
 ##### :res[header]
 
-The given `header` of the response.
+The given `header` of the response or `-` if not present.
 
 ##### :response-time[digits]
 
