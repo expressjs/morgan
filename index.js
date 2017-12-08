@@ -127,7 +127,7 @@ function morgan (format, options) {
       }
 
       debug('log request')
-      stream.write(line + '\n')
+      stream.write(typeof line === 'string' ? (line + '\n') : line)
     };
 
     if (immediate) {
