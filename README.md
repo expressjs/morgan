@@ -4,7 +4,6 @@
 [![NPM Downloads][downloads-image]][downloads-url]
 [![Build Status][travis-image]][travis-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
-[![Gratipay][gratipay-image]][gratipay-url]
 
 HTTP request logger middleware for node.js
 
@@ -413,5 +412,3 @@ function assignId (req, res, next) {
 [coveralls-url]: https://coveralls.io/r/expressjs/morgan?branch=master
 [downloads-image]: https://img.shields.io/npm/dm/morgan.svg
 [downloads-url]: https://npmjs.org/package/morgan
-[gratipay-image]: https://img.shields.io/gratipay/dougwilson.svg
-[gratipay-url]: https://www.gratipay.com/dougwilson/
