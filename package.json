@@ -17,7 +17,7 @@
   "dependencies": {
     "basic-auth": "~2.0.0",
     "debug": "2.6.9",
-    "depd": "~1.1.1",
+    "depd": "~1.1.2",
     "on-finished": "~2.3.0",
     "on-headers": "~1.0.1"
   },
