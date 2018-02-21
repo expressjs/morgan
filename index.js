@@ -463,7 +463,7 @@ function getFormatFunction (name) {
  */
 
 function getip (req) {
-  return req.ip ||
+  return ( req.headers && req.headers['x-forwarded-for']) || req.ip ||
     req._remoteAddress ||
     (req.connection && req.connection.remoteAddress) ||
     undefined
