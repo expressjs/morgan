@@ -23,8 +23,8 @@ describe('morgan()', function () {
       })
 
       request(createServer(undefined, { stream: stream }))
-      .get('/')
-      .expect(200, cb)
+        .get('/')
+        .expect(200, cb)
     })
 
     describe('format', function () {
@@ -40,8 +40,8 @@ describe('morgan()', function () {
         })
 
         request(createServer('tiny', { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should accept format as format string', function (done) {
@@ -56,8 +56,8 @@ describe('morgan()', function () {
         })
 
         request(createServer(':method :url', { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should accept format as function', function (done) {
@@ -76,8 +76,8 @@ describe('morgan()', function () {
         }
 
         request(createServer(format, { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should reject format as bool', function () {
@@ -98,8 +98,8 @@ describe('morgan()', function () {
           })
 
           request(createServer({ stream: stream }))
-          .get('/')
-          .expect(200, cb)
+            .get('/')
+            .expect(200, cb)
         })
 
         it('should accept format in options for back-compat', function (done) {
@@ -114,8 +114,8 @@ describe('morgan()', function () {
           })
 
           request(createServer({ format: ':method :url', stream: stream }))
-          .get('/')
-          .expect(200, cb)
+            .get('/')
+            .expect(200, cb)
         })
 
         it('should accept format function in options for back-compat', function (done) {
@@ -134,8 +134,8 @@ describe('morgan()', function () {
           }
 
           request(createServer({ format: format, stream: stream }))
-          .get('/')
-          .expect(200, cb)
+            .get('/')
+            .expect(200, cb)
         })
       })
     })
@@ -168,8 +168,8 @@ describe('morgan()', function () {
         })
 
         request(createServer(undefined, { stream: undefined }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should set stream to write logs to', function (done) {
@@ -185,8 +185,8 @@ describe('morgan()', function () {
         })
 
         request(createServer(undefined, { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
     })
   })
@@ -205,8 +205,8 @@ describe('morgan()', function () {
         })
 
         request(createServer(':date', { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should get current date in "clf" format', function (done) {
@@ -221,8 +221,8 @@ describe('morgan()', function () {
         })
 
         request(createServer(':date[clf]', { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should get current date in "iso" format', function (done) {
@@ -237,8 +237,8 @@ describe('morgan()', function () {
         })
 
         request(createServer(':date[iso]', { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should get current date in "web" format', function (done) {
@@ -253,8 +253,8 @@ describe('morgan()', function () {
         })
 
         request(createServer(':date[web]', { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should be blank for unknown format', function (done) {
@@ -269,8 +269,8 @@ describe('morgan()', function () {
         })
 
         request(createServer(':date[bogus]', { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
     })
 
@@ -287,8 +287,8 @@ describe('morgan()', function () {
         })
 
         request(createServer(':http-version', { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
     })
 
@@ -305,9 +305,9 @@ describe('morgan()', function () {
         })
 
         request(createServer(':req[x-from-string]', { stream: stream }))
-        .get('/')
-        .set('x-from-string', 'me')
-        .expect(200, cb)
+          .get('/')
+          .set('x-from-string', 'me')
+          .expect(200, cb)
       })
 
       it('should display all values of array headers', function (done) {
@@ -322,9 +322,9 @@ describe('morgan()', function () {
         })
 
         request(createServer(':req[set-cookie]', { stream: stream }))
-        .get('/')
-        .set('Set-Cookie', ['foo=bar', 'fizz=buzz'])
-        .expect(200, cb)
+          .get('/')
+          .set('Set-Cookie', ['foo=bar', 'fizz=buzz'])
+          .expect(200, cb)
       })
     })
 
@@ -341,8 +341,8 @@ describe('morgan()', function () {
         })
 
         request(createServer(':res[x-sent]', { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should display all values of array headers', function (done) {
@@ -362,9 +362,9 @@ describe('morgan()', function () {
         })
 
         request(server)
-        .get('/')
-        .expect('X-Keys', 'foo, bar')
-        .expect(200, cb)
+          .get('/')
+          .expect('X-Keys', 'foo, bar')
+          .expect(200, cb)
       })
     })
 
@@ -382,8 +382,8 @@ describe('morgan()', function () {
         })
 
         request(createServer(':remote-addr', { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should use req.ip if there', function (done) {
@@ -402,8 +402,8 @@ describe('morgan()', function () {
         })
 
         request(server)
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should work on https server', function (done) {
@@ -465,9 +465,9 @@ describe('morgan()', function () {
         })
 
         request(createServer(':remote-addr', { stream: stream }))
-        .get('/')
-        .set('Connection', 'close')
-        .expect(200, cb)
+          .get('/')
+          .set('Connection', 'close')
+          .expect(200, cb)
       })
 
       it('should work when connection: keep-alive', function (done) {
@@ -490,9 +490,9 @@ describe('morgan()', function () {
         })
 
         request(server.listen())
-        .get('/')
-        .set('Connection', 'keep-alive')
-        .expect(200, cb)
+          .get('/')
+          .set('Connection', 'keep-alive')
+          .expect(200, cb)
       })
 
       it('should work when req.ip is a getter', function (done) {
@@ -513,9 +513,9 @@ describe('morgan()', function () {
         })
 
         request(server)
-        .get('/')
-        .set('Connection', 'close')
-        .expect(200, cb)
+          .get('/')
+          .set('Connection', 'close')
+          .expect(200, cb)
       })
 
       it('should not fail if req.connection missing', function (done) {
@@ -537,9 +537,9 @@ describe('morgan()', function () {
         })
 
         request(server.listen())
-        .get('/')
-        .set('Connection', 'keep-alive')
-        .expect(200, cb)
+          .get('/')
+          .set('Connection', 'keep-alive')
+          .expect(200, cb)
       })
     })
 
@@ -556,8 +556,8 @@ describe('morgan()', function () {
         })
 
         request(createServer(':remote-user', { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should support Basic authorization', function (done) {
@@ -572,9 +572,9 @@ describe('morgan()', function () {
         })
 
         request(createServer(':remote-user', { stream: stream }))
-        .get('/')
-        .set('Authorization', 'Basic dGo6')
-        .expect(200, cb)
+          .get('/')
+          .set('Authorization', 'Basic dGo6')
+          .expect(200, cb)
       })
 
       it('should be empty for empty Basic authorization user', function (done) {
@@ -589,9 +589,9 @@ describe('morgan()', function () {
         })
 
         request(createServer(':remote-user', { stream: stream }))
-        .get('/')
-        .set('Authorization', 'Basic Og==')
-        .expect(200, cb)
+          .get('/')
+          .set('Authorization', 'Basic Og==')
+          .expect(200, cb)
       })
     })
 
@@ -613,8 +613,8 @@ describe('morgan()', function () {
         var start = Date.now()
 
         request(createServer(':response-time', { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should have three digits by default', function (done) {
@@ -629,8 +629,8 @@ describe('morgan()', function () {
         })
 
         request(createServer(':response-time', { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should have five digits with argument "5"', function (done) {
@@ -645,8 +645,8 @@ describe('morgan()', function () {
         })
 
         request(createServer(':response-time[5]', { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should have no digits with argument "0"', function (done) {
@@ -661,8 +661,8 @@ describe('morgan()', function () {
         })
 
         request(createServer(':response-time[0]', { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should not include response latency', function (done) {
@@ -691,8 +691,8 @@ describe('morgan()', function () {
         var start = Date.now()
 
         request(server)
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should be empty without hidden property', function (done) {
@@ -712,8 +712,8 @@ describe('morgan()', function () {
         })
 
         request(server)
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should be empty before response', function (done) {
@@ -733,8 +733,8 @@ describe('morgan()', function () {
         })
 
         request(server)
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should be empty if morgan invoked after response sent', function (done) {
@@ -762,8 +762,8 @@ describe('morgan()', function () {
         })
 
         request(server)
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
     })
 
@@ -780,8 +780,8 @@ describe('morgan()', function () {
         })
 
         request(createServer(':status', { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should not exist before response sent', function (done) {
@@ -801,8 +801,8 @@ describe('morgan()', function () {
         })
 
         request(server)
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should not exist for aborted request', function (done) {
@@ -833,8 +833,8 @@ describe('morgan()', function () {
         })
 
         request(createServer(':url', { stream: stream }))
-        .get('/foo')
-        .expect(200, cb)
+          .get('/foo')
+          .expect(200, cb)
       })
 
       it('should use req.originalUrl if exists', function (done) {
@@ -854,8 +854,8 @@ describe('morgan()', function () {
         })
 
         request(server)
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should not exist for aborted request', function (done) {
@@ -892,8 +892,8 @@ describe('morgan()', function () {
         }
 
         request(createServer(format, { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should not log for undefined return', function (done) {
@@ -906,8 +906,8 @@ describe('morgan()', function () {
         }
 
         request(createServer(format, { stream: stream }))
-        .get('/')
-        .expect(200, done)
+          .get('/')
+          .expect(200, done)
       })
 
       it('should not log for null return', function (done) {
@@ -920,8 +920,8 @@ describe('morgan()', function () {
         }
 
         request(createServer(format, { stream: stream }))
-        .get('/')
-        .expect(200, done)
+          .get('/')
+          .expect(200, done)
       })
     })
 
@@ -939,11 +939,11 @@ describe('morgan()', function () {
         })
 
         request(createServer('combined', { stream: stream }))
-        .get('/')
-        .set('Authorization', 'Basic dGo6')
-        .set('Referer', 'http://localhost/')
-        .set('User-Agent', 'my-ua')
-        .expect(200, cb)
+          .get('/')
+          .set('Authorization', 'Basic dGo6')
+          .set('Referer', 'http://localhost/')
+          .set('User-Agent', 'my-ua')
+          .expect(200, cb)
       })
     })
 
@@ -961,9 +961,9 @@ describe('morgan()', function () {
         })
 
         request(createServer('common', { stream: stream }))
-        .get('/')
-        .set('Authorization', 'Basic dGo6')
-        .expect(200, cb)
+          .get('/')
+          .set('Authorization', 'Basic dGo6')
+          .expect(200, cb)
       })
     })
 
@@ -981,11 +981,11 @@ describe('morgan()', function () {
         })
 
         request(createServer('default', { stream: stream }))
-        .get('/')
-        .set('Authorization', 'Basic dGo6')
-        .set('Referer', 'http://localhost/')
-        .set('User-Agent', 'my-ua')
-        .expect(200, cb)
+          .get('/')
+          .set('Authorization', 'Basic dGo6')
+          .set('Referer', 'http://localhost/')
+          .set('User-Agent', 'my-ua')
+          .expect(200, cb)
       })
     })
 
@@ -1008,8 +1008,8 @@ describe('morgan()', function () {
         })
 
         request(server)
-        .get('/')
-        .expect(102, cb)
+          .get('/')
+          .expect(102, cb)
       })
 
       it('should color 2xx green', function (done) {
@@ -1030,8 +1030,8 @@ describe('morgan()', function () {
         })
 
         request(server)
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
 
       it('should color 3xx cyan', function (done) {
@@ -1052,8 +1052,8 @@ describe('morgan()', function () {
         })
 
         request(server)
-        .get('/')
-        .expect(300, cb)
+          .get('/')
+          .expect(300, cb)
       })
 
       it('should color 4xx yelow', function (done) {
@@ -1074,8 +1074,8 @@ describe('morgan()', function () {
         })
 
         request(server)
-        .get('/')
-        .expect(400, cb)
+          .get('/')
+          .expect(400, cb)
       })
 
       it('should color 5xx red', function (done) {
@@ -1096,8 +1096,8 @@ describe('morgan()', function () {
         })
 
         request(server)
-        .get('/')
-        .expect(500, cb)
+          .get('/')
+          .expect(500, cb)
       })
 
       describe('with "immediate: true" option', function () {
@@ -1118,8 +1118,8 @@ describe('morgan()', function () {
           })
 
           request(server)
-          .get('/')
-          .expect(200, cb)
+            .get('/')
+            .expect(200, cb)
         })
       })
     })
@@ -1138,9 +1138,9 @@ describe('morgan()', function () {
         })
 
         request(createServer('short', { stream: stream }))
-        .get('/')
-        .set('Authorization', 'Basic dGo6')
-        .expect(200, cb)
+          .get('/')
+          .set('Authorization', 'Basic dGo6')
+          .expect(200, cb)
       })
     })
 
@@ -1158,8 +1158,8 @@ describe('morgan()', function () {
         })
 
         request(createServer('tiny', { stream: stream }))
-        .get('/')
-        .expect(200, cb)
+          .get('/')
+          .expect(200, cb)
       })
     })
   })
@@ -1184,13 +1184,13 @@ describe('morgan()', function () {
       }
 
       request(server)
-      .get('/first')
-      .expect(200, function (err) {
-        if (err) return cb(err)
-        request(server)
-        .get('/second')
-        .expect(200, cb)
-      })
+        .get('/first')
+        .expect(200, function (err) {
+          if (err) return cb(err)
+          request(server)
+            .get('/second')
+            .expect(200, cb)
+        })
     })
 
     it('should accept custom interval', function (done) {
@@ -1212,13 +1212,13 @@ describe('morgan()', function () {
       }
 
       request(server)
-      .get('/first')
-      .expect(200, function (err) {
-        if (err) return cb(err)
-        request(server)
-        .get('/second')
-        .expect(200, cb)
-      })
+        .get('/first')
+        .expect(200, function (err) {
+          if (err) return cb(err)
+          request(server)
+            .get('/second')
+            .expect(200, cb)
+        })
     })
   })
 
@@ -1240,8 +1240,8 @@ describe('morgan()', function () {
       })
 
       request(server)
-      .get('/')
-      .expect(200, cb)
+        .get('/')
+        .expect(200, cb)
     })
 
     it('should not have value for :response-time', function (done) {
@@ -1261,8 +1261,8 @@ describe('morgan()', function () {
       })
 
       request(server)
-      .get('/')
-      .expect(200, cb)
+        .get('/')
+        .expect(200, cb)
     })
 
     it('should not have value for :status', function (done) {
@@ -1282,8 +1282,8 @@ describe('morgan()', function () {
       })
 
       request(server)
-      .get('/')
-      .expect(200, cb)
+        .get('/')
+        .expect(200, cb)
     })
 
     it('should log before response', function (done) {
@@ -1305,8 +1305,8 @@ describe('morgan()', function () {
       })
 
       request(server)
-      .get('/')
-      .expect(200, cb)
+        .get('/')
+        .expect(200, cb)
     })
   })
 
@@ -1321,9 +1321,9 @@ describe('morgan()', function () {
       }
 
       request(createServer({ format: 'default', skip: skip, stream: stream }))
-      .get('/?skip=true')
-      .set('Connection', 'close')
-      .expect(200, done)
+        .get('/?skip=true')
+        .set('Connection', 'close')
+        .expect(200, done)
     })
 
     it('should be able to skip based on response', function (done) {
@@ -1336,8 +1336,8 @@ describe('morgan()', function () {
       }
 
       request(createServer({ format: 'default', skip: skip, stream: stream }))
-      .get('/')
-      .expect(200, done)
+        .get('/')
+        .expect(200, done)
     })
   })
 })
