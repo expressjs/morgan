@@ -11,7 +11,7 @@ describe('morgan() deprecations', function () {
     originalConsoleError = process.stderr.write
 
     process.stderr.write = function write (chunk, encoding) {
-      errors.push(Buffer.from(chunk, encoding))
+      errors.push(Buffer.from ? Buffer.from(chunk, encoding) : new Buffer(chunk, encoding))
     }
   })
   after(function () {
@@ -23,7 +23,7 @@ describe('morgan() deprecations', function () {
   it('should tell you to use morgan "combined" if format arg is an object', function () {
     morgan({})
     assert.equal(getErrors().length, 1)
-    assert(getErrors()[0].startsWith('morgan deprecated morgan(options): use morgan("combined", options) instead'))
+    assert(startsWith(getErrors()[0], 'morgan deprecated morgan(options): use morgan("combined", options) instead'))
   })
 
   it('regex removes all ANSI characters', function () {
@@ -36,4 +36,7 @@ describe('morgan() deprecations', function () {
 var ANSI_REGEX = /\u001b\[.*?m/g
 function removeANSI (string) {
   return string.replace(ANSI_REGEX, '')
+}
+function startsWith (string, preffix) {
+  return string.lastIndexOf(preffix, 0) === 0
 }
