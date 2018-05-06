@@ -11,6 +11,7 @@ describe('morgan() deprecations', function () {
     originalConsoleError = process.stderr.write
 
     process.stderr.write = function write (chunk, encoding) {
+      /* eslint node/no-deprecated-api: 0 */ // this is actually trying to be compat with older node
       errors.push(Buffer.from ? Buffer.from(chunk, encoding) : new Buffer(chunk, encoding))
     }
   })
