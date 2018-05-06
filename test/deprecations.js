@@ -5,7 +5,7 @@ describe('morgan() deprecations', function () {
   var originalConsoleError
   var errors = []
   function getErrors () {
-    return errors.map(e => removeANSI(e.toString('utf8')))
+    return errors.map(function (e) { return removeANSI(e.toString('utf8')) })
   }
   before(function () {
     originalConsoleError = process.stderr.write
