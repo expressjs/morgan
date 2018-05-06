@@ -33,7 +33,7 @@ describe('morgan() deprecations', function () {
   })
 })
 
-var ANSI_REGEX = new RegExp(/\u001b\[.*?m/, 'g')
+var ANSI_REGEX = /\u001b\[.*?m/g
 function removeANSI (string) {
   return string.replace(ANSI_REGEX, '')
 }
