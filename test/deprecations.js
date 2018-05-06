@@ -20,11 +20,18 @@ describe('morgan() deprecations', function () {
       process.stderr.write = originalConsoleError
     }
   })
+  afterEach(function () {
+    errors = []
+  })
 
   it('should tell you to use morgan "combined" if format arg is an object', function () {
     morgan({})
-    assert.equal(getErrors().length, 1)
-    assert(startsWith(getErrors()[0], 'morgan deprecated morgan(options): use morgan("combined", options) instead'))
+    assert(startsWith(getErrors()[0], 'morgan deprecated morgan(options): use morgan(format, options) instead'))
+  })
+
+  it('should tell you to use "combined" instead of "default"', function () {
+    morgan('default')
+    assert(startsWith(getErrors()[0], 'morgan deprecated default format: use combined format'))
   })
 
   it('regex removes all ANSI characters', function () {

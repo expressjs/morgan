@@ -62,10 +62,11 @@ function morgan (format, options) {
 
   if (format && typeof format === 'object') {
     opts = format
-    fmt = opts.format || 'combined'
+
+    fmt = opts.format || 'default'
 
     // smart deprecation message
-    deprecate('morgan(options): use morgan(' + (typeof fmt === 'string' ? JSON.stringify(fmt) : 'format') + ', options) instead')
+    deprecate('morgan(options): use morgan(' + (typeof opts.format === 'string' ? JSON.stringify(opts.format) : 'format') + ', options) instead')
   }
 
   if (fmt === undefined) {
@@ -446,7 +447,7 @@ function format (name, fmt) {
 
 function getFormatFunction (name) {
   // lookup format
-  var fmt = morgan[name] || name || morgan.combined
+  var fmt = morgan[name] || name || morgan.default
 
   // return compiled format
   return typeof fmt !== 'function'
