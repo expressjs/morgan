@@ -110,13 +110,13 @@ Standard Apache common log output.
 
 ##### dev
 
-Concise output colored by response status for development use. The `:status`
+Concise output colored by response status for development use. The `:status-colored`
 token will be colored green for success codes, red for server error codes,
 yellow for client error codes, cyan for redirection codes, and uncolored
 for information codes.
 
 ```
-:method :url :status :response-time ms - :res[content-length]
+:method :url :status-colored :response-time ms - :res[content-length]
 ```
 
 ##### short
@@ -219,6 +219,18 @@ has finished being written out to the connection, in milliseconds.
 
 The `digits` argument is a number that specifies the number of digits to
 include on the number, defaulting to `3`, which provides microsecond precision.
+
+##### :status-colored
+
+Same as `:status` but the output will be colored red for server error codes,
+yellow for client error codes, cyan for redirection codes, green for success codes,
+and uncolored for all other codes.
+
+This token also adds a reset escape code to ensure color will only be applied to the status code.  The escape code removes any existing colors in your logs that come after the `:status-colored` token. For something like a background color that's applied to the entire log string, you must add it back after the `:status-colored` token.
+
+For example, this log format sets a magenta background color to the entire log string.  Notice that it's added at the beginning of the log and immediately after the `:status-colored` token.
+
+`morgan('\x1b[45m:method :url :status-colored\x1b[45m :res[content-length]\x1b[0m')`
 
 ##### :url
 
