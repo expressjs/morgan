@@ -261,9 +261,19 @@ morgan.token('date', function getDateToken (req, res, format) {
  */
 
 morgan.token('status', function getStatusToken (req, res) {
-  return headersSent(res)
+  const status = headersSent(res)
     ? String(res.statusCode)
     : undefined
+
+  // get status color
+  let color = status >= 500 ? 31 // red
+    : status >= 400 ? 33 // yellow
+      : status >= 300 ? 36 // cyan
+        : status >= 200 ? 32 // green
+          : 0 // no color
+
+  // Return colored status
+  return '\x1b[' + color + 'm:status \x1b[0m'
 })
 
 /**
