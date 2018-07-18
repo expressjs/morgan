@@ -250,7 +250,11 @@ morgan.token('status', function getStatusToken (req, res) {
           : 0 // no color
 
   // Return colored status
-  return '\x1b[' + color + 'm' + status + '\x1b[0m'
+  if (status === undefined) {
+    return undefined
+  } else {
+    return '\x1b[' + color + 'm' + status + '\x1b[0m'
+  }
 })
 
 /**
