@@ -14,7 +14,7 @@ describe('morgan()', function () {
       var cb = after(2, function (err, res, line) {
         if (err) return done(err)
         assert(res.text.length > 0)
-        assert.equal(line.substr(0, res.text.length), res.text)
+        assert.strictEqual(line.substr(0, res.text.length), res.text)
         done()
       })
 
@@ -47,7 +47,7 @@ describe('morgan()', function () {
       it('should accept format as format string', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, 'GET /')
+          assert.strictEqual(line, 'GET /')
           done()
         })
 
@@ -63,7 +63,7 @@ describe('morgan()', function () {
       it('should accept format as function', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, 'GET / 200')
+          assert.strictEqual(line, 'GET / 200')
           done()
         })
 
@@ -89,7 +89,7 @@ describe('morgan()', function () {
           var cb = after(2, function (err, res, line) {
             if (err) return done(err)
             assert(res.text.length > 0)
-            assert.equal(line.substr(0, res.text.length), res.text)
+            assert.strictEqual(line.substr(0, res.text.length), res.text)
             done()
           })
 
@@ -105,7 +105,7 @@ describe('morgan()', function () {
         it('should accept format in options for back-compat', function (done) {
           var cb = after(2, function (err, res, line) {
             if (err) return done(err)
-            assert.equal(line, 'GET /')
+            assert.strictEqual(line, 'GET /')
             done()
           })
 
@@ -121,7 +121,7 @@ describe('morgan()', function () {
         it('should accept format function in options for back-compat', function (done) {
           var cb = after(2, function (err, res, line) {
             if (err) return done(err)
-            assert.equal(line, 'apple')
+            assert.strictEqual(line, 'apple')
             done()
           })
 
@@ -155,7 +155,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           assert(res.text.length > 0)
-          assert.equal(line.substr(0, res.text.length), res.text)
+          assert.strictEqual(line.substr(0, res.text.length), res.text)
           done()
         })
 
@@ -176,7 +176,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           assert(res.text.length > 0)
-          assert.equal(line.substr(0, res.text.length), res.text)
+          assert.strictEqual(line.substr(0, res.text.length), res.text)
           done()
         })
 
@@ -260,7 +260,7 @@ describe('morgan()', function () {
       it('should be blank for unknown format', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, '-')
+          assert.strictEqual(line, '-')
           done()
         })
 
@@ -296,7 +296,7 @@ describe('morgan()', function () {
       it('should get request properties', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, 'me')
+          assert.strictEqual(line, 'me')
           done()
         })
 
@@ -313,7 +313,7 @@ describe('morgan()', function () {
       it('should display all values of array headers', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, 'foo=bar, fizz=buzz')
+          assert.strictEqual(line, 'foo=bar, fizz=buzz')
           done()
         })
 
@@ -332,7 +332,7 @@ describe('morgan()', function () {
       it('should get response properties', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, 'true')
+          assert.strictEqual(line, 'true')
           done()
         })
 
@@ -348,7 +348,7 @@ describe('morgan()', function () {
       it('should display all values of array headers', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, 'foo, bar')
+          assert.strictEqual(line, 'foo, bar')
           done()
         })
 
@@ -373,7 +373,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           assert.ok(res.text.length > 0)
-          assert.equal(line, res.text)
+          assert.strictEqual(line, res.text)
           done()
         })
 
@@ -389,7 +389,7 @@ describe('morgan()', function () {
       it('should use req.ip if there', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, '10.0.0.1')
+          assert.strictEqual(line, '10.0.0.1')
           done()
         })
 
@@ -418,7 +418,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           assert.ok(res.text.length > 0)
-          assert.equal(line, res.text)
+          assert.strictEqual(line, res.text)
           done()
         })
 
@@ -456,7 +456,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           assert.ok(res.text.length > 0)
-          assert.equal(line, res.text)
+          assert.strictEqual(line, res.text)
           done()
         })
 
@@ -474,7 +474,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           assert.ok(res.text.length > 0)
-          assert.equal(line, res.text)
+          assert.strictEqual(line, res.text)
 
           res.req.connection.destroy()
           server.close(done)
@@ -498,7 +498,7 @@ describe('morgan()', function () {
       it('should work when req.ip is a getter', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, '10.0.0.1')
+          assert.strictEqual(line, '10.0.0.1')
           done()
         })
 
@@ -522,7 +522,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           assert.ok(res.text.length > 0)
-          assert.equal(line, res.text)
+          assert.strictEqual(line, res.text)
 
           res.req.connection.destroy()
           server.close(done)
@@ -547,7 +547,7 @@ describe('morgan()', function () {
       it('should be empty if none present', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, '-')
+          assert.strictEqual(line, '-')
           done()
         })
 
@@ -563,7 +563,7 @@ describe('morgan()', function () {
       it('should support Basic authorization', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, 'tj')
+          assert.strictEqual(line, 'tj')
           done()
         })
 
@@ -580,7 +580,7 @@ describe('morgan()', function () {
       it('should be empty for empty Basic authorization user', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, '-')
+          assert.strictEqual(line, '-')
           done()
         })
 
@@ -698,7 +698,7 @@ describe('morgan()', function () {
       it('should be empty without hidden property', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, '-')
+          assert.strictEqual(line, '-')
           done()
         })
 
@@ -719,7 +719,7 @@ describe('morgan()', function () {
       it('should be empty before response', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, '-')
+          assert.strictEqual(line, '-')
           done()
         })
 
@@ -740,7 +740,7 @@ describe('morgan()', function () {
       it('should be empty if morgan invoked after response sent', function (done) {
         var cb = after(3, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, '-')
+          assert.strictEqual(line, '-')
           done()
         })
 
@@ -771,7 +771,7 @@ describe('morgan()', function () {
       it('should get response status', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, String(res.statusCode))
+          assert.strictEqual(line, String(res.statusCode))
           done()
         })
 
@@ -787,7 +787,7 @@ describe('morgan()', function () {
       it('should not exist before response sent', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, '-')
+          assert.strictEqual(line, '-')
           done()
         })
 
@@ -807,7 +807,7 @@ describe('morgan()', function () {
 
       it('should not exist for aborted request', function (done) {
         var stream = createLineStream(function (line) {
-          assert.equal(line, '-')
+          assert.strictEqual(line, '-')
           server.close(done)
         })
 
@@ -824,7 +824,7 @@ describe('morgan()', function () {
       it('should get request URL', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, '/foo')
+          assert.strictEqual(line, '/foo')
           done()
         })
 
@@ -840,7 +840,7 @@ describe('morgan()', function () {
       it('should use req.originalUrl if exists', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, '/bar')
+          assert.strictEqual(line, '/bar')
           done()
         })
 
@@ -860,7 +860,7 @@ describe('morgan()', function () {
 
       it('should not exist for aborted request', function (done) {
         var stream = createLineStream(function (line) {
-          assert.equal(line, '-')
+          assert.strictEqual(line, '-')
           server.close(done)
         })
 
@@ -879,7 +879,7 @@ describe('morgan()', function () {
       it('should log result of function', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line, 'GET / 200')
+          assert.strictEqual(line, 'GET / 200')
           done()
         })
 
@@ -930,7 +930,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           var masked = line.replace(/\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2} \+0000/, '_timestamp_')
-          assert.equal(masked, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 - "http://localhost/" "my-ua"')
+          assert.strictEqual(masked, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 - "http://localhost/" "my-ua"')
           done()
         })
 
@@ -952,7 +952,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           var masked = line.replace(/\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2} \+0000/, '_timestamp_')
-          assert.equal(masked, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 -')
+          assert.strictEqual(masked, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 -')
           done()
         })
 
@@ -972,7 +972,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           var masked = line.replace(/\w+, \d+ \w+ \d+ \d+:\d+:\d+ \w+/, '_timestamp_')
-          assert.equal(masked, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 - "http://localhost/" "my-ua"')
+          assert.strictEqual(masked, res.text + ' - tj [_timestamp_] "GET / HTTP/1.1" 200 - "http://localhost/" "my-ua"')
           done()
         })
 
@@ -993,8 +993,8 @@ describe('morgan()', function () {
       it('should not color 1xx', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line.substr(0, 37), '_color_0_GET / _color_0_102 _color_0_')
-          assert.equal(line.substr(-9), '_color_0_')
+          assert.strictEqual(line.substr(0, 37), '_color_0_GET / _color_0_102 _color_0_')
+          assert.strictEqual(line.substr(-9), '_color_0_')
           done()
         })
 
@@ -1015,8 +1015,8 @@ describe('morgan()', function () {
       it('should color 2xx green', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line.substr(0, 38), '_color_0_GET / _color_32_200 _color_0_')
-          assert.equal(line.substr(-9), '_color_0_')
+          assert.strictEqual(line.substr(0, 38), '_color_0_GET / _color_32_200 _color_0_')
+          assert.strictEqual(line.substr(-9), '_color_0_')
           done()
         })
 
@@ -1037,8 +1037,8 @@ describe('morgan()', function () {
       it('should color 3xx cyan', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line.substr(0, 38), '_color_0_GET / _color_36_300 _color_0_')
-          assert.equal(line.substr(-9), '_color_0_')
+          assert.strictEqual(line.substr(0, 38), '_color_0_GET / _color_36_300 _color_0_')
+          assert.strictEqual(line.substr(-9), '_color_0_')
           done()
         })
 
@@ -1059,8 +1059,8 @@ describe('morgan()', function () {
       it('should color 4xx yelow', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line.substr(0, 38), '_color_0_GET / _color_33_400 _color_0_')
-          assert.equal(line.substr(-9), '_color_0_')
+          assert.strictEqual(line.substr(0, 38), '_color_0_GET / _color_33_400 _color_0_')
+          assert.strictEqual(line.substr(-9), '_color_0_')
           done()
         })
 
@@ -1081,8 +1081,8 @@ describe('morgan()', function () {
       it('should color 5xx red', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.equal(line.substr(0, 38), '_color_0_GET / _color_31_500 _color_0_')
-          assert.equal(line.substr(-9), '_color_0_')
+          assert.strictEqual(line.substr(0, 38), '_color_0_GET / _color_31_500 _color_0_')
+          assert.strictEqual(line.substr(-9), '_color_0_')
           done()
         })
 
@@ -1104,7 +1104,7 @@ describe('morgan()', function () {
         it('should not have color or response values', function (done) {
           var cb = after(2, function (err, res, line) {
             if (err) return done(err)
-            assert.equal(line, '_color_0_GET / _color_0_- _color_0_- ms - -_color_0_')
+            assert.strictEqual(line, '_color_0_GET / _color_0_- _color_0_- ms - -_color_0_')
             done()
           })
 
@@ -1129,7 +1129,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           var masked = line.replace(/\d+\.\d{3} ms/, '_timer_')
-          assert.equal(masked, res.text + ' tj GET / HTTP/1.1 200 - - _timer_')
+          assert.strictEqual(masked, res.text + ' tj GET / HTTP/1.1 200 - - _timer_')
           done()
         })
 
@@ -1149,7 +1149,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           var masked = line.replace(/\d+\.\d{3} ms/, '_timer_')
-          assert.equal(masked, 'GET / 200 - - _timer_')
+          assert.strictEqual(masked, 'GET / 200 - - _timer_')
           done()
         })
 
@@ -1168,7 +1168,7 @@ describe('morgan()', function () {
     it('should flush log periodically', function (done) {
       var cb = after(2, function (err, res, log) {
         if (err) return done(err)
-        assert.equal(log, 'GET /first\nGET /second\n')
+        assert.strictEqual(log, 'GET /first\nGET /second\n')
         assert.ok(Date.now() - time >= 1000)
         assert.ok(Date.now() - time <= 1100)
         done()
@@ -1196,7 +1196,7 @@ describe('morgan()', function () {
     it('should accept custom interval', function (done) {
       var cb = after(2, function (err, res, log) {
         if (err) return done(err)
-        assert.equal(log, 'GET /first\nGET /second\n')
+        assert.strictEqual(log, 'GET /first\nGET /second\n')
         assert.ok(Date.now() - time >= 200)
         assert.ok(Date.now() - time <= 300)
         done()
@@ -1226,7 +1226,7 @@ describe('morgan()', function () {
     it('should not have value for :res', function (done) {
       var cb = after(2, function (err, res, line) {
         if (err) return done(err)
-        assert.equal(line, 'GET / -')
+        assert.strictEqual(line, 'GET / -')
         done()
       })
 
@@ -1247,7 +1247,7 @@ describe('morgan()', function () {
     it('should not have value for :response-time', function (done) {
       var cb = after(2, function (err, res, line) {
         if (err) return done(err)
-        assert.equal(line, 'GET / -')
+        assert.strictEqual(line, 'GET / -')
         done()
       })
 
@@ -1268,7 +1268,7 @@ describe('morgan()', function () {
     it('should not have value for :status', function (done) {
       var cb = after(2, function (err, res, line) {
         if (err) return done(err)
-        assert.equal(line, 'GET / -')
+        assert.strictEqual(line, 'GET / -')
         done()
       })
 
@@ -1290,7 +1290,7 @@ describe('morgan()', function () {
       var lineLogged = false
       var cb = after(2, function (err, res, line) {
         if (err) return done(err)
-        assert.equal(line, 'GET / -')
+        assert.strictEqual(line, 'GET / -')
         done()
       })
 
