@@ -439,7 +439,7 @@ describe('morgan()', function () {
           })
         })
 
-        var agent = new https.Agent({ca: cert})
+        var agent = new https.Agent({ ca: cert })
         var createConnection = agent.createConnection
 
         agent.createConnection = function (options) {
@@ -1226,7 +1226,7 @@ describe('morgan()', function () {
       })
       var server = createServer(':method :url', {
         buffer: true,
-        stream: {write: writeLog}
+        stream: { write: writeLog }
       })
       var time = Date.now()
 
@@ -1254,7 +1254,7 @@ describe('morgan()', function () {
       })
       var server = createServer(':method :url', {
         buffer: 200,
-        stream: {write: writeLog}
+        stream: { write: writeLog }
       })
       var time = Date.now()
 
