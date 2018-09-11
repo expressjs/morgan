@@ -1,5 +1,5 @@
-unreleased
-==========
+1.9.1 / 2018-09-10
+==================
 
   * Fix using special characters in format
   * deps: depd@~1.1.2
