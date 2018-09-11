@@ -375,8 +375,8 @@ function compile (format) {
     throw new TypeError('argument format must be a string')
   }
 
-  var fmt = format.replace(/"/g, '\\"')
-  var js = '  "use strict"\n  return "' + fmt.replace(/:([-\w]{2,})(?:\[([^\]]+)\])?/g, function (_, name, arg) {
+  var fmt = String(JSON.stringify(format))
+  var js = '  "use strict"\n  return ' + fmt.replace(/:([-\w]{2,})(?:\[([^\]]+)\])?/g, function (_, name, arg) {
     var tokenArguments = 'req, res'
     var tokenFunction = 'tokens[' + String(JSON.stringify(name)) + ']'
 
@@ -385,7 +385,7 @@ function compile (format) {
     }
 
     return '" +\n    (' + tokenFunction + '(' + tokenArguments + ') || "-") + "'
-  }) + '"'
+  })
 
   // eslint-disable-next-line no-new-func
   return new Function('tokens, req, res', js)

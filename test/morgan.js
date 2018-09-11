@@ -925,6 +925,57 @@ describe('morgan()', function () {
       })
     })
 
+    describe('a string', function () {
+      it('should accept format as format string of tokens', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line, 'GET /')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':method :url', { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
+
+      it('should accept text mixed with tokens', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line, 'method=GET url=/')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer('method=:method url=:url', { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
+
+      it('should accept special characters', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line, 'LOCAL\\tobi "GET /" 200')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer('LOCAL\\:remote-user ":method :url" :status', { stream: stream }))
+          .get('/')
+          .set('Authorization', 'Basic dG9iaTpsb2tp')
+          .expect(200, cb)
+      })
+    })
+
     describe('combined', function () {
       it('should match expectations', function (done) {
         var cb = after(2, function (err, res, line) {

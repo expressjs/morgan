@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Fix using special characters in format
   * deps: depd@~1.1.2
     - perf: remove argument reassignment
 
