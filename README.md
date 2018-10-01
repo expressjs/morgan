@@ -312,21 +312,16 @@ file per day in the `log/` directory using the
 
 ```js
 var express = require('express')
-var fs = require('fs')
 var morgan = require('morgan')
 var path = require('path')
 var rfs = require('rotating-file-stream')
 
 var app = express()
-var logDirectory = path.join(__dirname, 'log')
-
-// ensure log directory exists
-fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
 
 // create a rotating write stream
 var accessLogStream = rfs('access.log', {
   interval: '1d', // rotate daily
-  path: logDirectory
+  path: path.join(__dirname, 'log')
 })
 
 // setup the logger
