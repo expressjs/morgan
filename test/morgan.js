@@ -2,7 +2,9 @@
 process.env.NO_DEPRECATION = 'morgan'
 
 var assert = require('assert')
+var fs = require('fs')
 var http = require('http')
+var https = require('https')
 var join = require('path').join
 var morgan = require('..')
 var request = require('supertest')
@@ -407,14 +409,6 @@ describe('morgan()', function () {
       })
 
       it('should work on https server', function (done) {
-        var fs = require('fs')
-        var https = require('https')
-        var cert = fs.readFileSync(join(__dirname, 'fixtures/server.crt'), 'ascii')
-        var server = https.createServer({
-          key: fs.readFileSync(join(__dirname, 'fixtures/server.key'), 'ascii'),
-          cert: cert
-        })
-
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           assert.ok(res.text.length > 0)
@@ -425,31 +419,13 @@ describe('morgan()', function () {
         var stream = createLineStream(function (line) {
           cb(null, null, line)
         })
-        var logger = morgan(':remote-addr', { stream: stream })
 
-        server.on('request', function (req, res) {
-          logger(req, res, function (err) {
-            if (err) {
-              res.statusCode = 500
-              res.end(err.stack)
-            } else {
-              delete req._remoteAddress
-              res.end(req.connection.remoteAddress)
-            }
-          })
-        })
+        var server = createSecureServer(':remote-addr', { stream: stream })
 
-        var agent = new https.Agent({ ca: cert })
-        var createConnection = agent.createConnection
-
-        agent.createConnection = function (options) {
-          options.servername = 'morgan.local'
-          return createConnection.call(this, options)
-        }
-
-        var req = request(server).get('/')
-        req.agent(agent)
-        req.expect(200, cb)
+        request(server)
+          .get('/')
+          .ca(server.cert)
+          .expect(200, cb)
       })
 
       it('should work when connection: close', function (done) {
@@ -1444,11 +1420,11 @@ function createLineStream (callback) {
   return split().on('data', callback)
 }
 
-function createServer (format, opts, fn, fn1) {
+function createRequestListener (format, opts, fn, fn1) {
   var logger = morgan(format, opts)
   var middle = fn || noopMiddleware
 
-  return http.createServer(function onRequest (req, res) {
+  return function onRequest (req, res) {
     // prior alterations
     if (fn1) {
       fn1(req, res)
@@ -1466,7 +1442,20 @@ function createServer (format, opts, fn, fn1) {
         res.end((req.connection && req.connection.remoteAddress) || '-')
       })
     })
-  })
+  }
+}
+
+function createSecureServer (format, opts, fn, fn1) {
+  var cert = fs.readFileSync(join(__dirname, 'fixtures', 'server.crt'), 'ascii')
+  var key = fs.readFileSync(join(__dirname, 'fixtures', 'server.key'), 'ascii')
+
+  return https.createServer({ cert: cert, key: key })
+    .on('request', createRequestListener(format, opts, fn, fn1))
+}
+
+function createServer (format, opts, fn, fn1) {
+  return http.createServer()
+    .on('request', createRequestListener(format, opts, fn, fn1))
 }
 
 function expandColorCharacters (str) {
