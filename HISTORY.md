@@ -1,3 +1,9 @@
+unreleased
+==========
+
+  * deps: basic-auth@~2.0.1
+     - deps: safe-buffer@5.1.2
+
 1.9.1 / 2018-09-10
 ==================
 
