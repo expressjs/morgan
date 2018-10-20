@@ -38,6 +38,15 @@ before_install:
       npm rm --silent --save-dev istanbul
     fi
   - |
+    # supertest for http calls
+    # - use 1.1.0 for Node.js < 0.10
+    # - use 2.0.0 for Node.js < 4
+    if [[ "$(cut -d. -f1 <<< "$TRAVIS_NODE_VERSION")" -eq 0 && "$(cut -d. -f2 <<< "$TRAVIS_NODE_VERSION")" -lt 10 ]]; then
+      npm install --save-dev supertest@1.1.0
+    elif [[ "$(cut -d. -f1 <<< "$TRAVIS_NODE_VERSION")" -lt 4 ]]; then
+      npm install --save-dev supertest@2.0.0
+    fi
+  - |
     # eslint for linting
     # - remove on Node.js < 6
     if [[ "$(cut -d. -f1 <<< "$TRAVIS_NODE_VERSION")" -lt 6 ]]; then
