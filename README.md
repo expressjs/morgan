@@ -1,7 +1,7 @@
 # morgan
 
-[![NPM Version][npm-image]][npm-url]
-[![NPM Downloads][downloads-image]][downloads-url]
+[![NPM Version][npm-version-image]][npm-url]
+[![NPM Downloads][npm-downloads-image]][npm-url]
 [![Build Status][travis-image]][travis-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
 
@@ -404,11 +404,10 @@ function assignId (req, res, next) {
 
 [MIT](LICENSE)
 
-[npm-image]: https://img.shields.io/npm/v/morgan.svg
-[npm-url]: https://npmjs.org/package/morgan
-[travis-image]: https://img.shields.io/travis/expressjs/morgan/master.svg
-[travis-url]: https://travis-ci.org/expressjs/morgan
-[coveralls-image]: https://img.shields.io/coveralls/expressjs/morgan/master.svg
+[coveralls-image]: https://badgen.net/coveralls/c/github/expressjs/morgan/master
 [coveralls-url]: https://coveralls.io/r/expressjs/morgan?branch=master
-[downloads-image]: https://img.shields.io/npm/dm/morgan.svg
-[downloads-url]: https://npmjs.org/package/morgan
+[npm-downloads-image]: https://badgen.net/npm/dm/morgan
+[npm-url]: https://npmjs.org/package/morgan
+[npm-version-image]: https://badgen.net/npm/v/morgan
+[travis-image]: https://badgen.net/travis/expressjs/morgan/master
+[travis-url]: https://travis-ci.org/expressjs/morgan
