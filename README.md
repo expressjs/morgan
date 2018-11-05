@@ -212,6 +212,14 @@ If the request/response cycle completes before a response was sent to the
 client (for example, the TCP socket closed prematurely by a client aborting
 the request), then the status will be empty (displayed as `"-"` in the log).
 
+##### :total-time[digits]
+
+The time between the request coming into `morgan` and when the response
+has finished being written out to the connection, in milliseconds.
+
+The `digits` argument is a number that specifies the number of digits to
+include on the number, defaulting to `3`, which provides microsecond precision.
+
 ##### :url
 
 The URL of the request. This will use `req.originalUrl` if exists, otherwise `req.url`.

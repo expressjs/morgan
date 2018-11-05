@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Add `:total-time` token
   * Fix trailing space in colored status code for `dev` format
   * deps: basic-auth@~2.0.1
      - deps: safe-buffer@5.1.2

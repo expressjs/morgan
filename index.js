@@ -240,6 +240,26 @@ morgan.token('response-time', function getResponseTimeToken (req, res, digits) {
 })
 
 /**
+ * total time in milliseconds
+ */
+
+morgan.token('total-time', function getTotalTimeToken (req, res, digits) {
+  if (!req._startAt || !res._startAt) {
+    // missing request and/or response start time
+    return
+  }
+
+  // time elapsed from request start
+  var elapsed = process.hrtime(req._startAt)
+
+  // cover to milliseconds
+  var ms = (elapsed[0] * 1e3) + (elapsed[1] * 1e-6)
+
+  // return truncated value
+  return ms.toFixed(digits === undefined ? 3 : digits)
+})
+
+/**
  * current date
  */
 

@@ -641,12 +641,14 @@ describe('morgan()', function () {
           .expect(200, cb)
       })
 
-      it('should not include response latency', function (done) {
+      it('should not include response write time', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
+          var end = Date.now()
           var ms = parseFloat(line)
-          assert.ok(ms > 0, 'positive milliseconds')
-          assert.ok(ms < end - start + 1, 'response time expected to be < ' + (end - start + 1) + ', but was ' + ms)
+          assert(ms > 0)
+          assert(ms < end - start + 1)
+          assert(ms < write - start + 1)
           done()
         })
 
@@ -656,15 +658,15 @@ describe('morgan()', function () {
 
         var server = createServer(':response-time', { stream: stream }, function (req, res) {
           res.write('hello, ')
-          end = Date.now()
+          write = Date.now()
 
           setTimeout(function () {
             res.end('world!')
           }, 50)
         })
 
-        var end
         var start = Date.now()
+        var write = null
 
         request(server)
           .get('/')
@@ -793,6 +795,180 @@ describe('morgan()', function () {
 
         var test = request(server).post('/')
         test.write('0')
+      })
+    })
+
+    describe(':total-time', function () {
+      it('should be in milliseconds', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          var end = Date.now()
+          var ms = parseFloat(line)
+          assert(ms > 0)
+          assert(ms < end - start + 1)
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var start = Date.now()
+
+        request(createServer(':total-time', { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
+
+      it('should have three digits by default', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.ok(/^[0-9]+\.[0-9]{3}$/.test(line))
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':total-time', { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
+
+      it('should have five digits with argument "5"', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.ok(/^[0-9]+\.[0-9]{5}$/.test(line))
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':total-time[5]', { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
+
+      it('should have no digits with argument "0"', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.ok(/^[0-9]+$/.test(line))
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':total-time[0]', { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
+
+      it('should include response write time', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          var end = Date.now()
+          var ms = parseFloat(line)
+          assert(ms > 0)
+          assert(ms > write - start - 1)
+          assert(ms < end - start + 1)
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':total-time', { stream: stream }, function (req, res) {
+          res.write('hello, ')
+          write = Date.now()
+
+          setTimeout(function () {
+            res.end('world!')
+          }, 50)
+        })
+
+        var start = Date.now()
+        var write = null
+
+        request(server)
+          .get('/')
+          .expect(200, cb)
+      })
+
+      it('should be empty without hidden property', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line, '-')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':total-time', { stream: stream }, function (req, res, next) {
+          delete req._startAt
+          next()
+        })
+
+        request(server)
+          .get('/')
+          .expect(200, cb)
+      })
+
+      it('should be empty before response', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line, '-')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':total-time', {
+          immediate: true,
+          stream: stream
+        })
+
+        request(server)
+          .get('/')
+          .expect(200, cb)
+      })
+
+      it('should be empty if morgan invoked after response sent', function (done) {
+        var cb = after(3, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line, '-')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var logger = morgan(':total-time', {
+          immediate: true,
+          stream: stream
+        })
+
+        var server = http.createServer(function (req, res) {
+          setTimeout(function () {
+            logger(req, res, cb)
+          }, 10)
+
+          res.end()
+        })
+
+        request(server)
+          .get('/')
+          .expect(200, cb)
       })
     })
 
