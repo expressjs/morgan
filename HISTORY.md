@@ -4,6 +4,9 @@ unreleased
   * Fix trailing space in colored status code for `dev` format
   * deps: basic-auth@~2.0.1
      - deps: safe-buffer@5.1.2
+  * deps: depd@~2.0.0
+    - Replace internal `eval` usage with `Function` constructor
+    - Use instance methods on `process` to check for listeners
 
 1.9.1 / 2018-09-10
 ==================
