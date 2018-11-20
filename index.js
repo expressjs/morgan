@@ -68,6 +68,8 @@ function morgan (format, options) {
     deprecate('morgan(options): use morgan(' + (typeof fmt === 'string' ? JSON.stringify(fmt) : 'format') + ', options) instead')
   }
 
+  opts.newLineFormat = (options && options.newLineFormat !== undefined && options.newLineFormat !== null) ? options.newLineFormat : '\n'
+
   if (fmt === undefined) {
     deprecate('undefined format: specify a format')
   }
@@ -127,7 +129,7 @@ function morgan (format, options) {
       }
 
       debug('log request')
-      stream.write(line + '\n')
+      stream.write(line + opts.newLineFormat)
     };
 
     if (immediate) {
