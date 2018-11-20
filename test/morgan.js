@@ -1036,7 +1036,16 @@ describe('morgan()', function () {
 
         request(server)
           .get('/')
-          .expect(102, cb)
+          .expect(102, function (err, res) {
+            if (err && err.code === 'ECONNRESET') {
+              // finishing response with 1xx is invalid http
+              // but node.js server lets the server do this, so
+              // morgan needs to test in this condition even if
+              // the http client doesn't like it
+              err = null
+            }
+            cb(err, res)
+          })
       })
 
       it('should color 2xx green', function (done) {
