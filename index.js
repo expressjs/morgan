@@ -478,6 +478,7 @@ function getip (req) {
  */
 
 function headersSent (res) {
+  // istanbul ignore next: node.js 0.8 support
   return typeof res.headersSent !== 'boolean'
     ? Boolean(res._header)
     : res.headersSent
