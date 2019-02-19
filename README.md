@@ -209,7 +209,7 @@ The status code of the response.
 
 If the request/response cycle completes before a response was sent to the
 client (for example, the TCP socket closed prematurely by a client aborting
-the request), then the status will be empty (displayed as `"-"` in the log).
+the request), then the status will be empty.
 
 ##### :url
 
