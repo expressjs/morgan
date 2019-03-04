@@ -7,6 +7,8 @@ unreleased
   * deps: depd@~2.0.0
     - Replace internal `eval` usage with `Function` constructor
     - Use instance methods on `process` to check for listeners
+  * deps: on-headers@~1.0.2
+    - Fix `res.writeHead` patch missing return value
 
 1.9.1 / 2018-09-10
 ==================

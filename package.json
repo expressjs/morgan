@@ -19,7 +19,7 @@
     "debug": "2.6.9",
     "depd": "~2.0.0",
     "on-finished": "~2.3.0",
-    "on-headers": "~1.0.1"
+    "on-headers": "~1.0.2"
   },
   "devDependencies": {
     "eslint": "5.13.0",
