@@ -18,7 +18,6 @@ module.exports = function compile (format) {
         '" +\n    (' + tokenFunction + '(' + tokenArguments + ') || "-") + "'
       )
     })
-  console.log(js)
   // eslint-disable-next-line no-new-func
   return new Function('tokens, req, res', js)
 }
