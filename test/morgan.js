@@ -1376,6 +1376,68 @@ describe('morgan()', function () {
         .expect(200, done)
     })
   })
+
+  describe('with enableObjectStream option', function () {
+    it('should write an Object to stream based on the custom format function', function (done) {
+      var cb = after(2, function (err, res, streamOutput) {
+        if (err) return done(err)
+        assert.deepEqual(streamOutput, { get: 'GET' })
+        done()
+      })
+
+      var customStream = {
+        write: function (streamOutput) {
+          cb(null, null, streamOutput)
+        }
+      }
+
+      request(createServer((tokens, req, res) => ({ get: tokens.method(req, res) }), { enableObjectStream: true, stream: customStream }))
+        .get('/fakeEndpoint')
+        .expect(200, cb)
+    })
+
+    it('should write a string to stream when format is not a custom function', function (done) {
+      var cb = after(2, function (err, res, streamOutput) {
+        if (err) return done(err)
+        var masked = streamOutput.replace(/\w+, \d+ \w+ \d+ \d+:\d+:\d+ \w+/, '_timestamp_')
+        assert.strictEqual(masked, res.text + ' - tj [_timestamp_] "GET /fakeEndpoint HTTP/1.1" 200 - "http://localhost/" "my-ua"\n')
+        done()
+      })
+
+      var customStream = {
+        write: function (streamOutput) {
+          cb(null, null, streamOutput)
+        }
+      }
+
+      request(createServer('default', { enableObjectStream: true, stream: customStream }))
+        .get('/fakeEndpoint')
+        .set('Authorization', 'Basic dGo6')
+        .set('Referer', 'http://localhost/')
+        .set('User-Agent', 'my-ua')
+        .expect(200, cb)
+    })
+
+    it('should default to process.stdout when stream is not defined', function (done) {
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
+        assert(res.text.length > 0)
+        assert(typeof line === "string")
+        done()
+      })
+
+      var stream = createLineStream(function (line) {
+        cb(null, null, line)
+      })
+
+      Object.defineProperty(process, 'stdout', {
+        value: stream
+      })
+      request(createServer((tokens, req, res) => ({ get: tokens.method(req, res) }), { enableObjectStream: true, stream: undefined }))
+        .get('/')
+        .expect(200, cb)
+    })
+  })
 })
 
 describe('morgan.compile(format)', function () {
