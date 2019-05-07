@@ -79,12 +79,14 @@ function morgan (format, options) {
   var skip = opts.skip || false
 
   // format function
-  var formatLine = typeof fmt !== 'function'
+  var isFormatFunction = typeof fmt === 'function'
+  var formatLine = !isFormatFunction
     ? getFormatFunction(fmt)
     : fmt
 
   // stream
   var buffer = opts.buffer
+  var isStreamDefined = !!opts.stream
   var stream = opts.stream || process.stdout
 
   // buffering support
@@ -126,8 +128,13 @@ function morgan (format, options) {
         return
       }
 
-      debug('log request')
-      stream.write(line + '\n')
+      if (opts.enableObjectStream && isStreamDefined && isFormatFunction) {
+        debug('log request without newline character')
+        stream.write(line)
+      } else {
+        debug('log request')
+        stream.write(line + '\n')
+      }
     };
 
     if (immediate) {
