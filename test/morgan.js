@@ -1391,7 +1391,11 @@ describe('morgan()', function () {
         }
       }
 
-      request(createServer((tokens, req, res) => ({ get: tokens.method(req, res) }), { enableObjectStream: true, stream: customStream }))
+      var customFormatFunction = function (tokens, req, res) {
+        return { get: tokens.method(req, res) }
+      }
+
+      request(createServer(customFormatFunction, { enableObjectStream: true, stream: customStream }))
         .get('/fakeEndpoint')
         .expect(200, cb)
     })
@@ -1422,7 +1426,7 @@ describe('morgan()', function () {
       var cb = after(2, function (err, res, line) {
         if (err) return done(err)
         assert(res.text.length > 0)
-        assert(typeof line === "string")
+        assert(typeof line === 'string')
         done()
       })
 
@@ -1433,7 +1437,11 @@ describe('morgan()', function () {
       Object.defineProperty(process, 'stdout', {
         value: stream
       })
-      request(createServer((tokens, req, res) => ({ get: tokens.method(req, res) }), { enableObjectStream: true, stream: undefined }))
+
+      var customFormatFunction = function (tokens, req, res) {
+        return { get: tokens.method(req, res) }
+      }
+      request(createServer(customFormatFunction, { enableObjectStream: true, stream: undefined }))
         .get('/')
         .expect(200, cb)
     })
