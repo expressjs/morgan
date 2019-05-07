@@ -1381,7 +1381,7 @@ describe('morgan()', function () {
     it('should write an Object to stream based on the custom format function', function (done) {
       var cb = after(2, function (err, res, streamOutput) {
         if (err) return done(err)
-        assert.deepEqual(streamOutput, { get: 'GET' })
+        assert.deepStrictEqual(streamOutput, { get: 'GET' })
         done()
       })
 
