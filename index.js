@@ -162,7 +162,7 @@ morgan.format('common', ':remote-addr - :remote-user [:date[clf]] ":method :url 
  */
 
 morgan.format('default', ':remote-addr - :remote-user [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"')
-deprecate.property(morgan, 'default', 'default format: use combined format')
+//deprecate.property(morgan, 'default', 'default format: use combined format')
 
 /**
  * Short format.
