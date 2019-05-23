@@ -253,6 +253,8 @@ morgan.token('date', function getDateToken (req, res, format) {
       return date.toISOString()
     case 'web':
       return date.toUTCString()
+    case 'local':
+      return date.toLocaleString()
   }
 })
 
