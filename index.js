@@ -503,8 +503,8 @@ function pad2 (num) {
  */
 
 function recordStartTime () {
-  this._startAt = process.hrtime()
-  this._startTime = new Date()
+  this._startAt = this[Symbol.for('request-received.startAt')] ? this[Symbol.for('request-received.startAt')] : process.hrtime()
+  this._startTime = this[Symbol.for('request-received.startTime')] ? this[Symbol.for('request-received.startTime')] : new Date()
 }
 
 /**
