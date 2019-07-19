@@ -445,12 +445,12 @@ function format (name, fmt) {
  */
 
 function getFormatFunction (name) {
-  // lookup format
-  var fmt = morgan[name] || name || morgan.default
-
-  if (fmt === morgan.default) {
+  if (name === 'default') {
     deprecate('default format: use combined format')
   }
+
+  // lookup format
+  var fmt = morgan[name] || name || morgan.default
 
   // return compiled format
   return typeof fmt !== 'function'
