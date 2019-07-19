@@ -7,6 +7,7 @@ unreleased
   * deps: depd@~2.0.0
     - Replace internal `eval` usage with `Function` constructor
     - Use instance methods on `process` to check for listeners
+  * refactored deprecation message for `default` format to fix issue when using `esm` module
 
 1.9.1 / 2018-09-10
 ==================

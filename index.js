@@ -161,8 +161,8 @@ morgan.format('common', ':remote-addr - :remote-user [:date[clf]] ":method :url 
  * Default format.
  */
 
+// @deprecated
 morgan.format('default', ':remote-addr - :remote-user [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"')
-deprecate.property(morgan, 'default', 'default format: use combined format')
 
 /**
  * Short format.
@@ -447,6 +447,10 @@ function format (name, fmt) {
 function getFormatFunction (name) {
   // lookup format
   var fmt = morgan[name] || name || morgan.default
+
+  if (fmt === morgan.default) {
+    deprecate('default format: use combined format')
+  }
 
   // return compiled format
   return typeof fmt !== 'function'
