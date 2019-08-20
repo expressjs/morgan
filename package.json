@@ -32,7 +32,7 @@
     "istanbul": "0.4.5",
     "mocha": "6.2.0",
     "split": "1.0.1",
-    "supertest": "3.4.2"
+    "supertest": "4.0.2"
   },
   "files": [
     "LICENSE",
