@@ -271,7 +271,7 @@ morgan.token('status', function getStatusToken (req, res) {
  */
 
 morgan.token('referrer', function getReferrerToken (req) {
-  return req.headers['referer'] || req.headers['referrer']
+  return req.headers.referer || req.headers.referrer
 })
 
 /**
