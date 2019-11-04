@@ -478,8 +478,12 @@ function getip (req) {
  */
 
 function headersSent (res) {
+  var isHeadersAlreadySent = res.getHeaders
+    ? res.getHeaders()
+    : res._headers
+
   return typeof res.headersSent !== 'boolean'
-    ? Boolean(res.getHeaders())
+    ? Boolean(isHeadersAlreadySent)
     : res.headersSent
 }
 
