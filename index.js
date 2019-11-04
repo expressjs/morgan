@@ -479,7 +479,7 @@ function getip (req) {
 
 function headersSent (res) {
   return typeof res.headersSent !== 'boolean'
-    ? Boolean(res._header)
+    ? Boolean(res.getHeaders())
     : res.headersSent
 }
 
