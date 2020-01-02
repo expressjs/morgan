@@ -78,6 +78,9 @@ function morgan (format, options) {
   // check if log entry should be skipped
   var skip = opts.skip || false
 
+  // get settings for json response
+  var recordJsonResponse = opts.recordJsonResponse || false
+
   // format function
   var formatLine = typeof fmt !== 'function'
     ? getFormatFunction(fmt)
@@ -134,6 +137,11 @@ function morgan (format, options) {
       // immediate log
       logRequest()
     } else {
+      // record response body
+      if (recordJsonResponse) {
+        recordResponseBody(res)
+      }
+
       // record response start
       onHeaders(res, recordStartTime)
 
@@ -237,6 +245,14 @@ morgan.token('response-time', function getResponseTimeToken (req, res, digits) {
 
   // return truncated value
   return ms.toFixed(digits === undefined ? 3 : digits)
+})
+
+/**
+ * response body
+ */
+
+morgan.token('response-body', function getResponseBody (req, res) {
+  return res.body
 })
 
 /**
@@ -505,6 +521,26 @@ function pad2 (num) {
 function recordStartTime () {
   this._startAt = process.hrtime()
   this._startTime = new Date()
+}
+
+/**
+ * Build up res.end proxy and record the json response body.
+ * @private
+ */
+function recordResponseBody (res) {
+  const end = res.end
+  res.end = (chunk, encoding) => {
+    res.end = end
+    res.end(chunk, encoding)
+    if (chunk && res.getHeader('content-type') && res.getHeader('content-type').indexOf('application/json') >= 0) {
+      const stringBody = chunk.toString()
+      try{
+        res.body = JSON.parse(stringBody)
+      } catch (error) {
+        res.body = stringBody
+      }
+    }
+  }
 }
 
 /**
