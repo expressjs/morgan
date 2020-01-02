@@ -84,6 +84,10 @@ morgan('combined', {
 })
 ```
 
+##### recordJsonResponse
+
+Record response body in `res.body`, just apply this rule at response with `application/json` header.
+
 ##### stream
 
 Output stream for writing log lines, defaults to `process.stdout`.
