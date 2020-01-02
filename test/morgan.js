@@ -1376,6 +1376,28 @@ describe('morgan()', function () {
         .expect(200, done)
     })
   })
+
+  describe('with recordJsonResponse option', function () {
+    it('should be able to record response body in res.body', function (done) {
+      const response = '65535'
+
+      var cb = after(2, function (err, res, line) {
+        if (err) return done(err)
+        assert.strictEqual(res.body, JSON.parse(response))
+        assert.strictEqual(line, response)
+        done()
+      })
+
+      var stream = createLineStream(function (line) {
+        cb(null, null, line)
+      })
+
+      request(createServer(':response-body', { stream: stream, recordJsonResponse: true }, (req, res, next) => { res.end(response) },
+        (res, req) => req.setHeader('content-type', 'application/json')))
+        .get('/?recordJsonResponse=true')
+        .expect(200, cb)
+    })
+  })
 })
 
 describe('morgan.compile(format)', function () {
