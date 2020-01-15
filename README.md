@@ -309,6 +309,7 @@ app.get('/', function (req, res) {
 Simple app that will log all requests in the Apache combined format to one log
 file per day in the `log/` directory using the
 [rotating-file-stream module](https://www.npmjs.com/package/rotating-file-stream).
+This example specifically works with [rotating-file-stream module](https://www.npmjs.com/package/rotating-file-stream) version `1.4.6` and below. For use with later versions [see the upgrading guide](https://github.com/iccicci/rotating-file-stream#upgrading-from-v1xx-to-v2xx).
 
 ```js
 var express = require('express')
