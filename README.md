@@ -320,17 +320,17 @@ var app = express()
 
 // function for creating names for files
 const generateName = (date) => {
-return new Date(date)
-		.toLocaleDateString()
-		.replace(/\//g, "-")
-		.concat(".log")
+  return new Date(date)
+    .toLocaleDateString()
+    .replace(/\//g, '-')
+    .concat('.log')
 }
 
 // create a rotating write stream
 const accessLogStream = rfs.createStream(generateName, {
-	interval: "1d", // rotate daily
-	immutable: true,
-	path: path.join(__dirname, 'log')
+  interval: '1d', // rotate daily
+  immutable: true,
+  path: path.join(__dirname, 'log')
 })
 
 // setup the logger
