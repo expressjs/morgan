@@ -972,6 +972,59 @@ describe('morgan()', function () {
       })
     })
 
+    describe(':status-colored', function () {
+      it('should get 200 response status with color', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line, '\u001b[32m200\u001b[0m')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':status-colored', { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
+
+      it('should not exist before response sent', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line, '\u001b[0m-\u001b[0m')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':status-colored', {
+          immediate: true,
+          stream: stream
+        })
+
+        request(server)
+          .get('/')
+          .expect(200, cb)
+      })
+
+      it('should not exist for aborted request', function (done) {
+        var stream = createLineStream(function (line) {
+          assert.strictEqual(line, '\u001b[0m-\u001b[0m')
+          server.close(done)
+        })
+
+        var server = createServer(':status-colored', { stream: stream }, function () {
+          test.abort()
+        })
+
+        var test = request(server).post('/')
+        test.write('0')
+      })
+    })
+
     describe(':url', function () {
       it('should get request URL', function (done) {
         var cb = after(2, function (err, res, line) {
