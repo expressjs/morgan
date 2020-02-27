@@ -19,7 +19,8 @@
     "debug": "2.6.9",
     "depd": "~2.0.0",
     "on-finished": "~2.3.0",
-    "on-headers": "~1.0.2"
+    "on-headers": "~1.0.2",
+    "sinon": "2.0.0"
   },
   "devDependencies": {
     "eslint": "5.16.0",
@@ -31,6 +32,7 @@
     "eslint-plugin-standard": "4.0.0",
     "istanbul": "0.4.5",
     "mocha": "6.1.4",
+    "sinon": "2.0.0",
     "split": "1.0.1",
     "supertest": "3.3.0"
   },

@@ -9,6 +9,7 @@ var join = require('path').join
 var morgan = require('..')
 var request = require('supertest')
 var split = require('split')
+var sinon = require('sinon')
 
 describe('morgan()', function () {
   describe('arguments', function () {
@@ -207,6 +208,24 @@ describe('morgan()', function () {
         })
 
         request(createServer(':date', { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
+
+      it('should handle dates with single digits when using "clf" format', function (done) {
+        var clock = sinon.useFakeTimers(new Date('2020-02-27').getTime())
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.ok(/^\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2} \+0000$/.test(line))
+          clock.restore()
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':date[clf]', { stream: stream }))
           .get('/')
           .expect(200, cb)
       })
