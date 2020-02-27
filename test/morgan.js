@@ -1048,6 +1048,28 @@ describe('morgan()', function () {
           .expect(200, cb)
       })
 
+      it('should log result of function when using morgan.format', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line, 'GET / 200')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        function format (tokens, req, res) {
+          return [req.method, req.url, res.statusCode].join(' ')
+        }
+
+        morgan.format('custom', format)
+
+        request(createServer('custom', { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
+
       it('should not log for undefined return', function (done) {
         var stream = createLineStream(function () {
           throw new Error('should not log line')
