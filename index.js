@@ -495,6 +495,7 @@ function headersSent (res) {
 function pad2 (num) {
   var str = String(num)
 
+  // istanbul ignore next: num is current datetime
   return (str.length === 1 ? '0' : '') + str
 }
 
