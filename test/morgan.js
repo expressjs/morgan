@@ -1270,14 +1270,12 @@ describe('morgan()', function () {
     describe('dev', function () {
       it('should not color 1xx', function (done) {
         var cb = after(2, function (err, res, line) {
-          console.log('line', line)
           if (err) return done(err)
-          assert.strictEqual(line.substr(0, 36), '_color_0_GET / _color_0_102_color_0_')
-          assert.strictEqual(line.substr(-9), '_color_0_')
+          assert.strictEqual(String(line).substring(0, 9), 'GET / 102')
           done()
         })
 
-        var stream = createColorLineStream(function onLine (line) {
+        var stream = createLineStream(function (line) {
           cb(null, null, line)
         })
 
@@ -1303,12 +1301,11 @@ describe('morgan()', function () {
       it('should color 2xx green', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.strictEqual(line.substr(0, 37), '_color_0_GET / _color_32_200_color_0_')
-          assert.strictEqual(line.substr(-9), '_color_0_')
+          assert.strictEqual(String(line).substring(0, 18), 'GET / \u001b[32m200\u001b[0m')
           done()
         })
 
-        var stream = createColorLineStream(function onLine (line) {
+        var stream = createLineStream(function (line) {
           cb(null, null, line)
         })
 
@@ -1325,12 +1322,11 @@ describe('morgan()', function () {
       it('should color 3xx cyan', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.strictEqual(line.substr(0, 37), '_color_0_GET / _color_36_300_color_0_')
-          assert.strictEqual(line.substr(-9), '_color_0_')
+          assert.strictEqual(String(line).substring(0, 18), 'GET / \u001b[36m300\u001b[0m')
           done()
         })
 
-        var stream = createColorLineStream(function onLine (line) {
+        var stream = createLineStream(function (line) {
           cb(null, null, line)
         })
 
@@ -1347,12 +1343,11 @@ describe('morgan()', function () {
       it('should color 4xx yelow', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.strictEqual(line.substr(0, 37), '_color_0_GET / _color_33_400_color_0_')
-          assert.strictEqual(line.substr(-9), '_color_0_')
+          assert.strictEqual(String(line).substring(0, 18), 'GET / \u001b[33m400\u001b[0m')
           done()
         })
 
-        var stream = createColorLineStream(function onLine (line) {
+        var stream = createLineStream(function (line) {
           cb(null, null, line)
         })
 
@@ -1369,12 +1364,11 @@ describe('morgan()', function () {
       it('should color 5xx red', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.strictEqual(line.substr(0, 37), '_color_0_GET / _color_31_500_color_0_')
-          assert.strictEqual(line.substr(-9), '_color_0_')
+          assert.strictEqual(String(line).substring(0, 18), 'GET / \u001b[31m500\u001b[0m')
           done()
         })
 
-        var stream = createColorLineStream(function onLine (line) {
+        var stream = createLineStream(function (line) {
           cb(null, null, line)
         })
 
@@ -1392,11 +1386,11 @@ describe('morgan()', function () {
         it('should not have color or response values', function (done) {
           var cb = after(2, function (err, res, line) {
             if (err) return done(err)
-            assert.strictEqual(line, '_color_0_GET / _color_0_-_color_0_ - ms - -_color_0_')
+            assert.strictEqual(line, 'GET / - - ms - -')
             done()
           })
 
-          var stream = createColorLineStream(function onLine (line) {
+          var stream = createLineStream(function (line) {
             cb(null, null, line)
           })
 
@@ -1671,12 +1665,6 @@ function after (count, callback) {
   }
 }
 
-function createColorLineStream (callback) {
-  return createLineStream(function onLine (line) {
-    callback(expandColorCharacters(line))
-  })
-}
-
 function createLineStream (callback) {
   return split().on('data', callback)
 }
@@ -1717,11 +1705,6 @@ function createSecureServer (format, opts, fn, fn1) {
 function createServer (format, opts, fn, fn1) {
   return http.createServer()
     .on('request', createRequestListener(format, opts, fn, fn1))
-}
-
-function expandColorCharacters (str) {
-  // eslint-disable-next-line no-control-regex
-  return str.replace(/\x1b\[(\d+)m/g, '_color_$1_')
 }
 
 function noopMiddleware (req, res, next) {

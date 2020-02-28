@@ -187,7 +187,7 @@ morgan.format('tiny', ':method :url :status :res[content-length] - :response-tim
  * dev (colored)
  */
 
-morgan.format('dev', '\x1b[0m:method :url :status-colored :response-time ms - :res[content-length]\x1b[0m')
+morgan.format('dev', ':method :url :status-colored :response-time ms - :res[content-length]')
 
 /**
  * request url
@@ -280,10 +280,7 @@ morgan.token('status-colored', function getStatusColoredToken (req, res) {
         : status >= 200 ? 32 // green
           : 0 // no color
 
-  // using placeholder here since `compile` adds it if token function returns falsy,
-  // but this coloring token returns color data anyway (as per tests) and
-  // value won't be eligible for substitute
-  return '\x1b[' + color + 'm' + (status || EMPTY_TOKEN_VALUE_PLACEHOLDER) + '\x1b[0m'
+  return color ? '\x1b[' + color + 'm' + status + '\x1b[0m' : status
 })
 
 /**
@@ -481,13 +478,13 @@ function getFormatFunction (name) {
  *
  * @param {IncomingMessage} req
  * @param {OutgoingMessage} res
- * @return {string | undefined}
+ * @return {number | undefined}
  * @public
  */
 
 function getStatusToken (req, res) {
   return headersSent(res)
-    ? String(res.statusCode)
+    ? res.statusCode
     : undefined
 }
 
