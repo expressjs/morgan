@@ -992,7 +992,7 @@ describe('morgan()', function () {
       it('should not exist before response sent', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.strictEqual(line, '\u001b[0m-\u001b[0m')
+          assert.strictEqual(line, '-')
           done()
         })
 
@@ -1012,7 +1012,7 @@ describe('morgan()', function () {
 
       it('should not exist for aborted request', function (done) {
         var stream = createLineStream(function (line) {
-          assert.strictEqual(line, '\u001b[0m-\u001b[0m')
+          assert.strictEqual(line, '-')
           server.close(done)
         })
 
@@ -1270,6 +1270,7 @@ describe('morgan()', function () {
     describe('dev', function () {
       it('should not color 1xx', function (done) {
         var cb = after(2, function (err, res, line) {
+          console.log('line', line)
           if (err) return done(err)
           assert.strictEqual(line.substr(0, 36), '_color_0_GET / _color_0_102_color_0_')
           assert.strictEqual(line.substr(-9), '_color_0_')
