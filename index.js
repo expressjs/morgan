@@ -48,13 +48,6 @@ var CLF_MONTH = [
 var DEFAULT_BUFFER_DURATION = 1000
 
 /**
- * Placeholder that replaces empty token values in resulting log line
- * @private
- */
-
-var EMPTY_TOKEN_VALUE_PLACEHOLDER = '-'
-
-/**
  * Create a logger middleware.
  *
  * @public
@@ -280,10 +273,7 @@ morgan.token('status-colored', function getStatusColoredToken (req, res) {
         : status >= 200 ? 32 // green
           : 0 // no color
 
-  // using placeholder here since `compile` adds it if token function returns falsy,
-  // but this coloring token returns color data anyway (as per tests) and
-  // value won't be eligible for substitute
-  return '\x1b[' + color + 'm' + (status || EMPTY_TOKEN_VALUE_PLACEHOLDER) + '\x1b[0m'
+  return color ? '\x1b[' + color + 'm' + status + '\x1b[0m' : status
 })
 
 /**
@@ -404,9 +394,7 @@ function compile (format) {
       tokenArguments += ', ' + String(JSON.stringify(arg))
     }
 
-    return '" +\n    (' +
-      tokenFunction + '(' + tokenArguments + ') || "' + EMPTY_TOKEN_VALUE_PLACEHOLDER +
-      '") + "'
+    return '" +\n    (' + tokenFunction + '(' + tokenArguments + ') || "-") + "'
   })
 
   // eslint-disable-next-line no-new-func
