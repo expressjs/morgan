@@ -110,12 +110,11 @@ Standard Apache common log output.
 
 ##### dev
 
-Concise output colored by response status for development use. The `:status`
-token will be colored red for server error codes, yellow for client error
-codes, cyan for redirection codes, and uncolored for all other codes.
+Concise output colored by response status for development use.
+See `:status-colored` for details.
 
 ```
-:method :url :status :response-time ms - :res[content-length]
+:method :url :status-colored :response-time ms - :res[content-length]
 ```
 
 ##### short
@@ -210,6 +209,12 @@ The status code of the response.
 If the request/response cycle completes before a response was sent to the
 client (for example, the TCP socket closed prematurely by a client aborting
 the request), then the status will be empty (displayed as `"-"` in the log).
+
+##### :status-colored
+
+Same as `:status` but the output will be colored red for server error codes,
+yellow for client error codes, cyan for redirection codes, green for success codes,
+and uncolored for all other codes.
 
 ##### :url
 

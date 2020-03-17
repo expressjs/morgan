@@ -48,6 +48,13 @@ var CLF_MONTH = [
 var DEFAULT_BUFFER_DURATION = 1000
 
 /**
+ * Placeholder that replaces empty token values in resulting log line
+ * @private
+ */
+
+var EMPTY_TOKEN_VALUE_PLACEHOLDER = '-'
+
+/**
  * Create a logger middleware.
  *
  * @public
@@ -180,30 +187,7 @@ morgan.format('tiny', ':method :url :status :res[content-length] - :response-tim
  * dev (colored)
  */
 
-morgan.format('dev', function developmentFormatLine (tokens, req, res) {
-  // get the status code if response written
-  var status = headersSent(res)
-    ? res.statusCode
-    : undefined
-
-  // get status color
-  var color = status >= 500 ? 31 // red
-    : status >= 400 ? 33 // yellow
-      : status >= 300 ? 36 // cyan
-        : status >= 200 ? 32 // green
-          : 0 // no color
-
-  // get colored function
-  var fn = developmentFormatLine[color]
-
-  if (!fn) {
-    // compile
-    fn = developmentFormatLine[color] = compile('\x1b[0m:method :url \x1b[' +
-      color + 'm:status\x1b[0m :response-time ms - :res[content-length]\x1b[0m')
-  }
-
-  return fn(tokens, req, res)
-})
+morgan.format('dev', '\x1b[0m:method :url :status-colored :response-time ms - :res[content-length]\x1b[0m')
 
 /**
  * request url
@@ -260,10 +244,26 @@ morgan.token('date', function getDateToken (req, res, format) {
  * response status code
  */
 
-morgan.token('status', function getStatusToken (req, res) {
-  return headersSent(res)
-    ? String(res.statusCode)
-    : undefined
+morgan.token('status', getStatusToken)
+
+/**
+ * colored response status code
+ */
+
+morgan.token('status-colored', function getStatusColoredToken (req, res) {
+  var status = getStatusToken(req, res)
+
+  // get status color
+  var color = status >= 500 ? 31 // red
+    : status >= 400 ? 33 // yellow
+      : status >= 300 ? 36 // cyan
+        : status >= 200 ? 32 // green
+          : 0 // no color
+
+  // using placeholder here since `compile` adds it if token function returns falsy,
+  // but this coloring token returns color data anyway (as per tests) and
+  // value won't be eligible for substitute
+  return '\x1b[' + color + 'm' + (status || EMPTY_TOKEN_VALUE_PLACEHOLDER) + '\x1b[0m'
 })
 
 /**
@@ -384,7 +384,9 @@ function compile (format) {
       tokenArguments += ', ' + String(JSON.stringify(arg))
     }
 
-    return '" +\n    (' + tokenFunction + '(' + tokenArguments + ') || "-") + "'
+    return '" +\n    (' +
+      tokenFunction + '(' + tokenArguments + ') || "' + EMPTY_TOKEN_VALUE_PLACEHOLDER +
+      '") + "'
   })
 
   // eslint-disable-next-line no-new-func
@@ -452,6 +454,21 @@ function getFormatFunction (name) {
   return typeof fmt !== 'function'
     ? compile(fmt)
     : fmt
+}
+
+/**
+ * Get value for status token
+ *
+ * @param {IncomingMessage} req
+ * @param {OutgoingMessage} res
+ * @return {string | undefined}
+ * @public
+ */
+
+function getStatusToken (req, res) {
+  return headersSent(res)
+    ? String(res.statusCode)
+    : undefined
 }
 
 /**
