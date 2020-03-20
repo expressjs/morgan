@@ -1,5 +1,5 @@
-unreleased
-==========
+1.10.0 / 2020-03-20
+===================
 
   * Add `:total-time` token
   * Fix trailing space in colored status code for `dev` format
