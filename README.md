@@ -226,7 +226,7 @@ Same as `:status` but the output will be colored red for server error codes,
 yellow for client error codes, cyan for redirection codes, green for success codes,
 and uncolored for all other codes.
 
-This token also adds a reset escape code to ensure color will only be applied to the status code.  The escape code removes any existing colors in your logs that come after the `:status-colored` token. For something like a background color that's applied to the entire log string, you must add it back after the `:status-colored` token.
+In addition, this token adds a reset escape code to ensure that the color will only be applied to the status code.  Due to how ANSI escape codes work, any existing colors in your logs that come after the `:status-colored` token will be removed. 
 
 For example, this log format sets a magenta background color to the entire log string.  Notice that it's added at the beginning of the log and immediately after the `:status-colored` token.
 
