@@ -9,14 +9,22 @@ HTTP request logger middleware for node.js
 
 > Named after [Dexter](http://en.wikipedia.org/wiki/Dexter_Morgan), a show you should not watch until completion.
 
-## API
-
+## Quick start
+First, `run npm install morgan --save` for your app. Then, in an Express (or Connect) app:
 <!-- eslint-disable no-unused-vars -->
 
 ```js
+const express = require('express')
+const morgan = require('morgan')
+
+const app = express()
+
+app.use(morgan('tiny'))
+```
+## API
+```js
 var morgan = require('morgan')
 ```
-
 ### morgan(format, options)
 
 Create a new morgan logger middleware function using the given `format` and `options`.
