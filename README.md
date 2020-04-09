@@ -9,6 +9,12 @@ HTTP request logger middleware for node.js
 
 > Named after [Dexter](http://en.wikipedia.org/wiki/Dexter_Morgan), a show you should not watch until completion.
 
+## Installation
+
+```
+npm install morgan
+```
+
 ## API
 
 <!-- eslint-disable no-unused-vars -->
@@ -20,15 +26,11 @@ var morgan = require('morgan')
 ### morgan(format, options)
 
 Create a new morgan logger middleware function using the given `format` and `options`.
-The `format` argument may be a string of a predefined name (see below for the names),
-a string of a format string, or a function that will produce a log entry.
-
-The `format` function will be called with three arguments `tokens`, `req`, and `res`,
-where `tokens` is an object with all defined tokens, `req` is the HTTP request and `res`
-is the HTTP response. The function is expected to return a string that will be the log
-line, or `undefined` / `null` to skip logging.
+The `format` argument may be a predefined format string, a custom format string, or a function that returns a log entry.
 
 #### Using a predefined format string
+
+All predefined format strings are [here](#predefined-formats).
 
 <!-- eslint-disable no-undef -->
 
@@ -36,7 +38,9 @@ line, or `undefined` / `null` to skip logging.
 morgan('tiny')
 ```
 
-#### Using format string of predefined tokens
+#### Using a custom format string
+
+Custom format strings are made with [tokens](#tokens).  You define the format you'd like your log entry to have and use tokens to interpolate data into your logs.
 
 <!-- eslint-disable no-undef -->
 
@@ -45,6 +49,11 @@ morgan(':method :url :status :res[content-length] - :response-time ms')
 ```
 
 #### Using a custom format function
+
+The `format` function will be called with three arguments `tokens`, `req`, and `res`,
+where `tokens` is an object with all defined tokens, `req` is the HTTP request and `res`
+is the HTTP response. The function is expected to return a string that will be the log
+line, or `undefined` / `null` to skip logging.
 
 <!-- eslint-disable no-undef -->
 
@@ -64,13 +73,13 @@ morgan(function (tokens, req, res) {
 
 Morgan accepts these properties in the options object.
 
-##### immediate
+##### `immediate`
 
 Write log line on request instead of response. This means that a requests will
 be logged even if the server crashes, _but data from the response (like the
 response code, content length, etc.) cannot be logged_.
 
-##### skip
+##### `skip`
 
 Function to determine if logging is skipped, defaults to `false`. This function
 will be called as `skip(req, res)`.
@@ -84,7 +93,7 @@ morgan('combined', {
 })
 ```
 
-##### stream
+##### `stream`
 
 Output stream for writing log lines, defaults to `process.stdout`.
 
@@ -92,7 +101,7 @@ Output stream for writing log lines, defaults to `process.stdout`.
 
 There are various pre-defined formats provided:
 
-##### combined
+##### `combined`
 
 Standard Apache combined log output.
 
@@ -100,7 +109,7 @@ Standard Apache combined log output.
 :remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"
 ```
 
-##### common
+##### `common`
 
 Standard Apache common log output.
 
@@ -108,7 +117,7 @@ Standard Apache common log output.
 :remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length]
 ```
 
-##### dev
+##### `dev`
 
 Concise output colored by response status for development use. The `:status`
 token will be colored green for success codes, red for server error codes,
@@ -119,7 +128,7 @@ for information codes.
 :method :url :status :response-time ms - :res[content-length]
 ```
 
-##### short
+##### `short`
 
 Shorter than default, also including response time.
 
@@ -127,7 +136,7 @@ Shorter than default, also including response time.
 :remote-addr :remote-user :method :url HTTP/:http-version :status :res[content-length] - :response-time ms
 ```
 
-##### tiny
+##### `tiny`
 
 The minimal output.
 
@@ -137,26 +146,7 @@ The minimal output.
 
 #### Tokens
 
-##### Creating new tokens
-
-To define a token, simply invoke `morgan.token()` with the name and a callback function.
-This callback function is expected to return a string value. The value returned is then
-available as ":type" in this case:
-
-<!-- eslint-disable no-undef -->
-
-```js
-morgan.token('type', function (req, res) { return req.headers['content-type'] })
-```
-
-Calling `morgan.token()` using the same name as an existing token will overwrite that
-token definition.
-
-The token function is expected to be called with the arguments `req` and `res`, representing
-the HTTP request and HTTP response. Additionally, the token can accept further arguments of
-it's choosing to customize behavior.
-
-##### :date[format]
+##### `:date[format]`
 
 The current date and time in UTC. The available formats are:
 
@@ -166,37 +156,37 @@ The current date and time in UTC. The available formats are:
 
 If no format is given, then the default is `web`.
 
-##### :http-version
+##### `:http-version`
 
 The HTTP version of the request.
 
-##### :method
+##### `:method`
 
 The HTTP method of the request.
 
-##### :referrer
+##### `:referrer`
 
 The Referrer header of the request. This will use the standard mis-spelled Referer header if exists, otherwise Referrer.
 
-##### :remote-addr
+##### `:remote-addr`
 
 The remote address of the request. This will use `req.ip`, otherwise the standard `req.connection.remoteAddress` value (socket address).
 
-##### :remote-user
+##### `:remote-user`
 
 The user authenticated as part of Basic auth for the request.
 
-##### :req[header]
+##### `:req[header]`
 
 The given `header` of the request. If the header is not present, the
 value will be displayed as `"-"` in the log.
 
-##### :res[header]
+##### `:res[header]`
 
 The given `header` of the response. If the header is not present, the
 value will be displayed as `"-"` in the log.
 
-##### :response-time[digits]
+##### `:response-time[digits]`
 
 The time between the request coming into `morgan` and when the response
 headers are written, in milliseconds.
@@ -204,7 +194,7 @@ headers are written, in milliseconds.
 The `digits` argument is a number that specifies the number of digits to
 include on the number, defaulting to `3`, which provides microsecond precision.
 
-##### :status
+##### `:status`
 
 The status code of the response.
 
@@ -212,7 +202,7 @@ If the request/response cycle completes before a response was sent to the
 client (for example, the TCP socket closed prematurely by a client aborting
 the request), then the status will be empty (displayed as `"-"` in the log).
 
-##### :total-time[digits]
+##### `:total-time[digits]`
 
 The time between the request coming into `morgan` and when the response
 has finished being written out to the connection, in milliseconds.
@@ -220,26 +210,60 @@ has finished being written out to the connection, in milliseconds.
 The `digits` argument is a number that specifies the number of digits to
 include on the number, defaulting to `3`, which provides microsecond precision.
 
-##### :url
+##### `:url`
 
 The URL of the request. This will use `req.originalUrl` if exists, otherwise `req.url`.
 
-##### :user-agent
+##### `:user-agent`
 
 The contents of the User-Agent header of the request.
+
+##### Creating new tokens
+
+To define a new token, simply invoke `morgan.token()` with the name and a callback function.
+The callback function will be called with two arguments `req`, and `res`,
+where `req` is the HTTP request and `res` is the HTTP response.  This callback function is expected to return a string value.  
+
+For example, you would define a token named `type` as follows:
+
+<!-- eslint-disable no-undef -->
+
+```js
+morgan.token('type', function (req, res) { return req.headers['content-type'] })
+```
+
+`type` can then be used in format strings and is included in the `tokens` object passed to custom format functions:
+
+<!-- eslint-disable no-undef -->
+
+```js
+morgan(':method :url :type')
+```
+
+Additionally, the token function can accept further arguments of it's choosing to customize behavior.  They can be passed using `[]`, for example: `:token-name[pretty]` would pass the string `'pretty'` as an argument to the token `token-name`. 
+
+Calling `morgan.token()` using the same name as an existing token will overwrite that
+token definition.
 
 ### morgan.compile(format)
 
 Compile a format string into a `format` function for use by `morgan`. A format string
 is a string that represents a single log line and can utilize token syntax.
-Tokens are references by `:token-name`. If tokens accept arguments, they can
-be passed using `[]`, for example: `:token-name[pretty]` would pass the string
-`'pretty'` as an argument to the token `token-name`.
+Tokens are referenced by `:token-name`.
 
 The function returned from `morgan.compile` takes three arguments `tokens`, `req`, and
 `res`, where `tokens` is object with all defined tokens, `req` is the HTTP request and
 `res` is the HTTP response. The function will return a string that will be the log line,
 or `undefined` / `null` to skip logging.
+
+For example:
+
+<!-- eslint-disable no-undef -->
+
+```js
+var formatFunction = compile(':method :url :status :response-time :res[content-length')
+morgan(formatFunction)
+```
 
 Normally formats are defined using `morgan.format(name, format)`, but for certain
 advanced uses, this compile function is directly available.
@@ -248,7 +272,7 @@ advanced uses, this compile function is directly available.
 
 ### express/connect
 
-Simple app that will log all request in the Apache combined format to STDOUT
+Log all requests in the Apache combined format to STDOUT
 
 ```js
 var express = require('express')
@@ -265,7 +289,7 @@ app.get('/', function (req, res) {
 
 ### vanilla http server
 
-Simple app that will log all request in the Apache combined format to STDOUT
+Log all requests in the Apache combined format to STDOUT
 
 ```js
 var finalhandler = require('finalhandler')
@@ -291,7 +315,7 @@ http.createServer(function (req, res) {
 
 #### single file
 
-Simple app that will log all requests in the Apache combined format to the file
+Log all requests in the Apache combined format to the file
 `access.log`.
 
 ```js
@@ -315,7 +339,7 @@ app.get('/', function (req, res) {
 
 #### log file rotation
 
-Simple app that will log all requests in the Apache combined format to one log
+Log all requests in the Apache combined format to one log
 file per day in the `log/` directory using the
 [rotating-file-stream module](https://www.npmjs.com/package/rotating-file-stream).
 
@@ -350,7 +374,7 @@ combinations like:
   * Log all requests to file, but errors to console
   * ... and more!
 
-Sample app that will log all requests to a file using Apache format, but
+Log all requests to a file using Apache format, but
 error responses are logged to the console:
 
 ```js
@@ -378,7 +402,7 @@ app.get('/', function (req, res) {
 
 ### use custom token formats
 
-Sample app that will use custom token formats. This adds an ID to all requests and displays it using the `:id` token.
+This adds a unique `id` property on the `req` object and displays it using the `:id` token.
 
 ```js
 var express = require('express')
