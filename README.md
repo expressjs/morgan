@@ -64,13 +64,13 @@ morgan(function (tokens, req, res) {
 
 Morgan accepts these properties in the options object.
 
-##### immediate
+##### `immediate`
 
 Write log line on request instead of response. This means that a requests will
 be logged even if the server crashes, _but data from the response (like the
 response code, content length, etc.) cannot be logged_.
 
-##### skip
+##### `skip`
 
 Function to determine if logging is skipped, defaults to `false`. This function
 will be called as `skip(req, res)`.
@@ -84,7 +84,7 @@ morgan('combined', {
 })
 ```
 
-##### stream
+##### `stream`
 
 Output stream for writing log lines, defaults to `process.stdout`.
 
@@ -92,7 +92,7 @@ Output stream for writing log lines, defaults to `process.stdout`.
 
 There are various pre-defined formats provided:
 
-##### combined
+##### `combined`
 
 Standard Apache combined log output.
 
@@ -100,7 +100,7 @@ Standard Apache combined log output.
 :remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"
 ```
 
-##### common
+##### `common`
 
 Standard Apache common log output.
 
@@ -108,7 +108,7 @@ Standard Apache common log output.
 :remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length]
 ```
 
-##### dev
+##### `dev`
 
 Concise output colored by response status for development use. The `:status`
 token will be colored green for success codes, red for server error codes,
@@ -119,7 +119,7 @@ for information codes.
 :method :url :status :response-time ms - :res[content-length]
 ```
 
-##### short
+##### `short`
 
 Shorter than default, also including response time.
 
@@ -127,7 +127,7 @@ Shorter than default, also including response time.
 :remote-addr :remote-user :method :url HTTP/:http-version :status :res[content-length] - :response-time ms
 ```
 
-##### tiny
+##### `tiny`
 
 The minimal output.
 
@@ -156,7 +156,7 @@ The token function is expected to be called with the arguments `req` and `res`, 
 the HTTP request and HTTP response. Additionally, the token can accept further arguments of
 it's choosing to customize behavior.
 
-##### :date[format]
+##### `:date[format]`
 
 The current date and time in UTC. The available formats are:
 
@@ -166,37 +166,37 @@ The current date and time in UTC. The available formats are:
 
 If no format is given, then the default is `web`.
 
-##### :http-version
+##### `:http-version`
 
 The HTTP version of the request.
 
-##### :method
+##### `:method`
 
 The HTTP method of the request.
 
-##### :referrer
+##### `:referrer`
 
 The Referrer header of the request. This will use the standard mis-spelled Referer header if exists, otherwise Referrer.
 
-##### :remote-addr
+##### `:remote-addr`
 
 The remote address of the request. This will use `req.ip`, otherwise the standard `req.connection.remoteAddress` value (socket address).
 
-##### :remote-user
+##### `:remote-user`
 
 The user authenticated as part of Basic auth for the request.
 
-##### :req[header]
+##### `:req[header]`
 
 The given `header` of the request. If the header is not present, the
 value will be displayed as `"-"` in the log.
 
-##### :res[header]
+##### `:res[header]`
 
 The given `header` of the response. If the header is not present, the
 value will be displayed as `"-"` in the log.
 
-##### :response-time[digits]
+##### `:response-time[digits]`
 
 The time between the request coming into `morgan` and when the response
 headers are written, in milliseconds.
@@ -204,7 +204,7 @@ headers are written, in milliseconds.
 The `digits` argument is a number that specifies the number of digits to
 include on the number, defaulting to `3`, which provides microsecond precision.
 
-##### :status
+##### `:status`
 
 The status code of the response.
 
@@ -212,7 +212,7 @@ If the request/response cycle completes before a response was sent to the
 client (for example, the TCP socket closed prematurely by a client aborting
 the request), then the status will be empty (displayed as `"-"` in the log).
 
-##### :total-time[digits]
+##### `:total-time[digits]`
 
 The time between the request coming into `morgan` and when the response
 has finished being written out to the connection, in milliseconds.
@@ -220,11 +220,11 @@ has finished being written out to the connection, in milliseconds.
 The `digits` argument is a number that specifies the number of digits to
 include on the number, defaulting to `3`, which provides microsecond precision.
 
-##### :url
+##### `:url`
 
 The URL of the request. This will use `req.originalUrl` if exists, otherwise `req.url`.
 
-##### :user-agent
+##### `:user-agent`
 
 The contents of the User-Agent header of the request.
 
