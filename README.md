@@ -20,15 +20,11 @@ var morgan = require('morgan')
 ### morgan(format, options)
 
 Create a new morgan logger middleware function using the given `format` and `options`.
-The `format` argument may be a string of a predefined name (see below for the names),
-a string of a format string, or a function that will produce a log entry.
-
-The `format` function will be called with three arguments `tokens`, `req`, and `res`,
-where `tokens` is an object with all defined tokens, `req` is the HTTP request and `res`
-is the HTTP response. The function is expected to return a string that will be the log
-line, or `undefined` / `null` to skip logging.
+The `format` argument may be a predefined format string, a custom format string, or a function that returns a log entry.
 
 #### Using a predefined format string
+
+All predefined format strings are [here](#predefined-formats).
 
 <!-- eslint-disable no-undef -->
 
@@ -36,7 +32,9 @@ line, or `undefined` / `null` to skip logging.
 morgan('tiny')
 ```
 
-#### Using format string of predefined tokens
+#### Using a custom format string
+
+Custom format strings are made with [tokens](#tokens).  You define the format you'd like your log entry to have and use tokens to interpolate data into your logs.
 
 <!-- eslint-disable no-undef -->
 
@@ -45,6 +43,11 @@ morgan(':method :url :status :res[content-length] - :response-time ms')
 ```
 
 #### Using a custom format function
+
+The `format` function will be called with three arguments `tokens`, `req`, and `res`,
+where `tokens` is an object with all defined tokens, `req` is the HTTP request and `res`
+is the HTTP response. The function is expected to return a string that will be the log
+line, or `undefined` / `null` to skip logging.
 
 <!-- eslint-disable no-undef -->
 
