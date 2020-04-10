@@ -137,25 +137,6 @@ The minimal output.
 
 #### Tokens
 
-##### Creating new tokens
-
-To define a token, simply invoke `morgan.token()` with the name and a callback function.
-This callback function is expected to return a string value. The value returned is then
-available as ":type" in this case:
-
-<!-- eslint-disable no-undef -->
-
-```js
-morgan.token('type', function (req, res) { return req.headers['content-type'] })
-```
-
-Calling `morgan.token()` using the same name as an existing token will overwrite that
-token definition.
-
-The token function is expected to be called with the arguments `req` and `res`, representing
-the HTTP request and HTTP response. Additionally, the token can accept further arguments of
-it's choosing to customize behavior.
-
 ##### :date[format]
 
 The current date and time in UTC. The available formats are:
@@ -227,6 +208,33 @@ The URL of the request. This will use `req.originalUrl` if exists, otherwise `re
 ##### :user-agent
 
 The contents of the User-Agent header of the request.
+
+##### Creating new tokens
+
+To define a new token, invoke `morgan.token()` with the name and a callback function.
+The callback function will be called with two arguments `req`, and `res`,
+where `req` is the HTTP request and `res` is the HTTP response.  This callback function is expected to return a string value.  
+
+For example, you would define a token named `type` as follows:
+
+<!-- eslint-disable no-undef -->
+
+```js
+morgan.token('type', function (req, res) { return req.headers['content-type'] })
+```
+
+The token `type` can then be used in format strings and is included in the `tokens` object passed to custom format functions:
+
+<!-- eslint-disable no-undef -->
+
+```js
+morgan(':method :url :type')
+```
+
+Additionally, the token function can accept further arguments of it's choosing to customize behavior.  They can be passed using `[]`, for example: `:token-name[pretty]` would pass the string `'pretty'` as an argument to the token `token-name`. 
+
+Calling `morgan.token()` using the same name as an existing token will overwrite that
+token definition.
 
 ### morgan.compile(format)
 
