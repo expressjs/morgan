@@ -11,6 +11,33 @@ var request = require('supertest')
 var split = require('split')
 
 describe('morgan()', function () {
+  describe('exports', function () {
+    // methods
+    assert.ok(morgan.compile)
+    assert.ok(morgan.format)
+    assert.ok(morgan.token)
+    // formats
+    assert.ok(morgan.combined)
+    assert.ok(morgan.common)
+    assert.ok(morgan.default)
+    assert.ok(morgan.tiny)
+    assert.ok(morgan.dev)
+    // tokens
+    assert.ok(morgan.url)
+    assert.ok(morgan.method)
+    assert.ok(morgan['response-time'])
+    assert.ok(morgan['total-time'])
+    assert.ok(morgan.date)
+    assert.ok(morgan.status)
+    assert.ok(morgan.referrer)
+    assert.ok(morgan['remote-addr'])
+    assert.ok(morgan['remote-user'])
+    assert.ok(morgan['http-version'])
+    assert.ok(morgan['user-agent'])
+    assert.ok(morgan.req)
+    assert.ok(morgan.res)
+  })
+
   describe('arguments', function () {
     it('should use default format', function (done) {
       var cb = after(2, function (err, res, line) {
