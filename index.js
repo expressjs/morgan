@@ -109,6 +109,14 @@ function morgan (format, options) {
     // response data
     res._startAt = undefined
     res._startTime = undefined
+    res._chunkSize = 0
+
+    const write = res.write
+    res.write = function (body) {
+      console.log('Response body before sending: ', body)
+      res._chunkSize += Buffer.byteLength(body)
+      write.call(this, body)
+    }
 
     // record request start
     recordStartTime.call(req)
@@ -149,19 +157,19 @@ function morgan (format, options) {
  * Apache combined log format.
  */
 
-morgan.format('combined', ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"')
+morgan.format('combined', ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :content-length ":referrer" ":user-agent" ":chunked"')
 
 /**
  * Apache common log format.
  */
 
-morgan.format('common', ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length]')
+morgan.format('common', ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :content-length ":chunked"')
 
 /**
  * Default format.
  */
 
-morgan.format('default', ':remote-addr - :remote-user [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"')
+morgan.format('default', ':remote-addr - :remote-user [:date] ":method :url HTTP/:http-version" :status :content-length ":referrer" ":user-agent" ":chunked"')
 deprecate.property(morgan, 'default', 'default format: use combined format')
 
 /**
@@ -328,6 +336,22 @@ morgan.token('http-version', function getHttpVersionToken (req) {
 
 morgan.token('user-agent', function getUserAgentToken (req) {
   return req.headers['user-agent']
+})
+
+/**
+ * response chunked?
+ */
+
+morgan.token('chunked', function getTransferEncoding (_, res) {
+  return res._contentLength ? undefined : 'chunked'
+})
+
+/**
+ * content-length
+ */
+
+morgan.token('content-length', function getTransferEncoding (_, res) {
+  return res._chunkSize ? res._chunkSize : res._contentLength
 })
 
 /**
