@@ -206,6 +206,13 @@ morgan.format('dev', function developmentFormatLine (tokens, req, res) {
 })
 
 /**
+ * status message
+ */
+morgan.token('status-message', function getResponseTimeToken (req) {
+  return req.res.statusMessage;
+})
+
+/**
  * request url
  */
 
