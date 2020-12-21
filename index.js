@@ -87,6 +87,9 @@ function morgan (format, options) {
   var buffer = opts.buffer
   var stream = opts.stream || process.stdout
 
+  // Print Logs
+  var printlog = opts.print || false
+  
   // buffering support
   if (buffer) {
     deprecate('buffer option')
@@ -126,6 +129,11 @@ function morgan (format, options) {
         return
       }
 
+      if(printlog)
+      {
+        console.log(line);
+      }
+      
       debug('log request')
       stream.write(line + '\n')
     };
