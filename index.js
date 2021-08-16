@@ -177,6 +177,38 @@ morgan.format('short', ':remote-addr :remote-user :method :url HTTP/:http-versio
 morgan.format('tiny', ':method :url :status :res[content-length] - :response-time ms')
 
 /**
+ * JSON format.
+ */
+
+morgan.format('json', function jsonFormatLine (tokens, req, res) {
+  let severity = 'INFO'
+  const status = tokens.status(req, res)
+
+  if (status >= 500) severity = 'ERROR'
+  else if (status >= 400) severity = 'WARNING'
+
+  const httpRequest = {
+    requestMethod: tokens.method(req, res),
+    requestUrl: tokens.url(req, res),
+    status,
+    responseSize: tokens.res(req, res, 'content-length'),
+    userAgent: tokens['user-agent'](req, res),
+    remoteIp: tokens['remote-addr'](req, res),
+    referer: tokens.referrer(req, res),
+    protocol: `HTTP/${tokens['http-version'](req, res)}`
+  }
+
+  return JSON.stringify({
+    severity,
+    httpRequest,
+    remote_user: tokens['remote-user'](req, res),
+    timestamp: tokens.date(req, res, 'iso'),
+    response_time: tokens['response-time'](req, res),
+    total_time: tokens['total-time'](req, res)
+  })
+})
+
+/**
  * dev (colored)
  */
 

@@ -1374,6 +1374,33 @@ describe('morgan()', function () {
           .expect(200, cb)
       })
     })
+
+    describe('json', function () {
+      it('should match expectations', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          var masked = line
+            .replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z/, '_iso_date_')
+            .replace(/\d+.\d{3}/g, '_time_elapsed_')
+          assert.strictEqual(
+            masked,
+            '{"severity":"INFO","httpRequest":{"requestMethod":"GET","requestUrl":"/","status":"200","userAgent":"my-ua","remoteIp":"::ffff:127.0.0.1","referer":"http://localhost/","protocol":"HTTP/1.1"},"remote_user":"tj","timestamp":"_iso_date_","response_time":"_time_elapsed_","total_time":"_time_elapsed_"}'
+          )
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer('json', { stream: stream }))
+          .get('/')
+          .set('Authorization', 'Basic dGo6')
+          .set('Referer', 'http://localhost/')
+          .set('User-Agent', 'my-ua')
+          .expect(200, cb)
+      })
+    })
   })
 
   describe('with buffer option', function () {

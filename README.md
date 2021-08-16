@@ -145,6 +145,14 @@ The minimal output.
 :method :url :status :res[content-length] - :response-time ms
 ```
 
+##### json
+
+JSON output formatted according to the [Google Cloud Logging](https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry) specification 
+
+```
+:method :url :status :res[content-length] - :response-time ms
+```
+
 #### Tokens
 
 ##### Creating new tokens
