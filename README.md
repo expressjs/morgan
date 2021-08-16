@@ -147,7 +147,7 @@ The minimal output.
 
 ##### json
 
-JSON output formatted according to the [Google Cloud Logging](https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry) specification 
+JSON output. Formatted according to the [Google Cloud Logging](https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry) specification 
 
 ```
 :method :url :status :res[content-length] - :response-time ms
