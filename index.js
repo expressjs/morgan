@@ -103,12 +103,10 @@ function morgan (format, options) {
   return function logger (req, res, next) {
     // request data
     req._startAt = undefined
-    req._startTime = undefined
     req._remoteAddress = getip(req)
 
     // response data
     res._startAt = undefined
-    res._startTime = undefined
 
     // record request start
     recordStartTime.call(req)
@@ -526,7 +524,6 @@ function pad2 (num) {
 
 function recordStartTime () {
   this._startAt = process.hrtime()
-  this._startTime = new Date()
 }
 
 /**
