@@ -1,4 +1,3 @@
-# morgan
 
 [![NPM Version][npm-version-image]][npm-url]
 [![NPM Downloads][npm-downloads-image]][npm-url]
@@ -7,7 +6,11 @@
 
 HTTP request logger middleware for node.js
 
-> Named after [Dexter](http://en.wikipedia.org/wiki/Dexter_Morgan), a show you should not watch until completion.
+// I thought you meant: "The latter seasons of Dexter are no good and should be skipped"
+// -- which I think is better implied by my edit
+// Perhaps you meant: "The series is not yet complete, so wait until the series is finished being produced"
+// -- which means I'm wrong XD
+> Named after [Dexter](http://en.wikipedia.org/wiki/Dexter_Morgan), a show you should not watch to completion.
 
 ## Installation
 
