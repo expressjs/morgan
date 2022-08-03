@@ -76,7 +76,7 @@ Morgan accepts these properties in the options object.
 
 ##### immediate
 
-Write log line on request instead of response. This means that a requests will
+Write log line on request instead of response. This means that a request will
 be logged even if the server crashes, _but data from the response (like the
 response code, content length, etc.) cannot be logged_.
 
@@ -163,7 +163,7 @@ Calling `morgan.token()` using the same name as an existing token will overwrite
 token definition.
 
 The token function is expected to be called with the arguments `req` and `res`, representing
-the HTTP request and HTTP response. Additionally, the token can accept further arguments of
+the HTTP request and the HTTP response. Additionally, the token can accept further arguments of
 it's choosing to customize behavior.
 
 ##### :date[format]
@@ -186,7 +186,7 @@ The HTTP method of the request.
 
 ##### :referrer
 
-The Referrer header of the request. This will use the standard mis-spelled Referer header if exists, otherwise Referrer.
+The Referrer header of the request. This will use the standard misspelled Referer header if exists, otherwise Referrer.
 
 ##### :remote-addr
 
@@ -218,7 +218,7 @@ include on the number, defaulting to `3`, which provides microsecond precision.
 
 The status code of the response.
 
-If the request/response cycle completes before a response was sent to the
+If the request/response cycle ends before a response was sent to the
 client (for example, the TCP socket closed prematurely by a client aborting
 the request), then the status will be empty (displayed as `"-"` in the log).
 
@@ -240,7 +240,7 @@ The contents of the User-Agent header of the request.
 
 ### morgan.compile(format)
 
-Compile a format string into a `format` function for use by `morgan`. A format string
+Compiles a format string into a `format` function for use by `morgan`. A format string
 is a string that represents a single log line and can utilize token syntax.
 Tokens are references by `:token-name`. If tokens accept arguments, they can
 be passed using `[]`, for example: `:token-name[pretty]` would pass the string
