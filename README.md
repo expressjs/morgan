@@ -76,7 +76,7 @@ Morgan accepts these properties in the options object.
 
 ##### immediate
 
-Write log line on request instead of response. This means that a requests will
+Write log line on request instead of response. This means that a request will
 be logged even if the server crashes, _but data from the response (like the
 response code, content length, etc.) cannot be logged_.
 
@@ -163,7 +163,7 @@ Calling `morgan.token()` using the same name as an existing token will overwrite
 token definition.
 
 The token function is expected to be called with the arguments `req` and `res`, representing
-the HTTP request and HTTP response. Additionally, the token can accept further arguments of
+the HTTP request and the HTTP response. Additionally, the token can accept further arguments of
 it's choosing to customize behavior.
 
 ##### :date[format]
@@ -186,7 +186,7 @@ The HTTP method of the request.
 
 ##### :referrer
 
-The Referrer header of the request. This will use the standard mis-spelled Referer header if exists, otherwise Referrer.
+The Referrer header of the request. This will use the standard misspelled Referer header if exists, otherwise Referrer.
 
 ##### :remote-addr
 
