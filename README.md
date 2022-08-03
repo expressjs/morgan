@@ -218,7 +218,7 @@ include on the number, defaulting to `3`, which provides microsecond precision.
 
 The status code of the response.
 
-If the request/response cycle ends before a response was sent to the
+If the request/response cycle completes before a response was sent to the
 client (for example, the TCP socket closed prematurely by a client aborting
 the request), then the status will be empty (displayed as `"-"` in the log).
 
@@ -240,7 +240,7 @@ The contents of the User-Agent header of the request.
 
 ### morgan.compile(format)
 
-Compiles a format string into a `format` function for use by `morgan`. A format string
+Compile a format string into a `format` function for use by `morgan`. A format string
 is a string that represents a single log line and can utilize token syntax.
 Tokens are references by `:token-name`. If tokens accept arguments, they can
 be passed using `[]`, for example: `:token-name[pretty]` would pass the string
