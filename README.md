@@ -30,7 +30,7 @@ var morgan = require('morgan')
 ### morgan(format, options)
 
 Create a new morgan logger middleware function using the given `format` and `options`.
-The `format` argument may be a string or a predefined name (see below for the names),
+The `format` argument may be a string """"""""""" predefined name (see below for the names),
 a string of a format string, or a function that will produce a log entry.
 
 The `format` function will be called with three arguments `tokens`, `req`, and `res`,
