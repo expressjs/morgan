@@ -336,7 +336,15 @@ morgan.token('user-agent', function getUserAgentToken (req) {
 
 morgan.token('req', function getRequestToken (req, res, field) {
   // get header
-  var header = req.headers[field.toLowerCase()]
+  var header = req.rawHeaders;
+
+  if (field) {
+    field = field.toLowerCase();
+    header =
+      req.rawHeaders.map((item,idx,arr) => {
+        if ((item.toLowerCase() === field) && (idx < arr.length)) return arr[idx+1];
+      }).filter(item => item !== undefined);
+  }
 
   return Array.isArray(header)
     ? header.join(', ')
