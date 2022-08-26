@@ -336,7 +336,7 @@ morgan.token('user-agent', function getUserAgentToken (req) {
 
 morgan.token('req', function getRequestToken (req, res, field) {
   if (!field) {
-    throw new Error('req is missing field')
+    throw new Error('req is missing an argument')
   }
 
   // get header
