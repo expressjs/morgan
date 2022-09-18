@@ -336,11 +336,11 @@ morgan.token('user-agent', function getUserAgentToken (req) {
 
 morgan.token('req', function getRequestToken (req, res, field) {
   if (!field) {
-    throw new Error('req is missing an argument')
+    throw new TypeError('header argument is required to :req token')
   }
 
   // get header
-  var header = req.headers[field.toLowerCase()];
+  var header = req.headers[field.toLowerCase()]
 
   return Array.isArray(header)
     ? header.join(', ')
