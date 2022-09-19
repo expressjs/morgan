@@ -295,6 +295,10 @@ describe('morgan()', function () {
     })
 
     describe(':req', function () {
+      it('should throw an error if no header provided', function () {
+        assert.throws(() => request(createServer(':req')).get('/'), /header argument is required to :req token/)
+      })
+
       it('should get request properties', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
