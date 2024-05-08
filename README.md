@@ -2,8 +2,8 @@
 
 [![NPM Version][npm-version-image]][npm-url]
 [![NPM Downloads][npm-downloads-image]][npm-url]
-[![Build Status][travis-image]][travis-url]
-[![Test Coverage][coveralls-image]][coveralls-url]
+[![Build Status][ci-image]][ci-url]
+[![Coverage Status][coveralls-image]][coveralls-url]
 
 HTTP request logger middleware for node.js
 
@@ -418,10 +418,10 @@ function assignId (req, res, next) {
 
 [MIT](LICENSE)
 
+[ci-image]: https://badgen.net/github/checks/expressjs/morgan/master?label=ci
+[ci-url]: https://github.com/expressjs/morgan/actions/workflows/ci.yml
 [coveralls-image]: https://badgen.net/coveralls/c/github/expressjs/morgan/master
 [coveralls-url]: https://coveralls.io/r/expressjs/morgan?branch=master
 [npm-downloads-image]: https://badgen.net/npm/dm/morgan
 [npm-url]: https://npmjs.org/package/morgan
 [npm-version-image]: https://badgen.net/npm/v/morgan
-[travis-image]: https://badgen.net/travis/expressjs/morgan/master
-[travis-url]: https://travis-ci.org/expressjs/morgan
