@@ -127,7 +127,7 @@ function morgan (format, options) {
       }
 
       debug('log request')
-      stream.write(line + '\n')
+      stream.write(line + '\n', { responseTime: Number(getResponseTimeToken(req, res)) })
     };
 
     if (immediate) {
@@ -225,19 +225,7 @@ morgan.token('method', function getMethodToken (req) {
  * response time in milliseconds
  */
 
-morgan.token('response-time', function getResponseTimeToken (req, res, digits) {
-  if (!req._startAt || !res._startAt) {
-    // missing request and/or response start time
-    return
-  }
-
-  // calculate diff
-  var ms = (res._startAt[0] - req._startAt[0]) * 1e3 +
-    (res._startAt[1] - req._startAt[1]) * 1e-6
-
-  // return truncated value
-  return ms.toFixed(digits === undefined ? 3 : digits)
-})
+morgan.token('response-time', getResponseTimeToken)
 
 /**
  * total time in milliseconds
@@ -541,4 +529,18 @@ function recordStartTime () {
 function token (name, fn) {
   morgan[name] = fn
   return this
+}
+
+function getResponseTimeToken (req, res, digits) {
+  if (!req._startAt || !res._startAt) {
+    // missing request and/or response start time
+    return
+  }
+
+  // calculate diff
+  var ms = (res._startAt[0] - req._startAt[0]) * 1e3 +
+    (res._startAt[1] - req._startAt[1]) * 1e-6
+
+  // return truncated value
+  return ms.toFixed(digits === undefined ? 3 : digits)
 }
