@@ -24,7 +24,7 @@ $ npm install morgan
 <!-- eslint-disable no-unused-vars -->
 
 ```js
-var morgan = require('morgan')
+import morgan from "morgan";
 ```
 
 ### morgan(format, options)
