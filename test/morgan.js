@@ -1075,6 +1075,55 @@ describe('morgan()', function () {
           .get('/')
           .expect(200, done)
       })
+
+      it('should allow objects to pass-through for streams in object mode', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.deepEqual(line, { method: 'GET', url: '/', statusCode: 200 })
+          done()
+        })
+
+        var stream = {
+          writableObjectMode: true,
+          write (obj) { cb(null, null, obj) }
+        }
+
+        function format (tokens, req, res) {
+          return {
+            method: req.method,
+            url: req.url,
+            statusCode: res.statusCode
+          }
+        }
+
+        request(createServer(format, { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
+
+      it('should convert objects to string for streams not in object mode', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line, '[object Object]')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        function format (tokens, req, res) {
+          return {
+            method: req.method,
+            url: req.url,
+            statusCode: res.statusCode
+          }
+        }
+
+        request(createServer(format, { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
     })
 
     describe('a string', function () {
