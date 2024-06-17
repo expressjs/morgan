@@ -24,7 +24,7 @@ $ npm install morgan
 <!-- eslint-disable no-unused-vars -->
 
 ```js
-var morgan = require('morgan')
+import morgan from 'morgan'
 ```
 
 ### morgan(format, options)
@@ -261,8 +261,8 @@ advanced uses, this compile function is directly available.
 Sample app that will log all request in the Apache combined format to STDOUT
 
 ```js
-var express = require('express')
-var morgan = require('morgan')
+import express from 'express'
+import morgan from 'morgan'
 
 var app = express()
 
@@ -278,9 +278,9 @@ app.get('/', function (req, res) {
 Sample app that will log all request in the Apache combined format to STDOUT
 
 ```js
-var finalhandler = require('finalhandler')
-var http = require('http')
-var morgan = require('morgan')
+import finalhandler from 'finalhandler'
+import http from 'http'
+import morgan from 'morgan'
 
 // create "middleware"
 var logger = morgan('combined')
@@ -305,10 +305,10 @@ Sample app that will log all requests in the Apache combined format to the file
 `access.log`.
 
 ```js
-var express = require('express')
-var fs = require('fs')
-var morgan = require('morgan')
-var path = require('path')
+import express from 'express'
+import fs from 'fs'
+import morgan from 'morgan'
+import path from 'path'
 
 var app = express()
 
@@ -330,10 +330,10 @@ file per day in the `log/` directory using the
 [rotating-file-stream module](https://www.npmjs.com/package/rotating-file-stream).
 
 ```js
-var express = require('express')
-var morgan = require('morgan')
-var path = require('path')
-var rfs = require('rotating-file-stream') // version 2.x
+import express from 'express'
+import morgan from 'morgan'
+import path from 'path'
+import rfs from 'rotating-file-stream' // version 2.x
 
 var app = express()
 
@@ -364,10 +364,10 @@ Sample app that will log all requests to a file using Apache format, but
 error responses are logged to the console:
 
 ```js
-var express = require('express')
-var fs = require('fs')
-var morgan = require('morgan')
-var path = require('path')
+import express from 'express'
+import fs from 'fs'
+import morgan from 'morgan'
+import path from 'path'
 
 var app = express()
 
@@ -391,9 +391,9 @@ app.get('/', function (req, res) {
 Sample app that will use custom token formats. This adds an ID to all requests and displays it using the `:id` token.
 
 ```js
-var express = require('express')
-var morgan = require('morgan')
-var uuid = require('node-uuid')
+import express from 'express'
+import morgan from 'morgan'
+import uuid from 'node-uuid'
 
 morgan.token('id', function getId (req) {
   return req.id
