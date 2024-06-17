@@ -49,4 +49,5 @@
     "test-ci": "nyc --reporter=lcov --reporter=text npm test",
     "test-cov": "nyc --reporter=html --reporter=text npm test"
   }
+  "type": "module"
 }
