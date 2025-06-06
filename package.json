@@ -29,7 +29,7 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-standard": "4.0.1",
-    "mocha": "10.4.0",
+    "mocha": "10.8.2",
     "nyc": "15.1.0",
     "split": "1.0.1",
     "supertest": "4.0.2"
