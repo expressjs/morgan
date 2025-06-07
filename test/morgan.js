@@ -1312,6 +1312,41 @@ describe('morgan()', function () {
           .expect(500, cb)
       })
 
+      describe('NO_COLOR environment variable', function () {
+        var noColorInitial = process.env.NO_COLOR
+
+        beforeEach(() => {
+          console.log('No color')
+          process.env.NO_COLOR = '1'
+        })
+
+        afterEach(() => {
+          process.env.NO_COLOR = noColorInitial
+        })
+
+        it('should color if NO_COLOR environment variable is set', function (done) {
+          var cb = after(2, function (err, res, line) {
+            if (err) return done(err)
+            assert.strictEqual(line.substr(0, 36), '_color_0_GET / _color_0_500_color_0_')
+            assert.strictEqual(line.substr(-9), '_color_0_')
+            done()
+          })
+
+          var stream = createColorLineStream(function onLine (line) {
+            cb(null, null, line)
+          })
+
+          var server = createServer('dev', { stream: stream }, function (req, res, next) {
+            res.statusCode = 500
+            next()
+          })
+
+          request(server)
+            .get('/')
+            .expect(500, cb)
+        })
+      })
+
       describe('with "immediate: true" option', function () {
         it('should not have color or response values', function (done) {
           var cb = after(2, function (err, res, line) {
