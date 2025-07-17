@@ -1,3 +1,9 @@
+1.10.1 / 2025-07-17
+===================
+
+  * deps: on-headers@~1.1.0
+    - Fix [CVE-2025-7339](https://www.cve.org/CVERecord?id=CVE-2025-7339) ([GHSA-76c9-3jph-rj3q](https://github.com/expressjs/multer/security/advisories/GHSA-76c9-3jph-rj3q))
+
 1.10.0 / 2020-03-20
 ===================
 
