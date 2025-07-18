@@ -187,11 +187,12 @@ morgan.format('dev', function developmentFormatLine (tokens, req, res) {
     : undefined
 
   // get status color
-  var color = status >= 500 ? 31 // red
-    : status >= 400 ? 33 // yellow
-      : status >= 300 ? 36 // cyan
-        : status >= 200 ? 32 // green
-          : 0 // no color
+  var color = process.env.NO_COLOR ? 0 // color disabled by environment variable
+    : status >= 500 ? 31 // red
+      : status >= 400 ? 33 // yellow
+        : status >= 300 ? 36 // cyan
+          : status >= 200 ? 32 // green
+            : 0 // no color
 
   // get colored function
   var fn = developmentFormatLine[color]
