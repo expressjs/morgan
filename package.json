@@ -14,6 +14,10 @@
     "middleware"
   ],
   "repository": "expressjs/morgan",
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/express"
+  },
   "dependencies": {
     "basic-auth": "~2.0.1",
     "debug": "2.6.9",
