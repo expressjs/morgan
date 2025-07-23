@@ -76,12 +76,10 @@ function morgan (format, options) {
   var immediate = opts.immediate
 
   // check if log entry should be skipped
-  var skip = opts.skip || false
+  var skip = opts.skip
 
   // format function
-  var formatLine = typeof fmt !== 'function'
-    ? getFormatFunction(fmt)
-    : fmt
+  var formatLine = typeof fmt === 'function' ? fmt : getFormatFunction(fmt)
 
   // stream
   var buffer = opts.buffer
@@ -92,9 +90,7 @@ function morgan (format, options) {
     deprecate('buffer option')
 
     // flush interval
-    var interval = typeof buffer !== 'number'
-      ? DEFAULT_BUFFER_DURATION
-      : buffer
+    var interval = typeof buffer === 'number' ? buffer : DEFAULT_BUFFER_DURATION
 
     // swap the stream
     stream = createBufferStream(stream, interval)
@@ -114,7 +110,7 @@ function morgan (format, options) {
     recordStartTime.call(req)
 
     function logRequest () {
-      if (skip !== false && skip(req, res)) {
+      if (skip && skip(req, res)) {
         debug('skip request')
         return
       }
