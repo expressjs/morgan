@@ -24,18 +24,18 @@ module.exports.token = token
  * @private
  */
 
-const auth = require('basic-auth')
-const debug = require('debug')('morgan')
-const deprecate = require('depd')('morgan')
-const onFinished = require('on-finished')
-const onHeaders = require('on-headers')
+var auth = require('basic-auth')
+var debug = require('debug')('morgan')
+var deprecate = require('depd')('morgan')
+var onFinished = require('on-finished')
+var onHeaders = require('on-headers')
 
 /**
  * Array of CLF month names.
  * @private
  */
 
-const CLF_MONTH = [
+var CLF_MONTH = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
 ]
@@ -45,7 +45,7 @@ const CLF_MONTH = [
  * @private
  */
 
-const DEFAULT_BUFFER_DURATION = 1000
+var DEFAULT_BUFFER_DURATION = 1000
 
 /**
  * Create a logger middleware.
@@ -57,8 +57,8 @@ const DEFAULT_BUFFER_DURATION = 1000
  */
 
 function morgan(format, options) {
-  let fmt = format
-  let opts = options || {}
+  var fmt = format
+  var opts = options || {}
 
   if (format && typeof format === 'object') {
     opts = format
@@ -73,26 +73,26 @@ function morgan(format, options) {
   }
 
   // output on request instead of response
-  const immediate = opts.immediate
+  var immediate = opts.immediate
 
   // check if log entry should be skipped
-  const skip = opts.skip || false
+  var skip = opts.skip || false
 
   // format function
-  const formatLine = typeof fmt !== 'function'
+  var formatLine = typeof fmt !== 'function'
     ? getFormatFunction(fmt)
     : fmt
 
   // stream
-  const buffer = opts.buffer
-  let stream = opts.stream || process.stdout
+  var buffer = opts.buffer
+  var stream = opts.stream || process.stdout
 
   // buffering support
   if (buffer) {
     deprecate('buffer option')
 
     // flush interval
-    const interval = typeof buffer !== 'number'
+    var interval = typeof buffer !== 'number'
       ? DEFAULT_BUFFER_DURATION
       : buffer
 
@@ -119,7 +119,7 @@ function morgan(format, options) {
         return
       }
 
-      const line = formatLine(morgan, req, res)
+      var line = formatLine(morgan, req, res)
 
       if (line == null) {
         debug('skip line')
@@ -182,19 +182,19 @@ morgan.format('tiny', ':method :url :status :res[content-length] - :response-tim
 
 morgan.format('dev', function developmentFormatLine(tokens, req, res) {
   // get the status code if response written
-  const status = headersSent(res)
+  var status = headersSent(res)
     ? res.statusCode
     : undefined
 
   // get status color
-  const color = status >= 500 ? 31 // red
+  var color = status >= 500 ? 31 // red
     : status >= 400 ? 33 // yellow
       : status >= 300 ? 36 // cyan
         : status >= 200 ? 32 // green
           : 0 // no color
 
   // get colored function
-  let fn = developmentFormatLine[color]
+  var fn = developmentFormatLine[color]
 
   if (!fn) {
     // compile
@@ -232,7 +232,7 @@ morgan.token('response-time', function getResponseTimeToken(req, res, digits) {
   }
 
   // calculate diff
-  const ms = (res._startAt[0] - req._startAt[0]) * 1e3 +
+  var ms = (res._startAt[0] - req._startAt[0]) * 1e3 +
     (res._startAt[1] - req._startAt[1]) * 1e-6
 
   // return truncated value
@@ -250,10 +250,10 @@ morgan.token('total-time', function getTotalTimeToken(req, res, digits) {
   }
 
   // time elapsed from request start
-  const elapsed = process.hrtime(req._startAt)
+  var elapsed = process.hrtime(req._startAt)
 
   // cover to milliseconds
-  const ms = (elapsed[0] * 1e3) + (elapsed[1] * 1e-6)
+  var ms = (elapsed[0] * 1e3) + (elapsed[1] * 1e-6)
 
   // return truncated value
   return ms.toFixed(digits === undefined ? 3 : digits)
@@ -264,7 +264,7 @@ morgan.token('total-time', function getTotalTimeToken(req, res, digits) {
  */
 
 morgan.token('date', function getDateToken(req, res, format) {
-  const date = new Date()
+  var date = new Date()
 
   switch (format || 'web') {
     case 'clf':
@@ -306,7 +306,7 @@ morgan.token('remote-addr', getip)
 
 morgan.token('remote-user', function getRemoteUserToken(req) {
   // parse basic credentials
-  const credentials = auth(req)
+  var credentials = auth(req)
 
   // return username
   return credentials
@@ -344,7 +344,7 @@ morgan.token('user-agent', function getUserAgentToken(req) {
 
 morgan.token('req', function getRequestToken(req, res, field) {
   // get header
-  const header = req.headers[field.toLowerCase()]
+  var header = req.headers[field.toLowerCase()]
 
   return Array.isArray(header)
     ? header.join(', ')
@@ -361,7 +361,7 @@ morgan.token('res', function getResponseHeader(req, res, field) {
   }
 
   // get header
-  const header = res.getHeader(field)
+  var header = res.getHeader(field)
 
   return Array.isArray(header)
     ? header.join(', ')
@@ -377,13 +377,13 @@ morgan.token('res', function getResponseHeader(req, res, field) {
  */
 
 function clfdate(dateTime) {
-  const date = dateTime.getUTCDate()
-  const hour = dateTime.getUTCHours()
-  const mins = dateTime.getUTCMinutes()
-  const secs = dateTime.getUTCSeconds()
-  const year = dateTime.getUTCFullYear()
+  var date = dateTime.getUTCDate()
+  var hour = dateTime.getUTCHours()
+  var mins = dateTime.getUTCMinutes()
+  var secs = dateTime.getUTCSeconds()
+  var year = dateTime.getUTCFullYear()
 
-  const month = CLF_MONTH[dateTime.getUTCMonth()]
+  var month = CLF_MONTH[dateTime.getUTCMonth()]
 
   return pad2(date) + '/' + month + '/' + year +
     ':' + pad2(hour) + ':' + pad2(mins) + ':' + pad2(secs) +
@@ -403,10 +403,10 @@ function compile(format) {
     throw new TypeError('argument format must be a string')
   }
 
-  const fmt = String(JSON.stringify(format))
-  const js = '  "use strict"\n  return ' + fmt.replace(/:([-\w]{2,})(?:\[([^\]]+)\])?/g, function (_, name, arg) {
-    let tokenArguments = 'req, res'
-    const tokenFunction = 'tokens[' + String(JSON.stringify(name)) + ']'
+  var fmt = String(JSON.stringify(format))
+  var js = '  "use strict"\n  return ' + fmt.replace(/:([-\w]{2,})(?:\[([^\]]+)\])?/g, function (_, name, arg) {
+    var tokenArguments = 'req, res'
+    var tokenFunction = 'tokens[' + String(JSON.stringify(name)) + ']'
 
     if (arg !== undefined) {
       tokenArguments += ', ' + String(JSON.stringify(arg))
@@ -428,8 +428,8 @@ function compile(format) {
  */
 
 function createBufferStream(stream, interval) {
-  const buf = []
-  let timer = null
+  var buf = []
+  var timer = null
 
   // flush function
   function flush() {
@@ -474,7 +474,7 @@ function format(name, fmt) {
 
 function getFormatFunction(name) {
   // lookup format
-  const fmt = morgan[name] || name || morgan.default
+  var fmt = morgan[name] || name || morgan.default
 
   // return compiled format
   return typeof fmt !== 'function'
@@ -521,7 +521,7 @@ function headersSent(res) {
  */
 
 function pad2(num) {
-  const str = String(num)
+  var str = String(num)
 
   // istanbul ignore next: num is current datetime
   return (str.length === 1 ? '0' : '') + str
