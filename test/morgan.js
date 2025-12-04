@@ -73,7 +73,7 @@ describe('morgan()', function () {
           cb(null, null, line)
         })
 
-        function format(tokens, req, res) {
+        function format (tokens, req, res) {
           return [req.method, req.url, res.statusCode].join(' ')
         }
 
@@ -131,7 +131,7 @@ describe('morgan()', function () {
             cb(null, null, line)
           })
 
-          function format() {
+          function format () {
             return 'apple'
           }
 
@@ -1057,7 +1057,7 @@ describe('morgan()', function () {
           cb(null, null, line)
         })
 
-        function format(tokens, req, res) {
+        function format (tokens, req, res) {
           return [req.method, req.url, res.statusCode].join(' ')
         }
 
@@ -1071,7 +1071,7 @@ describe('morgan()', function () {
           throw new Error('should not log line')
         })
 
-        function format(tokens, req, res) {
+        function format (tokens, req, res) {
           return undefined
         }
 
@@ -1085,7 +1085,7 @@ describe('morgan()', function () {
           throw new Error('should not log line')
         })
 
-        function format(tokens, req, res) {
+        function format (tokens, req, res) {
           return null
         }
 
@@ -1219,7 +1219,7 @@ describe('morgan()', function () {
           done()
         })
 
-        var stream = createColorLineStream(function onLine(line) {
+        var stream = createColorLineStream(function onLine (line) {
           cb(null, null, line)
         })
 
@@ -1250,7 +1250,7 @@ describe('morgan()', function () {
           done()
         })
 
-        var stream = createColorLineStream(function onLine(line) {
+        var stream = createColorLineStream(function onLine (line) {
           cb(null, null, line)
         })
 
@@ -1272,7 +1272,7 @@ describe('morgan()', function () {
           done()
         })
 
-        var stream = createColorLineStream(function onLine(line) {
+        var stream = createColorLineStream(function onLine (line) {
           cb(null, null, line)
         })
 
@@ -1294,7 +1294,7 @@ describe('morgan()', function () {
           done()
         })
 
-        var stream = createColorLineStream(function onLine(line) {
+        var stream = createColorLineStream(function onLine (line) {
           cb(null, null, line)
         })
 
@@ -1316,7 +1316,7 @@ describe('morgan()', function () {
           done()
         })
 
-        var stream = createColorLineStream(function onLine(line) {
+        var stream = createColorLineStream(function onLine (line) {
           cb(null, null, line)
         })
 
@@ -1338,7 +1338,7 @@ describe('morgan()', function () {
             done()
           })
 
-          var stream = createColorLineStream(function onLine(line) {
+          var stream = createColorLineStream(function onLine (line) {
             cb(null, null, line)
           })
 
@@ -1409,7 +1409,7 @@ describe('morgan()', function () {
       })
       var time = Date.now()
 
-      function writeLog(log) {
+      function writeLog (log) {
         cb(null, null, log)
       }
 
@@ -1437,7 +1437,7 @@ describe('morgan()', function () {
       })
       var time = Date.now()
 
-      function writeLog(log) {
+      function writeLog (log) {
         cb(null, null, log)
       }
 
@@ -1546,7 +1546,7 @@ describe('morgan()', function () {
         throw new Error('should not log line')
       })
 
-      function skip(req) {
+      function skip (req) {
         return req.url.indexOf('skip=true') !== -1
       }
 
@@ -1561,7 +1561,7 @@ describe('morgan()', function () {
         throw new Error('should not log line')
       })
 
-      function skip(req, res) {
+      function skip (req, res) {
         return res.statusCode === 200
       }
 
@@ -1596,7 +1596,7 @@ describe('morgan.compile(format)', function () {
   })
 })
 
-function after(count, callback) {
+function after (count, callback) {
   var args = new Array(3)
   var i = 0
 
@@ -1613,29 +1613,29 @@ function after(count, callback) {
   }
 }
 
-function createColorLineStream(callback) {
-  return createLineStream(function onLine(line) {
+function createColorLineStream (callback) {
+  return createLineStream(function onLine (line) {
     callback(expandColorCharacters(line))
   })
 }
 
-function createLineStream(callback) {
+function createLineStream (callback) {
   return split().on('data', callback)
 }
 
-function createRequestListener(format, opts, fn, fn1) {
+function createRequestListener (format, opts, fn, fn1) {
   var logger = morgan(format, opts)
   var middle = fn || noopMiddleware
 
-  return function onRequest(req, res) {
+  return function onRequest (req, res) {
     // prior alterations
     if (fn1) {
       fn1(req, res)
     }
 
-    logger(req, res, function onNext(err) {
+    logger(req, res, function onNext (err) {
       // allow req, res alterations
-      middle(req, res, function onDone() {
+      middle(req, res, function onDone () {
         if (err) {
           res.statusCode = 500
           res.end(err.message)
@@ -1648,7 +1648,7 @@ function createRequestListener(format, opts, fn, fn1) {
   }
 }
 
-function createSecureServer(format, opts, fn, fn1) {
+function createSecureServer (format, opts, fn, fn1) {
   var cert = fs.readFileSync(join(__dirname, 'fixtures', 'server.crt'), 'ascii')
   var key = fs.readFileSync(join(__dirname, 'fixtures', 'server.key'), 'ascii')
 
@@ -1656,16 +1656,16 @@ function createSecureServer(format, opts, fn, fn1) {
     .on('request', createRequestListener(format, opts, fn, fn1))
 }
 
-function createServer(format, opts, fn, fn1) {
+function createServer (format, opts, fn, fn1) {
   return http.createServer()
     .on('request', createRequestListener(format, opts, fn, fn1))
 }
 
-function expandColorCharacters(str) {
+function expandColorCharacters (str) {
   // eslint-disable-next-line no-control-regex
   return str.replace(/\x1b\[(\d+)m/g, '_color_$1_')
 }
 
-function noopMiddleware(req, res, next) {
+function noopMiddleware (req, res, next) {
   next()
 }
