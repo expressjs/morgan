@@ -315,6 +315,14 @@ morgan.token('remote-user', function getRemoteUserToken (req) {
 })
 
 /**
+ * process id
+ */
+
+morgan.token('pid', function getPidToken (req) {
+  return String(process.pid)
+})
+
+/**
  * HTTP version
  */
 

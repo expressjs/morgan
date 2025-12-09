@@ -571,6 +571,24 @@ describe('morgan()', function () {
       })
     })
 
+    describe(':pid', function () {
+      it('should get process id', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line, String(process.pid))
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':pid', { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
+    })
+
     describe(':response-time', function () {
       it('should be in milliseconds', function (done) {
         var cb = after(2, function (err, res, line) {
