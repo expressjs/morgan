@@ -193,6 +193,10 @@ The HTTP version of the request.
 
 The HTTP method of the request.
 
+##### :pid
+
+The process ID of the Node.js process handling the request.
+
 ##### :referrer
 
 The Referrer header of the request. This will use the standard mis-spelled Referer header if exists, otherwise Referrer.
