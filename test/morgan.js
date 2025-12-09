@@ -1423,31 +1423,26 @@ describe('morgan()', function () {
         })
     })
 
-    it('should accept custom interval', function (done) {
-      var cb = after(2, function (err, res, log) {
-        if (err) return done(err)
-        assert.strictEqual(log, 'GET /first\nGET /second\n')
-        assert.ok(Date.now() - time >= 200)
-        assert.ok(Date.now() - time <= 300)
-        done()
-      })
+    it('should not flush before custom interval elapses', function (done) {
+      var writes = []
       var server = createServer(':method :url', {
-        buffer: 200,
-        stream: { write: writeLog }
+        buffer: 750,
+        stream: { write: function (log) { writes.push(log) } }
       })
-      var time = Date.now()
-
-      function writeLog (log) {
-        cb(null, null, log)
-      }
 
       request(server)
         .get('/first')
         .expect(200, function (err) {
-          if (err) return cb(err)
+          if (err) return done(err)
+          assert.strictEqual(writes.length, 0)
+
           request(server)
             .get('/second')
-            .expect(200, cb)
+            .expect(200, function (err) {
+              if (err) return done(err)
+              assert.strictEqual(writes.length, 0)
+              done()
+            })
         })
     })
   })
