@@ -40,7 +40,6 @@
   },
   "files": [
     "LICENSE",
-    "HISTORY.md",
     "README.md",
     "index.js"
   ],
