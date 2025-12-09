@@ -1580,7 +1580,7 @@ describe('morgan.compile(format)', function () {
       })
 
       it('should reject functions', function () {
-        assert.throws(morgan.compile.bind(morgan, function () { }), /argument format/)
+        assert.throws(morgan.compile.bind(morgan, function () {}), /argument format/)
       })
 
       it('should reject numbers', function () {
