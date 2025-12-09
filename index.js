@@ -75,6 +75,9 @@ function morgan (format, options) {
   // output on request instead of response
   var immediate = opts.immediate
 
+  // output to an objectMode stream
+  var objectMode = opts.objectMode
+
   // check if log entry should be skipped
   var skip = opts.skip || false
 
@@ -127,6 +130,11 @@ function morgan (format, options) {
       }
 
       debug('log request')
+      if (objectMode) {
+        stream.write(line)
+        return
+      }
+
       stream.write(line + '\n')
     };
 

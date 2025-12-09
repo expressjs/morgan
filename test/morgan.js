@@ -1570,6 +1570,40 @@ describe('morgan()', function () {
         .expect(200, done)
     })
   })
+
+  describe('with objectMode option', function () {
+    it('should write the literal object value', function (done) {
+      var cb = after(1, function (err) {
+        if (err) return done(err)
+        done()
+      })
+
+      function format (tokens, req, res) {
+        return {
+          method: tokens.method(req, res),
+          url: tokens.url(req, res),
+          status: tokens.status(req, res)
+        }
+      }
+
+      var stream = {
+        write: function (obj) {
+          assert.equal(obj.method, 'GET')
+          assert.equal(obj.url, '/')
+          assert.equal(obj.status, 200)
+        }
+      }
+
+      var server = createServer(format, {
+        stream: stream,
+        objectMode: true
+      })
+
+      request(server)
+      .get('/')
+      .expect(200, cb)
+    })
+  })
 })
 
 describe('morgan.compile(format)', function () {
