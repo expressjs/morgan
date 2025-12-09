@@ -1,6 +1,7 @@
-unreleased
+1.11.0 / 2025-12-09
 ===================
   * add `:pid` token
+  * remove HISTORY.md from published tarball
 
 1.10.1 / 2025-07-17
 ===================
