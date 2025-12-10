@@ -27,6 +27,12 @@ $ npm install morgan
 var morgan = require('morgan')
 ```
 
+## ES6 import
+
+```js
+import morgan from "morgan";
+```
+
 ### morgan(format, options)
 
 Create a new morgan logger middleware function using the given `format` and `options`.
