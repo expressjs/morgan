@@ -127,7 +127,12 @@ function morgan (format, options) {
       }
 
       debug('log request')
-      stream.write(line + '\n')
+      if (stream.writableObjectMode && typeof line == 'object') {
+        stream.write(line)
+      }
+      else {
+        stream.write(line + '\n')
+      }
     };
 
     if (immediate) {
