@@ -180,18 +180,19 @@ morgan.format('tiny', ':method :url :status :res[content-length] - :response-tim
  * dev (colored)
  */
 
-morgan.format('dev', function developmentFormatLine (tokens, req, res) {
+morgan.format('dev', function developmentFormatLine (morgan, req, res) {
   // get the status code if response written
   var status = headersSent(res)
     ? res.statusCode
     : undefined
 
-  // get status color
-  var color = status >= 500 ? 31 // red
-    : status >= 400 ? 33 // yellow
-      : status >= 300 ? 36 // cyan
-        : status >= 200 ? 32 // green
-          : 0 // no color
+  // get status color (disabled if NO_COLOR is set)
+  var color = process.env.NO_COLOR ? 0
+    : status >= 500 ? 31 // red
+      : status >= 400 ? 33 // yellow
+        : status >= 300 ? 36 // cyan
+          : status >= 200 ? 32 // green
+            : 0 // no color
 
   // get colored function
   var fn = developmentFormatLine[color]
@@ -202,7 +203,7 @@ morgan.format('dev', function developmentFormatLine (tokens, req, res) {
       color + 'm:status\x1b[0m :response-time ms - :res[content-length]\x1b[0m')
   }
 
-  return fn(tokens, req, res)
+  return fn(morgan, req, res)
 })
 
 /**
@@ -406,7 +407,7 @@ function compile (format) {
   var fmt = String(JSON.stringify(format))
   var js = '  "use strict"\n  return ' + fmt.replace(/:([-\w]{2,})(?:\[([^\]]+)\])?/g, function (_, name, arg) {
     var tokenArguments = 'req, res'
-    var tokenFunction = 'tokens[' + String(JSON.stringify(name)) + ']'
+    var tokenFunction = 'morgan.getToken(' + String(JSON.stringify(name)) + ')'
 
     if (arg !== undefined) {
       tokenArguments += ', ' + String(JSON.stringify(arg))
@@ -416,7 +417,7 @@ function compile (format) {
   })
 
   // eslint-disable-next-line no-new-func
-  return new Function('tokens, req, res', js)
+  return new Function('morgan, req, res', js)
 }
 
 /**
@@ -538,6 +539,13 @@ function recordStartTime () {
 }
 
 /**
+ * Token storage - stores custom tokens to avoid overwriting morgan methods.
+ * @private
+ */
+
+var tokenStore = Object.create(null)
+
+/**
  * Define a token function with the given name,
  * and callback fn(req, res).
  *
@@ -547,6 +555,21 @@ function recordStartTime () {
  */
 
 function token (name, fn) {
-  morgan[name] = fn
+  // disallow overwriting built-in properties to prevent breaking morgan
+  if (name === 'token' || name === 'format' || name === 'compile') {
+    tokenStore[name] = fn
+  } else {
+    morgan[name] = fn
+  }
   return this
+}
+
+/**
+ * Get token by name - checks custom tokenStore first, then morgan.
+ * This is used by the compiled format functions.
+ * @private
+ */
+
+morgan.getToken = function (name) {
+  return tokenStore[name] || morgan[name]
 }
