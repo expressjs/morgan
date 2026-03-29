@@ -186,6 +186,18 @@ morgan.format('dev', function developmentFormatLine (tokens, req, res) {
     ? res.statusCode
     : undefined
 
+  // respect NO_COLOR environment variable (see https://no-color.org)
+  if ('NO_COLOR' in process.env) {
+    var fn = developmentFormatLine.nocolor
+
+    if (!fn) {
+      fn = developmentFormatLine.nocolor = compile(
+        ':method :url :status :response-time ms - :res[content-length]')
+    }
+
+    return fn(tokens, req, res)
+  }
+
   // get status color
   var color = status >= 500 ? 31 // red
     : status >= 400 ? 33 // yellow
@@ -194,7 +206,7 @@ morgan.format('dev', function developmentFormatLine (tokens, req, res) {
           : 0 // no color
 
   // get colored function
-  var fn = developmentFormatLine[color]
+  fn = developmentFormatLine[color]
 
   if (!fn) {
     // compile
