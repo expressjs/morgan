@@ -16,7 +16,7 @@ describe('morgan()', function () {
       var cb = after(2, function (err, res, line) {
         if (err) return done(err)
         assert(res.text.length > 0)
-        assert.strictEqual(line.substr(0, res.text.length), res.text)
+        assert.strictEqual(line.substring(0, res.text.length), res.text)
         done()
       })
 
@@ -91,7 +91,7 @@ describe('morgan()', function () {
           var cb = after(2, function (err, res, line) {
             if (err) return done(err)
             assert(res.text.length > 0)
-            assert.strictEqual(line.substr(0, res.text.length), res.text)
+            assert.strictEqual(line.substring(0, res.text.length), res.text)
             done()
           })
 
@@ -157,7 +157,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           assert(res.text.length > 0)
-          assert.strictEqual(line.substr(0, res.text.length), res.text)
+          assert.strictEqual(line.substring(0, res.text.length), res.text)
           done()
         })
 
@@ -178,7 +178,7 @@ describe('morgan()', function () {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           assert(res.text.length > 0)
-          assert.strictEqual(line.substr(0, res.text.length), res.text)
+          assert.strictEqual(line.substring(0, res.text.length), res.text)
           done()
         })
 
@@ -1214,8 +1214,8 @@ describe('morgan()', function () {
       it('should not color 1xx', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.strictEqual(line.substr(0, 36), '_color_0_GET / _color_0_102_color_0_')
-          assert.strictEqual(line.substr(-9), '_color_0_')
+          assert.strictEqual(line.substring(0, 36), '_color_0_GET / _color_0_102_color_0_')
+          assert.strictEqual(line.substring(-9), '_color_0_')
           done()
         })
 
@@ -1245,8 +1245,8 @@ describe('morgan()', function () {
       it('should color 2xx green', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.strictEqual(line.substr(0, 37), '_color_0_GET / _color_32_200_color_0_')
-          assert.strictEqual(line.substr(-9), '_color_0_')
+          assert.strictEqual(line.substring(0, 37), '_color_0_GET / _color_32_200_color_0_')
+          assert.strictEqual(line.substring(-9), '_color_0_')
           done()
         })
 
@@ -1267,8 +1267,8 @@ describe('morgan()', function () {
       it('should color 3xx cyan', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.strictEqual(line.substr(0, 37), '_color_0_GET / _color_36_300_color_0_')
-          assert.strictEqual(line.substr(-9), '_color_0_')
+          assert.strictEqual(line.substring(0, 37), '_color_0_GET / _color_36_300_color_0_')
+          assert.strictEqual(line.substring(-9), '_color_0_')
           done()
         })
 
@@ -1289,8 +1289,8 @@ describe('morgan()', function () {
       it('should color 4xx yelow', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.strictEqual(line.substr(0, 37), '_color_0_GET / _color_33_400_color_0_')
-          assert.strictEqual(line.substr(-9), '_color_0_')
+          assert.strictEqual(line.substring(0, 37), '_color_0_GET / _color_33_400_color_0_')
+          assert.strictEqual(line.substring(-9), '_color_0_')
           done()
         })
 
@@ -1311,8 +1311,8 @@ describe('morgan()', function () {
       it('should color 5xx red', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
-          assert.strictEqual(line.substr(0, 37), '_color_0_GET / _color_31_500_color_0_')
-          assert.strictEqual(line.substr(-9), '_color_0_')
+          assert.strictEqual(line.substring(0, 37), '_color_0_GET / _color_31_500_color_0_')
+          assert.strictEqual(line.substring(-9), '_color_0_')
           done()
         })
 
