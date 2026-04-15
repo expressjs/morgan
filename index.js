@@ -186,20 +186,27 @@ morgan.format('dev', function developmentFormatLine (tokens, req, res) {
     ? res.statusCode
     : undefined
 
-  // get status color
-  var color = status >= 500 ? 31 // red
-    : status >= 400 ? 33 // yellow
-      : status >= 300 ? 36 // cyan
-        : status >= 200 ? 32 // green
-          : 0 // no color
+  // get status color (respect NO_COLOR env var)
+  var noColor = 'NO_COLOR' in process.env
+  var color = noColor ? 0
+    : status >= 500 ? 31 // red
+      : status >= 400 ? 33 // yellow
+        : status >= 300 ? 36 // cyan
+          : status >= 200 ? 32 // green
+            : 0 // no color
 
   // get colored function
-  var fn = developmentFormatLine[color]
+  var fn = developmentFormatLine[noColor ? 'nocolor' : color]
 
   if (!fn) {
-    // compile
-    fn = developmentFormatLine[color] = compile('\x1b[0m:method :url \x1b[' +
-      color + 'm:status\x1b[0m :response-time ms - :res[content-length]\x1b[0m')
+    if (noColor) {
+      // compile without ANSI escape codes
+      fn = developmentFormatLine['nocolor'] = compile(':method :url :status :response-time ms - :res[content-length]')
+    } else {
+      // compile with color
+      fn = developmentFormatLine[color] = compile('\x1b[0m:method :url \x1b[' +
+        color + 'm:status\x1b[0m :response-time ms - :res[content-length]\x1b[0m')
+    }
   }
 
   return fn(tokens, req, res)
