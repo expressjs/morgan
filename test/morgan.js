@@ -1354,6 +1354,31 @@ describe('morgan()', function () {
       })
     })
 
+    describe('dev with NO_COLOR', function () {
+      it('should not use ANSI color codes', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line.indexOf('\x1b'), -1, 'should not contain ANSI escape codes')
+          assert.ok(/GET \/ 200/.test(line), 'should contain method, url, and status')
+          done()
+        })
+
+        var stream = createLineStream(function onLine (line) {
+          cb(null, null, line)
+        })
+
+        process.env.NO_COLOR = ''
+        var server = createServer('dev', { stream: stream })
+
+        request(server)
+          .get('/')
+          .expect(200, function (err, res) {
+            delete process.env.NO_COLOR
+            cb(err, res)
+          })
+      })
+    })
+
     describe('short', function () {
       it('should match expectations', function (done) {
         var cb = after(2, function (err, res, line) {
