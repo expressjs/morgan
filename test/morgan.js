@@ -1352,6 +1352,61 @@ describe('morgan()', function () {
             .expect(200, cb)
         })
       })
+
+      describe('with NO_COLOR env var', function () {
+        before(function () {
+          process.env.NO_COLOR = ''
+        })
+
+        after(function () {
+          delete process.env.NO_COLOR
+          // clear cached format functions
+          delete morgan.dev.nocolor
+        })
+
+        it('should not include ANSI escape codes', function (done) {
+          var cb = after(2, function (err, res, line) {
+            if (err) return done(err)
+            assert.ok(line.indexOf('\x1b[') === -1, 'should not contain ANSI escape codes')
+            done()
+          })
+
+          var stream = createLineStream(function onLine (line) {
+            cb(null, null, line)
+          })
+
+          var server = createServer('dev', { stream: stream }, function (req, res, next) {
+            res.statusCode = 200
+            next()
+          })
+
+          request(server)
+            .get('/')
+            .expect(200, cb)
+        })
+
+        it('should still include status code and method', function (done) {
+          var cb = after(2, function (err, res, line) {
+            if (err) return done(err)
+            assert.ok(line.indexOf('GET') !== -1, 'should contain method')
+            assert.ok(line.indexOf('200') !== -1, 'should contain status')
+            done()
+          })
+
+          var stream = createLineStream(function onLine (line) {
+            cb(null, null, line)
+          })
+
+          var server = createServer('dev', { stream: stream }, function (req, res, next) {
+            res.statusCode = 200
+            next()
+          })
+
+          request(server)
+            .get('/')
+            .expect(200, cb)
+        })
+      })
     })
 
     describe('short', function () {
