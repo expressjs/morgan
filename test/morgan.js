@@ -1589,6 +1589,55 @@ describe('morgan.compile(format)', function () {
       })
     })
   })
+
+  describe('multiple instances', function () {
+    it('should preserve original request start time', function (done) {
+      var line1
+      var line2
+
+      var stream1 = createLineStream(function (line) {
+        line1 = line
+      })
+
+      var stream2 = createLineStream(function (line) {
+        line2 = line
+        check()
+      })
+
+      var logger1 = morgan(':response-time', { stream: stream1 })
+      var logger2 = morgan(':response-time', { stream: stream2 })
+
+      var server = http.createServer(function (req, res) {
+        logger1(req, res, function () {
+          // delay before second logger to verify timing is preserved
+          setTimeout(function () {
+            logger2(req, res, function () {
+              res.setHeader('X-Sent', 'true')
+              res.end('hello')
+            })
+          }, 50)
+        })
+      })
+
+      function check () {
+        // both loggers should report similar response times
+        // (both measured from the same start point)
+        var time1 = parseFloat(line1)
+        var time2 = parseFloat(line2)
+        // time2 should be >= time1 since it logs later
+        assert.ok(time2 >= time1, 'second logger time (' + time2 + ') should be >= first (' + time1 + ')')
+        // but time1 should also reflect the delay (>= 50ms)
+        assert.ok(time1 >= 40, 'first logger time (' + time1 + ') should include the delay')
+        done()
+      }
+
+      request(server)
+        .get('/')
+        .expect(200, function (err) {
+          if (err) return done(err)
+        })
+    })
+  })
 })
 
 function after (count, callback) {
