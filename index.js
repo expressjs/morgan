@@ -130,7 +130,7 @@ function morgan (format, options) {
       stream.write(line + '\n')
     };
 
-    if (immediate) {
+    if (immediate || req.headers.upgrade==='websocket')  {
       // immediate log
       logRequest()
     } else {
