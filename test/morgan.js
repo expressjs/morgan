@@ -1474,6 +1474,55 @@ describe('morgan()', function () {
             .expect(200, cb)
         })
       })
+
+      describe('with NO_COLOR environment variable', function () {
+        afterEach(function () {
+          delete process.env.NO_COLOR
+        })
+
+        it('should omit ANSI color codes when NO_COLOR is set', function (done) {
+          process.env.NO_COLOR = '1'
+
+          var cb = after(2, function (err, res, line) {
+            if (err) return done(err)
+            assert.strictEqual(/\x1b\[/.test(line), false, 'expected no ANSI codes')
+            done()
+          })
+
+          var stream = createLineStream(function (line) {
+            cb(null, null, line)
+          })
+
+          var server = createServer('dev', { stream: stream })
+
+          request(server)
+            .get('/')
+            .expect(200, cb)
+        })
+
+        it('should omit ANSI color codes for 5xx when NO_COLOR is set', function (done) {
+          process.env.NO_COLOR = '1'
+
+          var cb = after(2, function (err, res, line) {
+            if (err) return done(err)
+            assert.strictEqual(/\x1b\[/.test(line), false, 'expected no ANSI codes')
+            done()
+          })
+
+          var stream = createLineStream(function (line) {
+            cb(null, null, line)
+          })
+
+          var server = createServer('dev', { stream: stream }, function (req, res, next) {
+            res.statusCode = 500
+            next()
+          })
+
+          request(server)
+            .get('/')
+            .expect(500, cb)
+        })
+      })
     })
 
     describe('short', function () {

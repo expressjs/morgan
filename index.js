@@ -219,13 +219,19 @@ morgan.format('dev', function developmentFormatLine (tokens, req, res) {
         : status >= 200 ? 32 // green
           : 0 // no color
 
+  // respect NO_COLOR environment variable (https://no-color.org/)
+  var noColor = 'NO_COLOR' in process.env
+
   // get colored function
-  var fn = developmentFormatLine[color]
+  var key = noColor ? 'plain' : color
+  var fn = developmentFormatLine[key]
 
   if (!fn) {
     // compile
-    fn = developmentFormatLine[color] = compile('\x1b[0m:method :url \x1b[' +
-      color + 'm:status\x1b[0m :response-time ms - :res[content-length]\x1b[0m')
+    fn = developmentFormatLine[key] = noColor
+      ? compile(':method :url :status :response-time ms - :res[content-length]')
+      : compile('\x1b[0m:method :url \x1b[' +
+        color + 'm:status\x1b[0m :response-time ms - :res[content-length]\x1b[0m')
   }
 
   return fn(tokens, req, res)
