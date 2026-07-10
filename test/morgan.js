@@ -1150,6 +1150,23 @@ describe('morgan()', function () {
           .expect(200, cb)
       })
 
+      it('should escape control characters in URL', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line.indexOf('\r'), -1)
+          assert.strictEqual(line.indexOf('\n'), -1)
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':url', { stream: stream }))
+          .get('/foo%0d%0abar')
+          .expect(200, cb)
+      })
+
       it('should not exist for aborted request', function (done) {
         var stream = createLineStream(function (line) {
           assert.strictEqual(line, '-')
@@ -1162,6 +1179,150 @@ describe('morgan()', function () {
 
         var test = request(server).post('/')
         test.write('0')
+      })
+    })
+
+    describe(':user-agent', function () {
+      it('should escape control characters in user-agent', function (done) {
+        var lines = []
+        var cb = after(2, function (err) {
+          if (err) return done(err)
+          // must produce exactly one log line, not two
+          assert.strictEqual(lines.length, 1)
+          assert.strictEqual(lines[0].indexOf('\r'), -1)
+          assert.strictEqual(lines[0].indexOf('\n'), -1)
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          lines.push(line)
+          if (lines.length === 1) cb(null)
+        })
+
+        var server = createServer(':user-agent', { stream: stream }, function (req, res) {
+          req.socket.remoteAddress = '127.0.0.1'
+          res.end('OK')
+        })
+
+        server.listen(0, function () {
+          var port = server.address().port
+          var net = require('net')
+          var client = net.connect(port, '127.0.0.1', function () {
+            client.write(
+              'GET / HTTP/1.1\r\n' +
+              'Host: localhost\r\n' +
+              'User-Agent: evil\r\nfake: agent\r\n' +
+              'Connection: close\r\n' +
+              '\r\n'
+            )
+          })
+          client.on('data', function () {})
+          client.on('end', function () { server.close() })
+        })
+      })
+
+      it('should not forge log lines via user-agent CRLF injection', function (done) {
+        var lines = []
+        var cb = after(2, function (err) {
+          if (err) return done(err)
+
+          // must produce exactly one log line, not two
+          assert.strictEqual(lines.length, 1)
+          assert.strictEqual(lines[0].indexOf('\r'), -1)
+          assert.strictEqual(lines[0].indexOf('\n'), -1)
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          lines.push(line)
+          if (lines.length === 1) cb(null)
+        })
+
+        var server = createServer(':user-agent', { stream: stream }, function (req, res) {
+          req.socket.remoteAddress = '127.0.0.1'
+          res.end('OK')
+        })
+
+        server.listen(0, function () {
+          var port = server.address().port
+          var net = require('net')
+          var client = net.connect(port, '127.0.0.1', function () {
+            client.write(
+              'GET / HTTP/1.1\r\n' +
+              'Host: localhost\r\n' +
+              'User-Agent: curl/8.14.1\r\n192.0.2.0 - - [01/Jan/1970:00:00:00 +0000] "GET /admin HTTP/1.1" 404 -\r\n' +
+              'Connection: close\r\n' +
+              '\r\n'
+            )
+          })
+          client.on('data', function () {})
+          client.on('end', function () { server.close() })
+        })
+      })
+    })
+
+    describe(':req', function () {
+      it('should escape control characters in request headers', function (done) {
+        var lines = []
+        var cb = after(2, function (err) {
+          if (err) return done(err)
+          // must produce exactly one log line, not two
+          assert.strictEqual(lines.length, 1)
+          assert.strictEqual(lines[0].indexOf('\r'), -1)
+          assert.strictEqual(lines[0].indexOf('\n'), -1)
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          lines.push(line)
+          if (lines.length === 1) cb(null)
+        })
+
+        var server = createServer(':req[x-custom]', { stream: stream }, function (req, res) {
+          req.socket.remoteAddress = '127.0.0.1'
+          res.end('OK')
+        })
+
+        server.listen(0, function () {
+          var port = server.address().port
+          var net = require('net')
+          var client = net.connect(port, '127.0.0.1', function () {
+            client.write(
+              'GET / HTTP/1.1\r\n' +
+              'Host: localhost\r\n' +
+              'x-custom: evil\r\ninjected\r\n' +
+              'Connection: close\r\n' +
+              '\r\n'
+            )
+          })
+          client.on('data', function () {})
+          client.on('end', function () { server.close() })
+        })
+      })
+    })
+
+    describe(':remote-addr', function () {
+      it('should escape control characters in remote address', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line.indexOf('\r'), -1)
+          assert.strictEqual(line.indexOf('\n'), -1)
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        var server = createServer(':remote-addr', { stream: stream }, function (req, res) {
+          // Simulate spoofed IP with control characters
+          req.ip = '127.0.0.1\r\nFAKE'
+          res.end('OK')
+        })
+
+        request(server)
+          .get('/')
+          .expect(200, cb)
       })
     })
   })

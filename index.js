@@ -74,6 +74,22 @@ function escapeLogField (value) {
 }
 
 /**
+ * Strip control characters from a log line to prevent log forging.
+ * @private
+ *
+ * @param {string} line Log line to sanitize.
+ * @returns {string} Sanitized log line with control characters removed.
+ */
+function sanitizeLogLine (line) {
+  if (typeof line !== 'string') return line
+
+  // Strip control characters that could be used for log forging:
+  // \r (carriage return), \n (line feed), \x00 (null byte)
+  // eslint-disable-next-line no-control-regex
+  return line.replace(/[\r\n\x00]/g, '')
+}
+
+/**
  * Create a logger middleware.
  *
  * @public
@@ -153,7 +169,7 @@ function morgan (format, options) {
       }
 
       debug('log request')
-      stream.write(line + '\n')
+      stream.write(sanitizeLogLine(line) + '\n')
     };
 
     if (immediate) {
@@ -236,7 +252,7 @@ morgan.format('dev', function developmentFormatLine (tokens, req, res) {
  */
 
 morgan.token('url', function getUrlToken (req) {
-  return req.originalUrl || req.url
+  return escapeLogField(req.originalUrl || req.url)
 })
 
 /**
@@ -244,7 +260,7 @@ morgan.token('url', function getUrlToken (req) {
  */
 
 morgan.token('method', function getMethodToken (req) {
-  return req.method
+  return escapeLogField(req.method)
 })
 
 /**
@@ -317,14 +333,16 @@ morgan.token('status', function getStatusToken (req, res) {
  */
 
 morgan.token('referrer', function getReferrerToken (req) {
-  return req.headers.referer || req.headers.referrer
+  return escapeLogField(req.headers.referer || req.headers.referrer)
 })
 
 /**
  * remote address
  */
 
-morgan.token('remote-addr', getip)
+morgan.token('remote-addr', function getRemoteAddrToken (req) {
+  return escapeLogField(getip(req))
+})
 
 /**
  * remote user
@@ -353,7 +371,7 @@ morgan.token('pid', function getPidToken (req) {
  */
 
 morgan.token('http-version', function getHttpVersionToken (req) {
-  return req.httpVersionMajor + '.' + req.httpVersionMinor
+  return escapeLogField(req.httpVersionMajor + '.' + req.httpVersionMinor)
 })
 
 /**
@@ -361,7 +379,7 @@ morgan.token('http-version', function getHttpVersionToken (req) {
  */
 
 morgan.token('user-agent', function getUserAgentToken (req) {
-  return req.headers['user-agent']
+  return escapeLogField(req.headers['user-agent'])
 })
 
 /**
@@ -372,9 +390,9 @@ morgan.token('req', function getRequestToken (req, res, field) {
   // get header
   var header = req.headers[field.toLowerCase()]
 
-  return Array.isArray(header)
+  return escapeLogField(Array.isArray(header)
     ? header.join(', ')
-    : header
+    : header)
 })
 
 /**
