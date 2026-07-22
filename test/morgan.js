@@ -1333,6 +1333,21 @@ describe('morgan()', function () {
     })
 
     describe('dev', function () {
+      var previousNoColor
+
+      before(function () {
+        previousNoColor = process.env.NO_COLOR
+        delete process.env.NO_COLOR
+      })
+
+      after(function () {
+        if (previousNoColor === undefined) {
+          delete process.env.NO_COLOR
+        } else {
+          process.env.NO_COLOR = previousNoColor
+        }
+      })
+
       it('should not color 1xx', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
@@ -1467,6 +1482,46 @@ describe('morgan()', function () {
           var server = createServer('dev', {
             immediate: true,
             stream: stream
+          })
+
+          request(server)
+            .get('/')
+            .expect(200, cb)
+        })
+      })
+
+      describe('with NO_COLOR set', function () {
+        var previousNoColor
+
+        before(function () {
+          previousNoColor = process.env.NO_COLOR
+          process.env.NO_COLOR = '1'
+        })
+
+        after(function () {
+          if (previousNoColor === undefined) {
+            delete process.env.NO_COLOR
+          } else {
+            process.env.NO_COLOR = previousNoColor
+          }
+        })
+
+        it('should not emit ANSI color codes', function (done) {
+          var cb = after(2, function (err, res, line) {
+            if (err) return done(err)
+            assert.strictEqual(/\x1b\[/.test(line), false)
+            var masked = line.replace(/\d+\.\d{3} ms/, '_timer_')
+            assert.strictEqual(masked, 'GET / 200 _timer_ - -')
+            done()
+          })
+
+          var stream = createLineStream(function onLine (line) {
+            cb(null, null, line)
+          })
+
+          var server = createServer('dev', { stream: stream }, function (req, res, next) {
+            res.statusCode = 200
+            next()
           })
 
           request(server)

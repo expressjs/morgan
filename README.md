@@ -128,6 +128,9 @@ token will be colored green for success codes, red for server error codes,
 yellow for client error codes, cyan for redirection codes, and uncolored
 for information codes.
 
+When the `NO_COLOR` environment variable is set (to any non-empty value),
+color is disabled per [no-color.org](https://no-color.org/).
+
 ```
 :method :url :status :response-time ms - :res[content-length]
 # will output
