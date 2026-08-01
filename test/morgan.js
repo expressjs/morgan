@@ -1474,6 +1474,39 @@ describe('morgan()', function () {
             .expect(200, cb)
         })
       })
+
+      describe('when NO_COLOR is set', function () {
+        var oldNoColor
+
+        before(function () {
+          oldNoColor = process.env.NO_COLOR
+          process.env.NO_COLOR = '1'
+        })
+
+        after(function () {
+          process.env.NO_COLOR = oldNoColor
+        })
+
+        it('should not have color', function (done) {
+          var cb = after(2, function (err, res, line) {
+            if (err) return done(err)
+            assert.strictEqual(line, '_color_0_GET / _color_0_200_color_0_ - ms - -_color_0_')
+            done()
+          })
+
+          var stream = createColorLineStream(function onLine (line) {
+            cb(null, null, line)
+          })
+
+          var server = createServer('dev', {
+            stream: stream
+          })
+
+          request(server)
+            .get('/')
+            .expect(200, cb)
+        })
+      })
     })
 
     describe('short', function () {
