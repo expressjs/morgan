@@ -171,6 +171,10 @@ morgan.token('type', function (req, res) { return req.headers['content-type'] })
 Calling `morgan.token()` using the same name as an existing token will overwrite that
 token definition.
 
+The names `token`, `format`, and `compile` are reserved by morgan itself and cannot be
+used as custom token names. Attempting to register a token with one of these names will
+throw a `TypeError`.
+
 The token function is expected to be called with the arguments `req` and `res`, representing
 the HTTP request and HTTP response. Additionally, the token can accept further arguments of
 it's choosing to customize behavior.

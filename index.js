@@ -19,6 +19,8 @@ module.exports.compile = compile
 module.exports.format = format
 module.exports.token = token
 
+var RESERVED_TOKEN_NAMES = ['compile', 'format', 'token']
+
 /**
  * Module dependencies.
  * @private
@@ -573,6 +575,10 @@ function recordStartTime () {
  */
 
 function token (name, fn) {
+  if (RESERVED_TOKEN_NAMES.indexOf(name) !== -1) {
+    throw new TypeError('cannot use reserved name "' + name + '" for a token; choose a different name')
+  }
+
   morgan[name] = fn
   return this
 }
