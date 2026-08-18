@@ -1333,6 +1333,20 @@ describe('morgan()', function () {
     })
 
     describe('dev', function () {
+      var noColor = process.env.NO_COLOR
+
+      beforeEach(function () {
+        delete process.env.NO_COLOR
+      })
+
+      afterEach(function () {
+        if (noColor === undefined) {
+          delete process.env.NO_COLOR
+        } else {
+          process.env.NO_COLOR = noColor
+        }
+      })
+
       it('should not color 1xx', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
@@ -1476,16 +1490,12 @@ describe('morgan()', function () {
       })
 
       describe('with NO_COLOR environment variable', function () {
-        afterEach(function () {
-          delete process.env.NO_COLOR
-        })
-
         it('should omit ANSI color codes when NO_COLOR is set', function (done) {
           process.env.NO_COLOR = '1'
 
           var cb = after(2, function (err, res, line) {
             if (err) return done(err)
-            assert.strictEqual(/\x1b\[/.test(line), false, 'expected no ANSI codes')
+            assert.strictEqual(line.indexOf('\x1b['), -1, 'expected no ANSI codes')
             done()
           })
 
@@ -1505,7 +1515,7 @@ describe('morgan()', function () {
 
           var cb = after(2, function (err, res, line) {
             if (err) return done(err)
-            assert.strictEqual(/\x1b\[/.test(line), false, 'expected no ANSI codes')
+            assert.strictEqual(line.indexOf('\x1b['), -1, 'expected no ANSI codes')
             done()
           })
 
@@ -1521,6 +1531,26 @@ describe('morgan()', function () {
           request(server)
             .get('/')
             .expect(500, cb)
+        })
+
+        it('should preserve color when NO_COLOR is empty', function (done) {
+          process.env.NO_COLOR = ''
+
+          var cb = after(2, function (err, res, line) {
+            if (err) return done(err)
+            assert.strictEqual(line.substr(0, 37), '_color_0_GET / _color_32_200_color_0_')
+            done()
+          })
+
+          var stream = createColorLineStream(function onLine (line) {
+            cb(null, null, line)
+          })
+
+          var server = createServer('dev', { stream: stream })
+
+          request(server)
+            .get('/')
+            .expect(200, cb)
         })
       })
     })

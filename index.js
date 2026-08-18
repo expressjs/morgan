@@ -220,7 +220,7 @@ morgan.format('dev', function developmentFormatLine (tokens, req, res) {
           : 0 // no color
 
   // respect NO_COLOR environment variable (https://no-color.org/)
-  var noColor = 'NO_COLOR' in process.env
+  var noColor = Boolean(process.env.NO_COLOR)
 
   // get colored function
   var key = noColor ? 'plain' : color
