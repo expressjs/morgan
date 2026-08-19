@@ -212,8 +212,12 @@ morgan.format('dev', function developmentFormatLine (tokens, req, res) {
     ? res.statusCode
     : undefined
 
+  // check if color is disabled
+  var noColor = process.env.NO_COLOR != null && process.env.NO_COLOR !== ''
+
   // get status color
-  var color = status >= 500 ? 31 // red
+  var color = noColor ? 'no-color'
+    : status >= 500 ? 31 // red
     : status >= 400 ? 33 // yellow
       : status >= 300 ? 36 // cyan
         : status >= 200 ? 32 // green
@@ -224,8 +228,12 @@ morgan.format('dev', function developmentFormatLine (tokens, req, res) {
 
   if (!fn) {
     // compile
-    fn = developmentFormatLine[color] = compile('\x1b[0m:method :url \x1b[' +
-      color + 'm:status\x1b[0m :response-time ms - :res[content-length]\x1b[0m')
+    if (noColor) {
+      fn = developmentFormatLine[color] = compile(':method :url :status :response-time ms - :res[content-length]')
+    } else {
+      fn = developmentFormatLine[color] = compile('\x1b[0m:method :url \x1b[' +
+        color + 'm:status\x1b[0m :response-time ms - :res[content-length]\x1b[0m')
+    }
   }
 
   return fn(tokens, req, res)
