@@ -28,12 +28,12 @@
   "devDependencies": {
     "eslint": "6.8.0",
     "eslint-config-standard": "14.1.1",
-    "eslint-plugin-import": "2.20.2",
+    "eslint-plugin-import": "2.32.0",
     "eslint-plugin-markdown": "1.0.2",
     "eslint-plugin-node": "11.1.0",
-    "eslint-plugin-promise": "4.2.1",
-    "eslint-plugin-standard": "4.0.1",
-    "mocha": "10.4.0",
+    "eslint-plugin-promise": "4.3.1",
+    "eslint-plugin-standard": "4.1.0",
+    "mocha": "10.8.2",
     "nyc": "15.1.0",
     "split": "1.0.1",
     "supertest": "4.0.2"
