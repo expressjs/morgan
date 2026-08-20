@@ -128,16 +128,12 @@ function morgan (format, options) {
 
   return function logger (req, res, next) {
     // request data
-    req._startAt = undefined
-    req._startTime = undefined
     req._remoteAddress = getip(req)
 
-    // response data
-    res._startAt = undefined
-    res._startTime = undefined
-
-    // record request start
-    recordStartTime.call(req)
+    // record request start (only once, even with multiple morgan instances)
+    if (!req._startAt) {
+      recordStartTime.call(req)
+    }
 
     function logRequest () {
       if (skip !== false && skip(req, res)) {
@@ -160,8 +156,11 @@ function morgan (format, options) {
       // immediate log
       logRequest()
     } else {
-      // record response start
-      onHeaders(res, recordStartTime)
+      // record response start (only once, even with multiple morgan instances)
+      if (!res._onHeadersAdded) {
+        res._onHeadersAdded = true
+        onHeaders(res, recordStartTime)
+      }
 
       // log when response finished
       onFinished(res, logRequest)
