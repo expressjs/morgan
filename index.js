@@ -207,6 +207,15 @@ morgan.format('tiny', ':method :url :status :res[content-length] - :response-tim
  */
 
 morgan.format('dev', function developmentFormatLine (tokens, req, res) {
+  // NO_COLOR (https://no-color.org/): when present and not an empty
+  // string, regardless of its value, ANSI color codes must not be added
+  if (process.env.NO_COLOR) {
+    var plainFn = developmentFormatLine.plain || (developmentFormatLine.plain =
+      compile(':method :url :status :response-time ms - :res[content-length]'))
+
+    return plainFn(tokens, req, res)
+  }
+
   // get the status code if response written
   var status = headersSent(res)
     ? res.statusCode

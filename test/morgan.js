@@ -1474,6 +1474,38 @@ describe('morgan()', function () {
             .expect(200, cb)
         })
       })
+
+      describe('with NO_COLOR environment variable set', function () {
+        beforeEach(function () {
+          process.env.NO_COLOR = '1'
+        })
+
+        afterEach(function () {
+          delete process.env.NO_COLOR
+        })
+
+        it('should not emit any ANSI escape codes', function (done) {
+          var cb = after(2, function (err, res, line) {
+            if (err) return done(err)
+            assert.strictEqual(line.indexOf('\x1b'), -1)
+            assert.ok(/^GET \/ 200 \d+\.\d{3} ms - -$/.test(line), 'unexpected line: ' + line)
+            done()
+          })
+
+          var stream = createLineStream(function onLine (line) {
+            cb(null, null, line)
+          })
+
+          var server = createServer('dev', { stream: stream }, function (req, res, next) {
+            res.statusCode = 200
+            next()
+          })
+
+          request(server)
+            .get('/')
+            .expect(200, cb)
+        })
+      })
     })
 
     describe('short', function () {
