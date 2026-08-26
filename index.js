@@ -153,10 +153,9 @@ function morgan (format, options) {
       }
 
       debug('log request')
-      if (stream.writableObjectMode && typeof line == 'object') {
+      if (stream.writableObjectMode && typeof line === 'object') {
         stream.write(line)
-      }
-      else {
+      } else {
         stream.write(line + '\n')
       }
     };
