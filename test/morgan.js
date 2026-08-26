@@ -1225,7 +1225,7 @@ describe('morgan()', function () {
 
         var stream = {
           writableObjectMode: true,
-          write (obj) { cb(null, null, obj) }
+          write: function (obj) { cb(null, null, obj) }
         }
 
         function format (tokens, req, res) {
