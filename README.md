@@ -7,7 +7,7 @@
 
 HTTP request logger middleware for node.js
 
-> Named after [Dexter](http://en.wikipedia.org/wiki/Dexter_Morgan), a show you should not watch until completion.
+> Named after [Dexter](https://en.wikipedia.org/wiki/Dexter_Morgan), a show you should not watch until completion.
 
 ## Installation
 
@@ -20,6 +20,16 @@ $ npm install morgan
 ```
 
 ## API
+
+For ES Modules:
+
+<!-- eslint-disable no-unused-vars -->
+
+```js
+import morgan from 'morgan'
+```
+
+For CommonJS:
 
 <!-- eslint-disable no-unused-vars -->
 
@@ -97,6 +107,30 @@ morgan('combined', {
 ##### stream
 
 Output stream for writing log lines, defaults to `process.stdout`.
+
+If the stream is in object mode (`stream.writableObjectMode` is `true`) and the
+format function returns an object, the object is written to the stream as-is,
+without a trailing newline. This allows passing structured log entries to
+loggers that accept objects:
+
+<!-- eslint-disable no-undef -->
+
+```js
+morgan(function (tokens, req, res) {
+  return {
+    method: tokens.method(req, res),
+    url: tokens.url(req, res),
+    status: Number(tokens.status(req, res))
+  }
+}, {
+  stream: {
+    writableObjectMode: true,
+    write: function (entry) {
+      // entry is the object returned by the format function
+    }
+  }
+})
+```
 
 #### Predefined Formats
 
