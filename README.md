@@ -21,19 +21,22 @@ $ npm install morgan
 
 ## API
 
-<!-- eslint-disable no-unused-vars -->
-
 For ES Modules:
 
+<!-- eslint-disable no-unused-vars -->
+
 ```js
-import morgan from "morgan"
+import morgan from 'morgan'
 ```
 
 For CommonJS:
 
+<!-- eslint-disable no-unused-vars -->
+
 ```js
-var morgan = require("morgan")
+var morgan = require('morgan')
 ```
+
 ### morgan(format, options)
 
 Create a new morgan logger middleware function using the given `format` and `options`.
