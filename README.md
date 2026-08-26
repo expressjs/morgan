@@ -168,6 +168,10 @@ for information codes.
 GET /dev 200 0.224 ms - 2
 ```
 
+Set the `NO_COLOR` environment variable to a non-empty value to disable the
+colored output (see [no-color.org](https://no-color.org/)). The same fields are
+then printed without any ANSI escape sequences.
+
 ##### short
 
 Shorter than default, also including response time.
