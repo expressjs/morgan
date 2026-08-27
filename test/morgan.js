@@ -1,5 +1,8 @@
 
 process.env.NO_DEPRECATION = 'morgan'
+// empty, not deleted: per https://no-color.org an empty NO_COLOR must not
+// disable color, so the dev tests below guard that. Set: test/noColor.js
+process.env.NO_COLOR = ''
 
 var assert = require('assert')
 var fs = require('fs')
