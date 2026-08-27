@@ -1,7 +1,8 @@
 
 process.env.NO_DEPRECATION = 'morgan'
-// read once at require time, hence a separate file from test/morgan.js
-process.env.NO_COLOR = '1'
+// read once at require time, hence a separate file from test/morgan.js.
+// '0' is deliberate: any non-empty value disables color, whatever it is
+process.env.NO_COLOR = '0'
 
 var assert = require('assert')
 var http = require('http')

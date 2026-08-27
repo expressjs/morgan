@@ -213,17 +213,6 @@ morgan.format('tiny', ':method :url :status :res[content-length] - :response-tim
  */
 
 morgan.format('dev', function developmentFormatLine (tokens, req, res) {
-  // when NO_COLOR is set, use an escape free variant of dev format
-  if (NO_COLOR) {
-    var noColorFn = developmentFormatLine.noColor
-
-    if (!noColorFn) {
-      noColorFn = developmentFormatLine.noColor = compile(':method :url :status :response-time ms - :res[content-length]')
-    }
-
-    return noColorFn(tokens, req, res)
-  }
-
   // get the status code if response written
   var status = headersSent(res)
     ? res.statusCode
@@ -247,6 +236,12 @@ morgan.format('dev', function developmentFormatLine (tokens, req, res) {
 
   return fn(tokens, req, res)
 })
+
+// NO_COLOR (https://no-color.org): when set and not an empty string, the dev
+// format is replaced at load time with a variant free of escape sequences
+if (NO_COLOR) {
+  morgan.format('dev', compile(':method :url :status :response-time ms - :res[content-length]'))
+}
 
 /**
  * request url
