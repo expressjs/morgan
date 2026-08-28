@@ -47,6 +47,8 @@ var CLF_MONTH = [
 
 var DEFAULT_BUFFER_DURATION = 1000
 
+var NO_COLOR = Boolean(process.env.NO_COLOR)
+
 /**
  * Escape control characters and backslashes so a value is safe for
  * line-oriented logs.
@@ -234,6 +236,12 @@ morgan.format('dev', function developmentFormatLine (tokens, req, res) {
 
   return fn(tokens, req, res)
 })
+
+// NO_COLOR (https://no-color.org): when set and not an empty string, the dev
+// format is replaced at load time with a variant free of escape sequences
+if (NO_COLOR) {
+  morgan.format('dev', compile(':method :url :status :response-time ms - :res[content-length]'))
+}
 
 /**
  * request url

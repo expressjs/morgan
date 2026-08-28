@@ -168,6 +168,11 @@ for information codes.
 GET /dev 200 0.224 ms - 2
 ```
 
+Coloring is disabled when the [`NO_COLOR`](https://no-color.org) environment
+variable is set to any non-empty value, in which case the output above is
+written without any escape sequences. The variable is read once, when `morgan`
+is first required.
+
 ##### short
 
 Shorter than default, also including response time.
