@@ -85,6 +85,30 @@ describe('morgan()', function () {
           .expect(200, cb)
       })
 
+      it('should escape token values used from a function format', function (done) {
+        var nel = String.fromCharCode(0x85)
+
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line.indexOf(nel), -1)
+          assert.strictEqual(line, 'foo\\u0085bar')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        function format (tokens, req, res) {
+          return tokens.req(req, res, 'x-test')
+        }
+
+        request(createServer(format, { stream: stream }))
+          .get('/')
+          .set('x-test', 'foo' + nel + 'bar')
+          .expect(200, cb)
+      })
+
       it('should reject format as bool', function () {
         assert.throws(createServer.bind(null, true), /argument format/)
       })
@@ -329,6 +353,26 @@ describe('morgan()', function () {
         request(createServer(':req[set-cookie]', { stream: stream }))
           .get('/')
           .set('Set-Cookie', ['foo=bar', 'fizz=buzz'])
+          .expect(200, cb)
+      })
+
+      it('should escape control characters in header values', function (done) {
+        var nel = String.fromCharCode(0x85)
+
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line.indexOf(nel), -1)
+          assert.strictEqual(line, 'foo\\u0085bar')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        request(createServer(':req[x-test]', { stream: stream }))
+          .get('/')
+          .set('x-test', 'foo' + nel + 'bar')
           .expect(200, cb)
       })
     })
@@ -615,6 +659,27 @@ describe('morgan()', function () {
         request(createServer(':remote-user', { stream: stream }))
           .get('/')
           .set('Authorization', 'Basic ZXZpbAkbdXNlcjp4')
+          .expect(200, cb)
+      })
+
+      it('should escape Unicode line separators', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line.indexOf('\u0085'), -1)
+          assert.strictEqual(line.indexOf('\u2028'), -1)
+          assert.strictEqual(line.indexOf('\u2029'), -1)
+          assert.strictEqual(line, 'alice\\u0085next\\u2028line\\u2029end')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        // 'alice\u0085next\u2028line\u2029end:x' in Base64
+        request(createServer(':remote-user', { stream: stream }))
+          .get('/')
+          .set('Authorization', 'Basic YWxpY2XChW5leHTigKhsaW5l4oCpZW5kOng=')
           .expect(200, cb)
       })
 
