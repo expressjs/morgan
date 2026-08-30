@@ -1525,7 +1525,7 @@ describe('morgan()', function () {
           .expect(300, cb)
       })
 
-      it('should color 4xx yelow', function (done) {
+      it('should color 4xx yellow', function (done) {
         var cb = after(2, function (err, res, line) {
           if (err) return done(err)
           assert.strictEqual(line.substr(0, 37), '_color_0_GET / _color_33_400_color_0_')

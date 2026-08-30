@@ -290,7 +290,7 @@ morgan.token('total-time', function getTotalTimeToken (req, res, digits) {
   // time elapsed from request start
   var elapsed = process.hrtime(req._startAt)
 
-  // cover to milliseconds
+  // convert to milliseconds
   var ms = (elapsed[0] * 1e3) + (elapsed[1] * 1e-6)
 
   // return truncated value
