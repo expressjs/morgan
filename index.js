@@ -19,6 +19,13 @@ module.exports.compile = compile
 module.exports.format = format
 module.exports.token = token
 
+// Protect method names from being overwritten by token registrations
+Object.defineProperties(module.exports, {
+  compile: { writable: false, configurable: false },
+  format: { writable: false, configurable: false },
+  token: { writable: false, configurable: false }
+})
+
 /**
  * Module dependencies.
  * @private
