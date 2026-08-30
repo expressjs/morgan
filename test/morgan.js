@@ -1232,6 +1232,69 @@ describe('morgan()', function () {
         test.write('0')
       })
     })
+
+    describe('async tokens', function () {
+      it('should resolve Promise returned by token in string format', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line, 'GET /foo 200')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        morgan.token('async-method', function (req) {
+          return Promise.resolve(req.method)
+        })
+
+        request(createServer(':async-method :url :status', { stream: stream }))
+          .get('/foo')
+          .expect(200, cb)
+      })
+
+      it('should not log [object Promise] for async token', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line.indexOf('[object Promise]'), -1)
+          assert.strictEqual(line, 'ahmed')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        morgan.token('async-user', function () {
+          return Promise.resolve('ahmed')
+        })
+
+        request(createServer(':async-user', { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
+
+      it('should keep synchronous tokens working alongside async tokens', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.ok(/^GET \/sync-test \d+$/.test(line))
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        morgan.token('async-status', function (req, res) {
+          return Promise.resolve(String(res.statusCode))
+        })
+
+        request(createServer(':method :url :async-status', { stream: stream }))
+          .get('/sync-test')
+          .expect(200, cb)
+      })
+    })
   })
 
   describe('formats', function () {

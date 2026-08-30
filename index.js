@@ -154,6 +154,20 @@ function morgan (format, options) {
         return
       }
 
+      // Support Promise-returning format functions and compiled formats with
+      // async tokens: if formatLine returned a thenable, defer the write.
+      if (line && typeof line.then === 'function') {
+        line.then(function (str) {
+          if (str == null) {
+            debug('skip line')
+            return
+          }
+          debug('log request')
+          stream.write(str + '\n')
+        })
+        return
+      }
+
       debug('log request')
       if (stream.writableObjectMode && typeof line === 'object') {
         stream.write(line)
@@ -441,17 +455,88 @@ function compile (format) {
     throw new TypeError('argument format must be a string')
   }
 
-  var fmt = String(JSON.stringify(format))
-  var js = '  "use strict"\n  return ' + fmt.replace(/:([-\w]{2,})(?:\[([^\]]+)\])?/g, function (_, name, arg) {
+  // Build two parallel arrays as we scan the format string:
+  //   decls  – "var _v0 = tokens[\"name\"](req, res, \"arg\")" declarations
+  //   pieces – the string-assembly expression that references _v0, _v1, …
+  //            interleaved with the literal text segments
+  var decls = []
+  var pieces = []
+  var idx = 0
+  var lastIndex = 0
+  var tokenRe = /:([-\w]{2,})(?:\[([^\]]+)\])?/g
+  var match
+
+  while ((match = tokenRe.exec(format)) !== null) {
+    // push the literal segment before this token
+    pieces.push(JSON.stringify(format.slice(lastIndex, match.index)))
+    lastIndex = match.index + match[0].length
+
+    var name = match[1]
+    var arg = match[2]
     var tokenArguments = 'req, res'
-    var tokenFunction = 'tokens[' + String(JSON.stringify(name)) + ']'
+    var tokenFunction = 'tokens[' + JSON.stringify(name) + ']'
+    var varName = '_v' + idx
 
     if (arg !== undefined) {
-      tokenArguments += ', ' + String(JSON.stringify(arg))
+      tokenArguments += ', ' + JSON.stringify(arg)
     }
 
-    return '" +\n    (' + tokenFunction + '(' + tokenArguments + ') || "-") + "'
-  })
+    decls.push('  var ' + varName + ' = ' + tokenFunction + '(' + tokenArguments + ')')
+    // Each token piece is (_vN || "-") to match existing fallback behaviour
+    pieces.push('(' + varName + ' || "-")')
+    idx++
+  }
+
+  // push any trailing literal
+  pieces.push(JSON.stringify(format.slice(lastIndex)))
+
+  var varCount = idx
+
+  // Build the synchronous return expression (identical semantics to the old
+  // compile output so existing tests are unaffected)
+  var syncExpr = pieces.join(' + ')
+
+  var js = '  "use strict"\n'
+
+  if (varCount === 0) {
+    // No tokens at all – plain string, same as before
+    js += '  return ' + syncExpr
+  } else {
+    // Declare all token variables up front
+    js += decls.join('\n') + '\n'
+
+    // Build the Promise-check expression: any _vN that is non-null and thenable
+    var checks = []
+    for (var i = 0; i < varCount; i++) {
+      checks.push('(_v' + i + ' != null && typeof _v' + i + '.then === \'function\')')
+    }
+
+    // Build the resolved-values expression for the async path:
+    // inside Promise.all callback the values come in as _r[0], _r[1], …
+    var asyncPieces = pieces.map(function (p, pi) {
+      // odd-indexed pieces are token expressions "(_vN || "-")" → "(_r[K] || "-")"
+      // even-indexed pieces are literal strings
+      if (pi % 2 === 1) {
+        var k = (pi - 1) / 2
+        return '(_r[' + k + '] || "-")'
+      }
+      return p
+    })
+    var asyncExpr = asyncPieces.join(' + ')
+
+    // Build the Promise.all values array: _v0, _v1, …
+    var promiseArgs = []
+    for (var j = 0; j < varCount; j++) {
+      promiseArgs.push('_v' + j)
+    }
+
+    js += '  if (' + checks.join(' || ') + ') {\n'
+    js += '    return Promise.all([' + promiseArgs.join(', ') + ']).then(function (_r) {\n'
+    js += '      return ' + asyncExpr + '\n'
+    js += '    })\n'
+    js += '  }\n'
+    js += '  return ' + syncExpr
+  }
 
   // eslint-disable-next-line no-new-func
   return new Function('tokens, req, res', js)
