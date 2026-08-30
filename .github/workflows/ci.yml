@@ -244,3 +244,232 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         parallel-finished: true
+
+  # Cross-platform lanes, following the pattern merged in expressjs/multer#1464
+  # and proposed in expressjs/body-parser#759: the legacy `test` job above keeps
+  # running the full historical matrix on ubuntu via nvm (it cannot run on the
+  # hosted windows/macos runners, which have no nvm), while this job exercises
+  # the suite on windows and macos via actions/setup-node for every Node.js
+  # version those runners can install natively.
+  test-cross-platform:
+    permissions:
+      checks: write  # for coverallsapp/github-action to create new checks
+      contents: read  # for actions/checkout to fetch code
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+        - windows-latest
+        name:
+        - Node.js 10.x
+        - Node.js 11.x
+        - Node.js 12.x
+        - Node.js 13.x
+        - Node.js 14.x
+        - Node.js 15.x
+        - Node.js 16.x
+        - Node.js 17.x
+        - Node.js 18.x
+        - Node.js 19.x
+        - Node.js 20.x
+        - Node.js 21.x
+        - Node.js 22.x
+        - Node.js 23.x
+        - Node.js 24.x
+        - Node.js 25.x
+        - Node.js 26.x
+
+        include:
+        - name: Node.js 10.x
+          node-version: "10"
+          npm-i: mocha@8.4.0
+
+        - name: Node.js 11.x
+          node-version: "11"
+          npm-i: mocha@8.4.0
+
+        - name: Node.js 12.x
+          node-version: "12"
+          npm-i: mocha@9.2.2
+
+        - name: Node.js 13.x
+          node-version: "13"
+          npm-i: mocha@9.2.2
+
+        - name: Node.js 14.x
+          node-version: "14"
+
+        - name: Node.js 15.x
+          node-version: "15"
+
+        - name: Node.js 16.x
+          node-version: "16"
+
+        - name: Node.js 17.x
+          node-version: "17"
+
+        - name: Node.js 18.x
+          node-version: "18"
+
+        - name: Node.js 19.x
+          node-version: "19"
+
+        - name: Node.js 20.x
+          node-version: "20"
+
+        - name: Node.js 21.x
+          node-version: "21"
+
+        - name: Node.js 22.x
+          node-version: "22"
+
+        - name: Node.js 23.x
+          node-version: "23"
+
+        - name: Node.js 24.x
+          node-version: "24"
+
+        - name: Node.js 25.x
+          node-version: "25"
+
+        - name: Node.js 26.x
+          node-version: "26"
+
+        # Windows on Node.js < 22 is not yet proven for this suite; keep those
+        # legs informational until measured, mirroring expressjs/multer#1464.
+        - name: Node.js 10.x
+          os: windows-latest
+          experimental: true
+
+        - name: Node.js 11.x
+          os: windows-latest
+          experimental: true
+
+        - name: Node.js 12.x
+          os: windows-latest
+          experimental: true
+
+        - name: Node.js 13.x
+          os: windows-latest
+          experimental: true
+
+        - name: Node.js 14.x
+          os: windows-latest
+          experimental: true
+
+        - name: Node.js 15.x
+          os: windows-latest
+          experimental: true
+
+        - name: Node.js 16.x
+          os: windows-latest
+          experimental: true
+
+        - name: Node.js 17.x
+          os: windows-latest
+          experimental: true
+
+        - name: Node.js 18.x
+          os: windows-latest
+          experimental: true
+
+        - name: Node.js 19.x
+          os: windows-latest
+          experimental: true
+
+        - name: Node.js 20.x
+          os: windows-latest
+          experimental: true
+
+        - name: Node.js 21.x
+          os: windows-latest
+          experimental: true
+
+        # macOS: Node.js < 16 has no darwin-arm64 builds (setup-node cannot
+        # install them natively and those legs would be permanently red), so
+        # they are skipped. 16.x-21.x run informational until measured;
+        # 22+ are required checks.
+        - name: Node.js 16.x
+          os: macos-latest
+          node-version: "16"
+          experimental: true
+
+        - name: Node.js 17.x
+          os: macos-latest
+          node-version: "17"
+          experimental: true
+
+        - name: Node.js 18.x
+          os: macos-latest
+          node-version: "18"
+          experimental: true
+
+        - name: Node.js 19.x
+          os: macos-latest
+          node-version: "19"
+          experimental: true
+
+        - name: Node.js 20.x
+          os: macos-latest
+          node-version: "20"
+          experimental: true
+
+        - name: Node.js 21.x
+          os: macos-latest
+          node-version: "21"
+          experimental: true
+
+        - name: Node.js 22.x
+          os: macos-latest
+          node-version: "22"
+
+        - name: Node.js 23.x
+          os: macos-latest
+          node-version: "23"
+
+        - name: Node.js 24.x
+          os: macos-latest
+          node-version: "24"
+
+        - name: Node.js 25.x
+          os: macos-latest
+          node-version: "25"
+
+        - name: Node.js 26.x
+          os: macos-latest
+          node-version: "26"
+
+    continue-on-error: ${{ matrix.experimental == true }}
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
+    - name: Install Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install npm module(s) ${{ matrix.npm-i }}
+      run: npm install --save-dev ${{ matrix.npm-i }}
+      if: matrix.npm-i != ''
+
+    - name: Install Node.js dependencies
+      run: npm install
+
+    - name: List environment
+      shell: bash
+      run: |
+        echo "node@$(node -v)"
+        echo "npm@$(npm -v)"
+        npm -s ls ||:
+
+    - name: Run tests
+      shell: bash
+      run: |
+        if npm -ps ls nyc | grep -q nyc; then
+          npm run test-ci
+        else
+          npm test
+        fi
