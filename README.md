@@ -86,7 +86,7 @@ Morgan accepts these properties in the options object.
 
 ##### immediate
 
-Write log line on request instead of response. This means that a requests will
+Write log line on request instead of response. This means that requests will
 be logged even if the server crashes, _but data from the response (like the
 response code, content length, etc.) cannot be logged_.
 
@@ -212,7 +212,7 @@ token definition.
 
 The token function is expected to be called with the arguments `req` and `res`, representing
 the HTTP request and HTTP response. Additionally, the token can accept further arguments of
-it's choosing to customize behavior.
+its choosing to customize behavior.
 
 ##### :date[format]
 
@@ -238,7 +238,7 @@ The process ID of the Node.js process handling the request.
 
 ##### :referrer
 
-The Referrer header of the request. This will use the standard mis-spelled Referer header if exists, otherwise Referrer.
+The Referrer header of the request. This will use the standard mis-spelled Referer header if it exists, otherwise Referrer.
 
 ##### :remote-addr
 
@@ -284,7 +284,7 @@ include on the number, defaulting to `3`, which provides microsecond precision.
 
 ##### :url
 
-The URL of the request. This will use `req.originalUrl` if exists, otherwise `req.url`.
+The URL of the request. This will use `req.originalUrl` if it exists, otherwise `req.url`.
 
 ##### :user-agent
 
@@ -294,12 +294,12 @@ The contents of the User-Agent header of the request.
 
 Compile a format string into a `format` function for use by `morgan`. A format string
 is a string that represents a single log line and can utilize token syntax.
-Tokens are references by `:token-name`. If tokens accept arguments, they can
+Tokens are referenced by `:token-name`. If tokens accept arguments, they can
 be passed using `[]`, for example: `:token-name[pretty]` would pass the string
 `'pretty'` as an argument to the token `token-name`.
 
 The function returned from `morgan.compile` takes three arguments `tokens`, `req`, and
-`res`, where `tokens` is object with all defined tokens, `req` is the HTTP request and
+`res`, where `tokens` is an object with all defined tokens, `req` is the HTTP request and
 `res` is the HTTP response. The function will return a string that will be the log line,
 or `undefined` / `null` to skip logging.
 
@@ -310,7 +310,7 @@ advanced uses, this compile function is directly available.
 
 ### express/connect
 
-Sample app that will log all request in the Apache combined format to STDOUT
+Sample app that will log all requests in the Apache combined format to STDOUT
 
 ```js
 var express = require('express')
@@ -327,7 +327,7 @@ app.get('/', function (req, res) {
 
 ### vanilla http server
 
-Sample app that will log all request in the Apache combined format to STDOUT
+Sample app that will log all requests in the Apache combined format to STDOUT
 
 ```js
 var finalhandler = require('finalhandler')
@@ -445,7 +445,7 @@ Sample app that will use custom token formats. This adds an ID to all requests a
 ```js
 var express = require('express')
 var morgan = require('morgan')
-var uuid = require('node-uuid')
+var uuid = require('uuid')
 
 morgan.token('id', function getId (req) {
   return req.id
