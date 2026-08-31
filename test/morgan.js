@@ -1334,6 +1334,30 @@ describe('morgan()', function () {
           .get('/')
           .expect(200, cb)
       })
+
+      it('should handle thenable whose then() returns undefined', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line, 'ok')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        function format () {
+          return {
+            then: function (resolve) {
+              resolve('ok')
+            }
+          }
+        }
+
+        request(createServer(format, { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
     })
   })
 

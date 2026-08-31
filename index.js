@@ -168,7 +168,7 @@ function morgan (format, options) {
       // Support Promise-returning format functions and compiled formats with
       // async tokens: if formatLine returned a thenable, defer the write.
       if (line && typeof line.then === 'function') {
-        line.then(function (str) {
+        Promise.resolve(line).then(function (str) {
           if (str == null) {
             debug('skip line')
             return
