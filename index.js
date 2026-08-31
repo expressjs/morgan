@@ -141,6 +141,17 @@ function morgan (format, options) {
     // record request start
     recordStartTime.call(req)
 
+    // Write a resolved log value to the stream, preserving object-mode
+    // semantics: if the stream is in object mode and the value is an object,
+    // write it directly; otherwise coerce to string and append a newline.
+    function writeLog (val) {
+      if (stream.writableObjectMode && typeof val === 'object') {
+        stream.write(val)
+      } else {
+        stream.write(val + '\n')
+      }
+    }
+
     function logRequest () {
       if (skip !== false && skip(req, res)) {
         debug('skip request')
@@ -163,17 +174,17 @@ function morgan (format, options) {
             return
           }
           debug('log request')
-          stream.write(str + '\n')
+          writeLog(str)
+        }).catch(function (err) {
+          // A rejected async token must not become an unhandled rejection
+          // and crash the host process.  Log via debug and move on.
+          debug('async token error: %s', err && err.message ? err.message : err)
         })
         return
       }
 
       debug('log request')
-      if (stream.writableObjectMode && typeof line === 'object') {
-        stream.write(line)
-      } else {
-        stream.write(line + '\n')
-      }
+      writeLog(line)
     };
 
     if (immediate) {

@@ -1294,6 +1294,46 @@ describe('morgan()', function () {
           .get('/sync-test')
           .expect(200, cb)
       })
+
+      it('should not crash when a token returns a rejected Promise', function (done) {
+        // Regression test for PR #380 P1: an unhandled rejection from an async
+        // token must not terminate the Node.js process.  The request must
+        // complete normally even though the log line is silently dropped.
+        morgan.token('reject-token', function () {
+          return Promise.reject(new Error('token failure'))
+        })
+
+        request(createServer(':method :url :reject-token', {}))
+          .get('/')
+          .expect(200, done)
+      })
+
+      it('should pass resolved object to object-mode stream unchanged', function (done) {
+        // Regression test for PR #380 P2: the async path must honour
+        // writableObjectMode exactly like the synchronous path does.
+        var received = null
+        var cb = after(2, function (err) {
+          if (err) return done(err)
+          assert.deepEqual(received, { method: 'GET', url: '/' })
+          done()
+        })
+
+        var stream = {
+          writableObjectMode: true,
+          write: function (obj) {
+            received = obj
+            cb(null, null)
+          }
+        }
+
+        function format (tokens, req) {
+          return Promise.resolve({ method: req.method, url: req.url })
+        }
+
+        request(createServer(format, { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
     })
   })
 
