@@ -1358,6 +1358,66 @@ describe('morgan()', function () {
           .get('/')
           .expect(200, cb)
       })
+
+      it('should handle format function returning value with throwing then getter', function (done) {
+        var bad = {}
+        Object.defineProperty(bad, 'then', {
+          get: function () {
+            throw new Error('then getter failed')
+          }
+        })
+
+        function format () {
+          return bad
+        }
+
+        var uncaught = []
+        function onUncaught (err) {
+          uncaught.push(err)
+        }
+        process.on('uncaughtException', onUncaught)
+        process.on('unhandledRejection', onUncaught)
+
+        request(createServer(format, {}))
+          .get('/')
+          .expect(200, function (err) {
+            process.removeListener('uncaughtException', onUncaught)
+            process.removeListener('unhandledRejection', onUncaught)
+            if (err) return done(err)
+            assert.strictEqual(uncaught.length, 0)
+            done()
+          })
+      })
+
+      it('should handle token returning value with throwing then getter in compiled format', function (done) {
+        var bad = {}
+        Object.defineProperty(bad, 'then', {
+          get: function () {
+            throw new Error('token then getter failed')
+          }
+        })
+
+        morgan.token('throwing-then-token', function () {
+          return bad
+        })
+
+        var uncaught = []
+        function onUncaught (err) {
+          uncaught.push(err)
+        }
+        process.on('uncaughtException', onUncaught)
+        process.on('unhandledRejection', onUncaught)
+
+        request(createServer(':method :url :throwing-then-token', {}))
+          .get('/')
+          .expect(200, function (err) {
+            process.removeListener('uncaughtException', onUncaught)
+            process.removeListener('unhandledRejection', onUncaught)
+            if (err) return done(err)
+            assert.strictEqual(uncaught.length, 0)
+            done()
+          })
+      })
     })
   })
 

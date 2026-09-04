@@ -167,7 +167,7 @@ function morgan (format, options) {
 
       // Support Promise-returning format functions and compiled formats with
       // async tokens: if formatLine returned a thenable, defer the write.
-      if (line && typeof line.then === 'function') {
+      if (hasThenProperty(line)) {
         Promise.resolve(line).then(function (str) {
           if (str == null) {
             debug('skip line')
@@ -513,13 +513,22 @@ function compile (format) {
     // No tokens at all – plain string, same as before
     js += '  return ' + syncExpr
   } else {
+    // Helper to safely detect thenables even if accessing .then throws
+    js += '  function hasThenProperty (val) {\n'
+    js += '    try {\n'
+    js += '      return val != null && typeof val.then === \'function\'\n'
+    js += '    } catch (err) {\n'
+    js += '      return true\n'
+    js += '    }\n'
+    js += '  }\n'
+
     // Declare all token variables up front
     js += decls.join('\n') + '\n'
 
     // Build the Promise-check expression: any _vN that is non-null and thenable
     var checks = []
     for (var i = 0; i < varCount; i++) {
-      checks.push('(_v' + i + ' != null && typeof _v' + i + '.then === \'function\')')
+      checks.push('hasThenProperty(_v' + i + ')')
     }
 
     // Build the resolved-values expression for the async path:
@@ -644,6 +653,23 @@ function headersSent (res) {
   return typeof res.headersSent !== 'boolean'
     ? Boolean(res._header)
     : res.headersSent
+}
+
+/**
+ * Determine if a value has a then-property (thenable),
+ * guarding against throwing property getters.
+ *
+ * @param {object} val
+ * @return {boolean}
+ * @private
+ */
+
+function hasThenProperty (val) {
+  try {
+    return val != null && typeof val.then === 'function'
+  } catch (err) {
+    return true
+  }
 }
 
 /**
