@@ -1232,6 +1232,193 @@ describe('morgan()', function () {
         test.write('0')
       })
     })
+
+    describe('async tokens', function () {
+      it('should resolve Promise returned by token in string format', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line, 'GET /foo 200')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        morgan.token('async-method', function (req) {
+          return Promise.resolve(req.method)
+        })
+
+        request(createServer(':async-method :url :status', { stream: stream }))
+          .get('/foo')
+          .expect(200, cb)
+      })
+
+      it('should not log [object Promise] for async token', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line.indexOf('[object Promise]'), -1)
+          assert.strictEqual(line, 'ahmed')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        morgan.token('async-user', function () {
+          return Promise.resolve('ahmed')
+        })
+
+        request(createServer(':async-user', { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
+
+      it('should keep synchronous tokens working alongside async tokens', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.ok(/^GET \/sync-test \d+$/.test(line))
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        morgan.token('async-status', function (req, res) {
+          return Promise.resolve(String(res.statusCode))
+        })
+
+        request(createServer(':method :url :async-status', { stream: stream }))
+          .get('/sync-test')
+          .expect(200, cb)
+      })
+
+      it('should not crash when a token returns a rejected Promise', function (done) {
+        // Regression test for PR #380 P1: an unhandled rejection from an async
+        // token must not terminate the Node.js process.  The request must
+        // complete normally even though the log line is silently dropped.
+        morgan.token('reject-token', function () {
+          return Promise.reject(new Error('token failure'))
+        })
+
+        request(createServer(':method :url :reject-token', {}))
+          .get('/')
+          .expect(200, done)
+      })
+
+      it('should pass resolved object to object-mode stream unchanged', function (done) {
+        // Regression test for PR #380 P2: the async path must honour
+        // writableObjectMode exactly like the synchronous path does.
+        var received = null
+        var cb = after(2, function (err) {
+          if (err) return done(err)
+          assert.deepEqual(received, { method: 'GET', url: '/' })
+          done()
+        })
+
+        var stream = {
+          writableObjectMode: true,
+          write: function (obj) {
+            received = obj
+            cb(null, null)
+          }
+        }
+
+        function format (tokens, req) {
+          return Promise.resolve({ method: req.method, url: req.url })
+        }
+
+        request(createServer(format, { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
+
+      it('should handle thenable whose then() returns undefined', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line, 'ok')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        function format () {
+          return {
+            then: function (resolve) {
+              resolve('ok')
+            }
+          }
+        }
+
+        request(createServer(format, { stream: stream }))
+          .get('/')
+          .expect(200, cb)
+      })
+
+      it('should handle format function returning value with throwing then getter', function (done) {
+        var bad = {}
+        Object.defineProperty(bad, 'then', {
+          get: function () {
+            throw new Error('then getter failed')
+          }
+        })
+
+        function format () {
+          return bad
+        }
+
+        var uncaught = []
+        function onUncaught (err) {
+          uncaught.push(err)
+        }
+        process.on('uncaughtException', onUncaught)
+        process.on('unhandledRejection', onUncaught)
+
+        request(createServer(format, {}))
+          .get('/')
+          .expect(200, function (err) {
+            process.removeListener('uncaughtException', onUncaught)
+            process.removeListener('unhandledRejection', onUncaught)
+            if (err) return done(err)
+            assert.strictEqual(uncaught.length, 0)
+            done()
+          })
+      })
+
+      it('should handle token returning value with throwing then getter in compiled format', function (done) {
+        var bad = {}
+        Object.defineProperty(bad, 'then', {
+          get: function () {
+            throw new Error('token then getter failed')
+          }
+        })
+
+        morgan.token('throwing-then-token', function () {
+          return bad
+        })
+
+        var uncaught = []
+        function onUncaught (err) {
+          uncaught.push(err)
+        }
+        process.on('uncaughtException', onUncaught)
+        process.on('unhandledRejection', onUncaught)
+
+        request(createServer(':method :url :throwing-then-token', {}))
+          .get('/')
+          .expect(200, function (err) {
+            process.removeListener('uncaughtException', onUncaught)
+            process.removeListener('unhandledRejection', onUncaught)
+            if (err) return done(err)
+            assert.strictEqual(uncaught.length, 0)
+            done()
+          })
+      })
+    })
   })
 
   describe('formats', function () {
