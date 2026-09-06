@@ -1830,6 +1830,36 @@ describe('morgan.compile(format)', function () {
   })
 })
 
+describe('morgan.token(name, fn)', function () {
+  describe('arguments', function () {
+    describe('name', function () {
+      it('should reject reserved names', function () {
+        assert.throws(morgan.token.bind(morgan, 'token', function () {}), /reserved name/)
+        assert.throws(morgan.token.bind(morgan, 'format', function () {}), /reserved name/)
+        assert.throws(morgan.token.bind(morgan, 'compile', function () {}), /reserved name/)
+      })
+
+      it('should not corrupt morgan.token after rejecting a reserved name', function () {
+        assert.throws(morgan.token.bind(morgan, 'token', function () {}), /reserved name/)
+
+        // morgan.token itself must still be a working function
+        assert.strictEqual(typeof morgan.token, 'function')
+
+        // and registering a normal token afterwards must still work
+        morgan.token('my-custom-token', function () { return 'custom-value' })
+        assert.strictEqual(typeof morgan['my-custom-token'], 'function')
+        assert.strictEqual(morgan['my-custom-token']({}, {}), 'custom-value')
+      })
+
+      it('should allow non-reserved names', function () {
+        morgan.token('some-other-token', function () { return 'value' })
+        assert.strictEqual(typeof morgan['some-other-token'], 'function')
+        assert.strictEqual(morgan['some-other-token']({}, {}), 'value')
+      })
+    })
+  })
+})
+
 function after (count, callback) {
   var args = new Array(3)
   var i = 0
