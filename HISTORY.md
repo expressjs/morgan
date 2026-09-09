@@ -1,3 +1,8 @@
+1.12.1
+======
+  * Security fix for [CVE-2026-87859](https://www.cve.org/CVERecord?id=CVE-2026-87859)([GHSA-9f6g-j8ch-79g4](https://github.com/expressjs/morgan/security/advisories/GHSA-9f6g-j8ch-79g4))
+
+
 1.12.0
 ======
   * Security fix for [CVE-2026-15603](https://www.cve.org/CVERecord?id=CVE-2026-15603)([GHSA-jxfw-x594-9x9m](https://github.com/expressjs/morgan/security/advisories/GHSA-jxfw-x594-9x9m))
