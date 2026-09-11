@@ -20,6 +20,17 @@ module.exports.format = format
 module.exports.token = token
 
 /**
+ * Names that must not be registered as custom tokens, because token()
+ * stores callbacks on the morgan export object itself.
+ * @private
+ */
+var RESERVED_TOKEN_NAMES = {
+  compile: true,
+  format: true,
+  token: true
+}
+
+/**
  * Module dependencies.
  * @private
  */
@@ -586,6 +597,10 @@ function recordStartTime () {
  */
 
 function token (name, fn) {
+  if (Object.prototype.hasOwnProperty.call(RESERVED_TOKEN_NAMES, name)) {
+    throw new TypeError('morgan.token cannot use reserved name "' + name + '"')
+  }
+
   // wrap the token so its string output is always escaped for line-oriented
   // logs, regardless of whether the format is a string or a function
   morgan[name] = function tokenValue () {
