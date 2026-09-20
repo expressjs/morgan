@@ -1,3 +1,12 @@
+unreleased
+==========
+
+  * Fix `:response-time` and `:total-time` when multiple morgan
+    middlewares run on the same request
+    - Each logger keeps its own start time so a later instance cannot
+      reset an earlier one
+    - Fixes #141
+
 1.12.1
 ======
   * Security fix for [CVE-2026-87859](https://www.cve.org/CVERecord?id=CVE-2026-87859)([GHSA-9f6g-j8ch-79g4](https://github.com/expressjs/morgan/security/advisories/GHSA-9f6g-j8ch-79g4))

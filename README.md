@@ -266,6 +266,10 @@ headers are written, in milliseconds.
 The `digits` argument is a number that specifies the number of digits to
 include on the number, defaulting to `3`, which provides microsecond precision.
 
+When more than one `morgan` middleware is used on the same request, each
+instance records its own start time. A later logger does not reset the
+`:response-time` or `:total-time` of an earlier logger.
+
 ##### :status
 
 The status code of the response.

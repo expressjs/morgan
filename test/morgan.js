@@ -1672,6 +1672,130 @@ describe('morgan()', function () {
     })
   })
 
+  describe('with multiple instances', function () {
+    it('should not let a later logger overwrite an earlier logger start time', function (done) {
+      var delay = 50
+      var firstMs
+      var secondMs
+
+      var cb = after(3, function (err) {
+        if (err) return done(err)
+        assert.ok(firstMs >= delay - 5, 'first logger should include the delay, got ' + firstMs)
+        assert.ok(secondMs < delay, 'second logger should start after the delay, got ' + secondMs)
+        assert.ok(firstMs > secondMs)
+        done()
+      })
+
+      var first = morgan(':response-time', {
+        stream: createLineStream(function (line) {
+          firstMs = parseFloat(line)
+          cb()
+        })
+      })
+
+      var second = morgan(':response-time', {
+        stream: createLineStream(function (line) {
+          secondMs = parseFloat(line)
+          cb()
+        })
+      })
+
+      var server = http.createServer(function (req, res) {
+        first(req, res, function () {
+          setTimeout(function () {
+            second(req, res, function () {
+              res.end()
+            })
+          }, delay)
+        })
+      })
+
+      request(server)
+        .get('/')
+        .expect(200, cb)
+    })
+
+    it('should keep independent :total-time for each logger', function (done) {
+      var delay = 50
+      var firstMs
+      var secondMs
+
+      var cb = after(3, function (err) {
+        if (err) return done(err)
+        assert.ok(firstMs >= delay - 5, 'first logger should include the delay, got ' + firstMs)
+        assert.ok(secondMs < delay, 'second logger should start after the delay, got ' + secondMs)
+        assert.ok(firstMs > secondMs)
+        done()
+      })
+
+      var first = morgan(':total-time', {
+        stream: createLineStream(function (line) {
+          firstMs = parseFloat(line)
+          cb()
+        })
+      })
+
+      var second = morgan(':total-time', {
+        stream: createLineStream(function (line) {
+          secondMs = parseFloat(line)
+          cb()
+        })
+      })
+
+      var server = http.createServer(function (req, res) {
+        first(req, res, function () {
+          setTimeout(function () {
+            second(req, res, function () {
+              res.end()
+            })
+          }, delay)
+        })
+      })
+
+      request(server)
+        .get('/')
+        .expect(200, cb)
+    })
+
+    it('should log a response-time from both loggers when mounted together', function (done) {
+      var firstLine
+      var secondLine
+
+      var cb = after(3, function (err) {
+        if (err) return done(err)
+        assert.ok(/^[0-9]+\.[0-9]{3}$/.test(firstLine))
+        assert.ok(/^[0-9]+\.[0-9]{3}$/.test(secondLine))
+        done()
+      })
+
+      var first = morgan(':response-time', {
+        stream: createLineStream(function (line) {
+          firstLine = line
+          cb()
+        })
+      })
+
+      var second = morgan(':response-time', {
+        stream: createLineStream(function (line) {
+          secondLine = line
+          cb()
+        })
+      })
+
+      var server = http.createServer(function (req, res) {
+        first(req, res, function () {
+          second(req, res, function () {
+            res.end()
+          })
+        })
+      })
+
+      request(server)
+        .get('/')
+        .expect(200, cb)
+    })
+  })
+
   describe('with buffer option', function () {
     it('should flush log periodically', function (done) {
       var cb = after(2, function (err, res, log) {

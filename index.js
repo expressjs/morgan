@@ -130,6 +130,14 @@ function morgan (format, options) {
   }
 
   return function logger (req, res, next) {
+    // Per-logger copies. Multiple morgan() middlewares share req/res, and
+    // each instance used to reset the same _startAt/_startTime fields, so a
+    // later logger stamped out the earlier one (issue #141).
+    var reqStartAt
+    var reqStartTime
+    var resStartAt
+    var resStartTime
+
     // request data
     req._startAt = undefined
     req._startTime = undefined
@@ -141,12 +149,26 @@ function morgan (format, options) {
 
     // record request start
     recordStartTime.call(req)
+    reqStartAt = req._startAt
+    reqStartTime = req._startTime
+
+    function recordResponseStart () {
+      recordStartTime.call(this)
+      resStartAt = this._startAt
+      resStartTime = this._startTime
+    }
 
     function logRequest () {
       if (skip !== false && skip(req, res)) {
         debug('skip request')
         return
       }
+
+      // Put this logger's times back so tokens see what *this* instance
+      // recorded. Honor `delete req._startAt` / `delete res._startAt` so
+      // existing tests (and callers) can still blank those tokens.
+      restoreStartTime(req, reqStartAt, reqStartTime)
+      restoreStartTime(res, resStartAt, resStartTime)
 
       var line = formatLine(morgan, req, res)
 
@@ -168,7 +190,7 @@ function morgan (format, options) {
       logRequest()
     } else {
       // record response start
-      onHeaders(res, recordStartTime)
+      onHeaders(res, recordResponseStart)
 
       // log when response finished
       onFinished(res, logRequest)
@@ -574,6 +596,28 @@ function pad2 (num) {
 function recordStartTime () {
   this._startAt = process.hrtime()
   this._startTime = new Date()
+}
+
+/**
+ * Restore a logger's recorded start time onto req/res for token evaluation.
+ *
+ * A later morgan instance may have overwritten the shared `_startAt` /
+ * `_startTime` fields. If the caller deleted those properties, leave
+ * them deleted so `:response-time` / `:total-time` stay empty.
+ *
+ * @private
+ * @param {object} obj
+ * @param {Array|undefined} startAt
+ * @param {Date|undefined} startTime
+ */
+
+function restoreStartTime (obj, startAt, startTime) {
+  if (!Object.prototype.hasOwnProperty.call(obj, '_startAt')) {
+    return
+  }
+
+  obj._startAt = startAt
+  obj._startTime = startTime
 }
 
 /**
