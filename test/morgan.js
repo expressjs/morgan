@@ -683,6 +683,27 @@ describe('morgan()', function () {
           .expect(200, cb)
       })
 
+      it('should escape bidirectional control characters', function (done) {
+        var cb = after(2, function (err, res, line) {
+          if (err) return done(err)
+          assert.strictEqual(line.indexOf('\u200e'), -1)
+          assert.strictEqual(line.indexOf('\u202e'), -1)
+          assert.strictEqual(line.indexOf('\u2066'), -1)
+          assert.strictEqual(line, 'a\\u200eb\\u202ec\\u2066d')
+          done()
+        })
+
+        var stream = createLineStream(function (line) {
+          cb(null, null, line)
+        })
+
+        // 'a\u200eb\u202ec\u2066d:x' in Base64
+        request(createServer(':remote-user', { stream: stream }))
+          .get('/')
+          .set('Authorization', 'Basic YeKAjmLigK5j4oGmZDp4')
+          .expect(200, cb)
+      })
+
       it('should not forge additional log lines via CRLF injection', function (done) {
         var lines = []
         var cb = after(2, function (err, res) {
