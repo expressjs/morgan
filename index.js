@@ -443,6 +443,7 @@ function compile (format) {
   }
 
   var fmt = String(JSON.stringify(format))
+  var declarations = []
   var js = '  "use strict"\n  return ' + fmt.replace(/:([-\w]{2,})(?:\[([^\]]+)\])?/g, function (_, name, arg) {
     var tokenArguments = 'req, res'
     var tokenFunction = 'tokens[' + String(JSON.stringify(name)) + ']'
@@ -451,8 +452,21 @@ function compile (format) {
       tokenArguments += ', ' + String(JSON.stringify(arg))
     }
 
-    return '" +\n    (' + tokenFunction + '(' + tokenArguments + ') || "-") + "'
+    // The documented fallback is for a token that does not produce a value
+    // (undefined or null). `||` would also swallow legitimate empty or zero
+    // values, such as a header that is present but empty. The value is held in a
+    // local so it is evaluated exactly once, and `== null` matches only
+    // undefined and null while staying parseable on the older Node.js versions
+    // this module supports (unlike `??`).
+    var value = '__morganValue' + declarations.length
+    declarations.push('  var ' + value + ' = ' + tokenFunction + '(' + tokenArguments + ')')
+
+    return '" +\n    (' + value + ' == null ? "-" : ' + value + ') + "'
   })
+
+  if (declarations.length) {
+    js = '  "use strict"\n' + declarations.join('\n') + '\n  return ' + js.slice('  "use strict"\n  return '.length)
+  }
 
   // eslint-disable-next-line no-new-func
   return new Function('tokens, req, res', js)

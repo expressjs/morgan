@@ -356,6 +356,40 @@ describe('morgan()', function () {
           .expect(200, cb)
       })
 
+      it('should use the fallback for a header that is not present', function (done) {
+        var writes = []
+        var server = createServer(':req[x-absent]', {
+          stream: { write: function (log) { writes.push(log) } }
+        })
+
+        request(server)
+          .get('/')
+          .expect(200, function (err) {
+            if (err) return done(err)
+            assert.strictEqual(writes.join(''), '-\n')
+            done()
+          })
+      })
+
+      it('should keep an empty header value instead of using the fallback', function (done) {
+        var writes = []
+        var server = createServer(':req[x-empty]', {
+          stream: { write: function (log) { writes.push(log) } }
+        })
+
+        request(server)
+          .get('/')
+          .set('x-empty', '')
+          .expect(200, function (err) {
+            if (err) return done(err)
+            // The header is present, so this is not the missing-value case the
+            // "-" fallback is documented for, even though its value is empty.
+            // Only the trailing newline is written.
+            assert.strictEqual(writes.join(''), '\n')
+            done()
+          })
+      })
+
       it('should escape control characters in header values', function (done) {
         var nel = String.fromCharCode(0x85)
 
@@ -392,6 +426,24 @@ describe('morgan()', function () {
         request(createServer(':res[x-sent]', { stream: stream }))
           .get('/')
           .expect(200, cb)
+      })
+
+      it('should keep an empty response header value instead of using the fallback', function (done) {
+        var writes = []
+        var server = createServer(':res[x-empty]', {
+          stream: { write: function (log) { writes.push(log) } }
+        }, function (req, res, next) {
+          res.setHeader('x-empty', '')
+          next()
+        })
+
+        request(server)
+          .get('/')
+          .expect(200, function (err) {
+            if (err) return done(err)
+            assert.strictEqual(writes.join(''), '\n')
+            done()
+          })
       })
 
       it('should display all values of array headers', function (done) {
@@ -744,20 +796,21 @@ describe('morgan()', function () {
       })
 
       it('should be empty for empty Basic authorization user', function (done) {
-        var cb = after(2, function (err, res, line) {
-          if (err) return done(err)
-          assert.strictEqual(line, '-')
-          done()
+        var writes = []
+        var server = createServer(':remote-user', {
+          stream: { write: function (log) { writes.push(log) } }
         })
 
-        var stream = createLineStream(function (line) {
-          cb(null, null, line)
-        })
-
-        request(createServer(':remote-user', { stream: stream }))
+        request(server)
           .get('/')
           .set('Authorization', 'Basic Og==')
-          .expect(200, cb)
+          .expect(200, function (err) {
+            if (err) return done(err)
+            // A user that is present but empty is an empty value, not a missing
+            // one, so only the trailing newline is written.
+            assert.strictEqual(writes.join(''), '\n')
+            done()
+          })
       })
     })
 
