@@ -95,6 +95,11 @@ response code, content length, etc.) cannot be logged_.
 Function to determine if logging is skipped, defaults to `false`. This function
 will be called as `skip(req, res)`.
 
+The function is evaluated when the log line would be written: on request when
+`immediate: true`, otherwise when the response finishes. To filter by the final
+response status, as in the example below, leave `immediate` at its default
+(`false`). With `immediate: true`, the route handler has not run yet.
+
 <!-- eslint-disable no-undef -->
 
 ```js
