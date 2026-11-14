@@ -5,7 +5,7 @@
 [![Build Status][ci-image]][ci-url]
 [![Coverage Status][coveralls-image]][coveralls-url]
 
-HTTP request logger middleware for node.js
+HTTP request logger middleware for Node.js
 
 > Named after [Dexter](https://en.wikipedia.org/wiki/Dexter_Morgan), a show you should not watch until completion.
 
